@@ -38,13 +38,13 @@ export default function Footer({
             }
             disabled={!previousStep}
           >
-            Previous step
+            Passo anterior
           </Button>
           <Button
             onClick={nextStep ? () => setCurrentStep(nextStep) : undefined}
             disabled={!nextStep}
           >
-            Next step
+            Próximo passo
           </Button>
         </div>
         <Button
@@ -53,14 +53,14 @@ export default function Footer({
           onClick={() => setShowSmResumePreview(!showSmResumePreview)}
           className="md:hidden"
           title={
-            showSmResumePreview ? "Show input form" : "Show resume preview"
+            showSmResumePreview ? "Mostrar formulário" : "Mostrar visualização do currículo"
           }
         >
           {showSmResumePreview ? <PenLineIcon /> : <FileUserIcon />}
         </Button>
         <div className="flex items-center gap-3">
           <Button variant="secondary" asChild>
-            <Link href="/resumes">Close</Link>
+            <Link href="/resumes">Fechar</Link>
           </Button>
           <p
             className={cn(
@@ -68,7 +68,7 @@ export default function Footer({
               isSaving && "opacity-100",
             )}
           >
-            Saving...
+            Salvando...
           </p>
         </div>
       </div>

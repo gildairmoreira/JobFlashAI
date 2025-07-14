@@ -8,7 +8,7 @@ import CreateResumeButton from "./CreateResumeButton";
 import ResumeItem from "./ResumeItem";
 
 export const metadata: Metadata = {
-  title: "Your resumes",
+  title: "Seus currículos",
 };
 
 export default async function Page() {
@@ -42,7 +42,7 @@ export default async function Page() {
         canCreate={canCreateResume(subscriptionLevel, totalCount)}
       />
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold">Your resumes</h1>
+        <h1 className="text-3xl font-bold">Seus currículos</h1>
         <p>Total: {totalCount}</p>
       </div>
       <div className="flex w-full grid-cols-2 flex-col gap-3 sm:grid md:grid-cols-3 lg:grid-cols-4">

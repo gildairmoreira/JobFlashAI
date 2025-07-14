@@ -1,172 +1,167 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service",
+  title: "Termos de Serviço",
 };
 
 export default function Page() {
   return (
     <main className="mx-auto max-w-prose space-y-6 p-3 py-6">
-      <h1 className="text-center text-2xl font-bold">Terms of Service</h1>
+      <h1 className="text-center text-2xl font-bold">Termos de Serviço</h1>
       <p className="text-center text-sm text-muted-foreground">
-        Effective Date: Oct 31, 2024
+        Data de Vigência: 31 de outubro de 2024
       </p>
       <p>
-        Welcome to AI Resume Builder. These Terms of Service (&quot;Terms&quot;)
-        govern your use of our website and services, including any paid
-        subscription plans. By accessing or using AI Resume Builder (&quot;the
-        Service&quot;), you agree to be bound by these Terms. If you do not
-        agree to these Terms, do not use the Service.
+        Bem-vindo ao JobFlashAI. Estes Termos de Serviço (&quot;Termos&quot;)
+        regem o uso do nosso site e serviços. Ao acessar ou usar o JobFlashAI (&quot;o
+        Serviço&quot;), você concorda em estar vinculado a estes Termos. Se você não
+        concordar com estes Termos, não use o Serviço.
       </p>
-      <h2 className="text-xl font-semibold">1. Overview</h2>
+      <h2 className="text-xl font-semibold">1. Visão Geral</h2>
       <p>
-        AI Resume Builder is a SaaS platform that provides resume-building tools
-        powered by artificial intelligence. We offer both a free tier and paid
-        subscription plans (&quot;Paid Plans&quot;). Payments for Paid Plans are
-        processed through Stripe, our third-party payment provider.
+        JobFlashAI é uma plataforma que fornece ferramentas de criação de currículos
+        alimentadas por inteligência artificial. Oferecemos acesso gratuito a todas
+        as funcionalidades da plataforma.
       </p>
-      <h2 className="text-xl font-semibold">2. Eligibility</h2>
+      <h2 className="text-xl font-semibold">2. Elegibilidade</h2>
       <p>
-        You must be at least 18 years old and capable of entering into legally
-        binding contracts to use this Service. By accessing the Service, you
-        confirm that you meet this eligibility requirement.
+        Você deve ter pelo menos 18 anos e ser capaz de celebrar contratos
+        legalmente vinculativos para usar este Serviço. Ao acessar o Serviço, você
+        confirma que atende a este requisito de elegibilidade.
       </p>
-      <h2 className="text-xl font-semibold">3. Account Registration</h2>
+      <h2 className="text-xl font-semibold">3. Registro de Conta</h2>
       <p>
-        To access some features of the Service, including Paid Plans, you must
-        create an account. When registering, you agree to provide accurate and
-        current information. You are responsible for maintaining the security of
-        your account and password. We are not liable for any loss or damage
-        resulting from unauthorized access to your account.
+        Para acessar certas funcionalidades do Serviço, você pode precisar criar uma
+        conta. Ao se registrar, você concorda em fornecer informações precisas e
+        atuais. Você é responsável por manter a segurança da sua conta e senha.
+        Não somos responsáveis por qualquer perda ou dano resultante de acesso
+        não autorizado à sua conta.
       </p>
-      <h2 className="text-xl font-semibold">4. Free Tier</h2>
+      <h2 className="text-xl font-semibold">4. Acesso Gratuito</h2>
       <p>
-        We offer a free tier of the Service that includes limited access to
-        certain features. While on the free tier, you can create resumes with
-        basic functionality. Some advanced features and templates may only be
-        available to Paid Plan subscribers.
+        Oferecemos acesso gratuito ao Serviço que inclui todas as funcionalidades
+        da plataforma. No nível gratuito, você pode criar currículos com
+        funcionalidade completa. Reservamo-nos o direito de modificar as funcionalidades
+        disponíveis a qualquer momento.
       </p>
-      <h2 className="text-xl font-semibold">5. Paid Subscription Plans</h2>
+      <h2 className="text-xl font-semibold">5. Planos de Assinatura</h2>
       <p>
-        If you choose to upgrade to a Paid Plan, you will be required to provide
-        payment details via Stripe. All payments are processed securely by
-        Stripe in accordance with their terms and privacy policy. By
-        subscribing, you agree to the following terms:
+        Atualmente, oferecemos acesso gratuito a todas as funcionalidades da plataforma.
+        Reservamo-nos o direito de introduzir planos pagos no futuro, caso em que
+        notificaremos os usuários com antecedência sobre os seguintes termos:
       </p>
       <ul className="list-inside list-disc">
         <li>
-          <strong>Subscription Fees:</strong> Fees for Paid Plans are billed on
-          a recurring basis (monthly or annually) depending on the subscription
-          plan you select. Prices may vary depending on your location and are
-          subject to change with prior notice.
+          <strong>Cobrança:</strong> As taxas de assinatura serão cobradas antecipadamente
+          de forma recorrente (mensal ou anualmente, dependendo do plano escolhido).
         </li>
         <li>
-          <strong>Payment Method:</strong> You must provide a valid payment
-          method (credit card, debit card, etc.) to subscribe to a Paid Plan.
-          Your subscription will automatically renew unless you cancel before
-          the renewal date.
+          <strong>Renovação Automática:</strong> Sua assinatura será renovada automaticamente
+          no final de cada período de cobrança, a menos que você cancele antes da
+          data de renovação.
         </li>
         <li>
-          <strong>Refund Policy:</strong> AI Resume Builder does not offer
-          refunds for any payments already processed. However, you can cancel
-          your subscription at any time, and you will continue to have access to
-          the Paid Plan features until the end of your current billing period.
+          <strong>Mudanças de Preço:</strong> Podemos alterar os preços das assinaturas
+          com 30 dias de antecedência. As mudanças de preço se aplicarão ao seu próximo
+          ciclo de cobrança.
+        </li>
+        <li>
+          <strong>Reembolsos:</strong> As taxas de assinatura geralmente não são
+          reembolsáveis, exceto quando exigido pela lei aplicável.
         </li>
       </ul>
-      <h2 className="text-xl font-semibold">6. Cancelation of Subscription</h2>
+      <h2 className="text-xl font-semibold">6. Cancelamento de Conta</h2>
       <p>
-        You can cancel your subscription at any time by logging into your
-        account and following the cancelation process. Cancelation will take
-        effect at the end of the current billing cycle, and you will not be
-        charged further.
+        Você pode cancelar sua conta a qualquer momento fazendo login na sua
+        conta e seguindo o processo de cancelamento. O cancelamento entrará em
+        vigor imediatamente, e você perderá acesso às funcionalidades da plataforma.
       </p>
       <h2 className="text-xl font-semibold">
-        7. Changes to Services and Pricing
+        7. Mudanças nos Serviços e Preços
       </h2>
       <p>
-        We reserve the right to modify or discontinue the Service (or any part
-        of it) at any time, with or without notice. We may also adjust pricing
-        for Paid Plans; however, any price changes will not affect your current
-        subscription period and will be communicated before taking effect on
-        renewals.
+        Reservamo-nos o direito de modificar, suspender ou descontinuar qualquer parte do
+        Serviço a qualquer momento. Também podemos alterar nossos preços para Planos Pagos com
+        30 dias de antecedência. O uso contínuo do Serviço após tais mudanças
+        constitui aceitação dos novos termos.
       </p>
-      <h2 className="text-xl font-semibold">8. License to Use the Service</h2>
+      <h2 className="text-xl font-semibold">8. Licença para Usar o Serviço</h2>
       <p>
-        AI Resume Builder grants you a limited, non-exclusive, non-transferable,
-        and revocable license to use the Service for personal or professional
-        use in accordance with these Terms. You may not:
+        Sujeito a estes Termos, concedemos a você uma licença limitada, não exclusiva,
+        intransferível para acessar e usar o Serviço para seus propósitos pessoais
+        ou comerciais. Esta licença não inclui o direito de revender,
+        distribuir ou criar trabalhos derivados baseados no Serviço.
       </p>
       <ul className="list-inside list-disc">
-        <li>Copy, modify, or distribute any part of the Service;</li>
-        <li>Use the Service to build a competing product;</li>
+        <li>Copiar, modificar ou distribuir qualquer parte do Serviço;</li>
+        <li>Usar o Serviço para construir um produto concorrente;</li>
         <li>
-          Access or attempt to access the Service by any means other than
-          through the interfaces provided.
+          Acessar ou tentar acessar o Serviço por qualquer meio que não seja
+          através das interfaces fornecidas.
         </li>
       </ul>
-      <h2 className="text-xl font-semibold">9. Intellectual Property</h2>
+      <h2 className="text-xl font-semibold">9. Propriedade Intelectual</h2>
       <p>
-        All content, trademarks, logos, and intellectual property related to AI
-        Resume Builder are owned by AI Resume Builder or its licensors. You
-        agree not to infringe on these rights.
+        Todo o conteúdo, marcas registradas, logotipos e propriedade intelectual relacionados ao
+        JobFlashAI são de propriedade do JobFlashAI ou de seus licenciadores. Você
+        concorda em não infringir esses direitos.
       </p>
-      <h2 className="text-xl font-semibold">10. User Content</h2>
+      <h2 className="text-xl font-semibold">10. Conteúdo do Usuário</h2>
       <p>
-        By using the Service, you grant AI Resume Builder a non-exclusive,
-        worldwide, royalty-free license to use, modify, and display any content
-        you create using the platform (such as resumes) solely for the purpose
-        of providing the Service. You retain all ownership of your content.
+        Ao usar o Serviço, você concede ao JobFlashAI uma licença não exclusiva,
+        mundial e livre de royalties para usar, modificar e exibir qualquer conteúdo
+        que você criar usando a plataforma (como currículos) exclusivamente para o propósito
+        de fornecer o Serviço. Você mantém toda a propriedade do seu conteúdo.
       </p>
-      <h2 className="text-xl font-semibold">11. Privacy Policy</h2>
+      <h2 className="text-xl font-semibold">11. Política de Privacidade</h2>
       <p>
-        Your privacy is important to us. Please review our Privacy Policy [link]
-        to understand how we collect, use, and protect your personal
-        information.
+        Sua privacidade é importante para nós. Por favor, revise nossa Política de Privacidade [link]
+        para entender como coletamos, usamos e protegemos suas informações
+        pessoais.
       </p>
-      <h2 className="text-xl font-semibold">12. Third-Party Services</h2>
+      <h2 className="text-xl font-semibold">12. Serviços de Terceiros</h2>
       <p>
-        The Service may contain links or integrations to third-party websites or
-        services (e.g., Stripe for payments). AI Resume Builder is not
-        responsible for the content or practices of any third-party websites or
-        services.
+        O Serviço pode integrar com serviços de terceiros. Seu uso desses serviços de terceiros está
+        sujeito aos respectivos termos e políticas de privacidade. Não somos
+        responsáveis pelas práticas ou políticas desses serviços de terceiros.
       </p>
-      <h2 className="text-xl font-semibold">13. Disclaimer of Warranties</h2>
+      <h2 className="text-xl font-semibold">13. Isenção de Garantias</h2>
       <p>
-        The Service is provided on an &quot;as is&quot; and &quot;as
-        available&quot; basis. AI Resume Builder makes no warranties, express or
-        implied, regarding the Service, including but not limited to the
-        accuracy of resume outputs, the suitability of resumes for job
-        applications, or the uninterrupted availability of the Service.
+        O Serviço é fornecido &quot;como está&quot; e &quot;conforme disponível&quot;
+        sem quaisquer garantias de qualquer tipo, expressas ou implícitas. Não
+        garantimos que o Serviço será ininterrupto, livre de erros ou livre de
+        vírus ou outros componentes prejudiciais. Seu uso do Serviço é por sua
+        própria conta e risco.
       </p>
-      <h2 className="text-xl font-semibold">14. Limitation of Liability</h2>
+      <h2 className="text-xl font-semibold">14. Limitação de Responsabilidade</h2>
       <p>
-        To the fullest extent permitted by law, AI Resume Builder shall not be
-        liable for any indirect, incidental, consequential, or punitive damages,
-        including loss of profits, data, or business opportunities, arising out
-        of or related to your use of the Service.
+        Na extensão máxima permitida por lei, o JobFlashAI não será
+        responsável por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos,
+        incluindo mas não limitado à perda de lucros, dados ou uso,
+        decorrentes ou em conexão com seu uso do Serviço, mesmo se tivermos
+        sido avisados da possibilidade de tais danos.
       </p>
-      <h2 className="text-xl font-semibold">15. Governing Law</h2>
+      <h2 className="text-xl font-semibold">15. Lei Aplicável</h2>
       <p>
-        These Terms are governed by and construed in accordance with the laws of
-        [Insert Jurisdiction], without regard to its conflict of law provisions.
-        Any disputes arising from these Terms will be subject to the exclusive
-        jurisdiction of the courts located in [Insert Location].
+        Estes Termos serão regidos e interpretados de acordo com as
+        leis do Brasil, sem considerar seus princípios de conflito de leis. Quaisquer disputas decorrentes destes Termos estarão sujeitas à
+        jurisdição exclusiva dos tribunais do Brasil.
       </p>
-      <h2 className="text-xl font-semibold">16. Changes to the Terms</h2>
+      <h2 className="text-xl font-semibold">16. Alterações nos Termos</h2>
       <p>
-        We may update these Terms from time to time. Any changes will be posted
-        on this page, and the &quot;Effective Date&quot; will be updated
-        accordingly. Your continued use of the Service after the changes take
-        effect will constitute your acceptance of the new Terms.
+        Podemos atualizar estes Termos de tempos em tempos. Quaisquer alterações serão publicadas
+        nesta página, e a &quot;Data de Vigência&quot; será atualizada
+        adequadamente. Seu uso contínuo do Serviço após as alterações entrarem em
+        vigor constituirá sua aceitação dos novos Termos.
       </p>
-      <h2 className="text-xl font-semibold">17. Contact Us</h2>
+      <h2 className="text-xl font-semibold">17. Entre em Contato</h2>
       <p>
-        If you have any questions about these Terms, please contact us at
-        [Insert Contact Information].
+        Se você tiver alguma dúvida sobre estes Termos, entre em contato conosco em
+        [Inserir Informações de Contato].
       </p>
       <p>
-        By using AI Resume Builder, you acknowledge that you have read,
-        understood, and agree to these Terms of Service.
+        Ao usar o JobFlashAI, você reconhece que leu,
+        entendeu e concorda com estes Termos de Serviço.
       </p>
     </main>
   );

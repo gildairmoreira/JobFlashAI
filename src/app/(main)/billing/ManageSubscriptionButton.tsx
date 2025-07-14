@@ -19,7 +19,7 @@ export default function ManageSubscriptionButton() {
       console.error(error);
       toast({
         variant: "destructive",
-        description: "Something went wrong. Please try again.",
+        description: "Algo deu errado. Tente novamente.",
       });
     } finally {
       setLoading(false);
@@ -28,7 +28,7 @@ export default function ManageSubscriptionButton() {
 
   return (
     <LoadingButton onClick={handleClick} loading={loading}>
-      Manage subscription
+      Gerenciar assinatura
     </LoadingButton>
   );
 }

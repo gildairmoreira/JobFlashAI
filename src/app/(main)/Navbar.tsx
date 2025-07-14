@@ -18,13 +18,13 @@ export default function Navbar() {
         <Link href="/resumes" className="flex items-center gap-2">
           <Image
             src={logo}
-            alt="Logo"
+            alt="JobFlashAI Logo"
             width={35}
             height={35}
             className="rounded-full"
           />
           <span className="text-xl font-bold tracking-tight">
-            AI Resume Builder
+            JobFlashAI
           </span>
         </Link>
         <div className="flex items-center gap-3">
@@ -42,9 +42,9 @@ export default function Navbar() {
           >
             <UserButton.MenuItems>
               <UserButton.Link
-                label="Billing"
+                label="Configurações"
                 labelIcon={<CreditCard className="size-4" />}
-                href="/billing"
+                href="/settings"
               />
             </UserButton.MenuItems>
           </UserButton>

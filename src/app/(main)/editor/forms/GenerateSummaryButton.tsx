@@ -37,9 +37,17 @@ export default function GenerateSummaryButton({
       onSummaryGenerated(aiResponse);
     } catch (error) {
       console.error(error);
+      
+      let errorMessage = "Algo deu errado. Tente novamente.";
+      
+      if (error instanceof Error) {
+        // Usar a mensagem específica do erro se disponível
+        errorMessage = error.message;
+      }
+      
       toast({
         variant: "destructive",
-        description: "Something went wrong. Please try again.",
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -54,7 +62,7 @@ export default function GenerateSummaryButton({
       loading={loading}
     >
       <WandSparklesIcon className="size-4" />
-      Generate (AI)
+      Gerar (IA)
     </LoadingButton>
   );
 }

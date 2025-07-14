@@ -9,11 +9,11 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    template: "%s - AI Resume Builder",
-    absolute: "AI Resume Builder",
+    template: "%s - JobFlashAI",
+    absolute: "JobFlashAI",
   },
   description:
-    "AI Resume Builder is the easiest way to create a professional resume that will help you land your dream job.",
+    "JobFlashAI é a maneira mais fácil de criar um currículo profissional que vai te ajudar a conseguir o emprego dos seus sonhos.",
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="pt-BR" suppressHydrationWarning>
         <body className={inter.className}>
           <ThemeProvider
             attribute="class"

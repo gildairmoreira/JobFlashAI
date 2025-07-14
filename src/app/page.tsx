@@ -10,30 +10,30 @@ export default function Home() {
       <div className="max-w-prose space-y-3">
         <Image
           src={logo}
-          alt="Logo"
+          alt="JobFlashAI Logo"
           width={150}
           height={150}
           className="mx-auto md:ms-0"
         />
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-          Create the{" "}
-          <span className="inline-block bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
-            Perfect Resume
+          Crie o{" "}
+          <span className="inline-block bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+            Currículo Perfeito
           </span>{" "}
-          in Minutes
+          em Minutos
         </h1>
         <p className="text-lg text-gray-500">
-          Our <span className="font-bold">AI resume builder</span> helps you
-          design a professional resume, even if you&apos;re not very smart.
+          Nosso <span className="font-bold">gerador de currículos com IA</span> ajuda você
+          a criar um currículo profissional de forma rápida e fácil.
         </p>
         <Button asChild size="lg" variant="premium">
-          <Link href="/resumes">Get started</Link>
+          <Link href="/resumes">Começar agora</Link>
         </Button>
       </div>
       <div>
         <Image
           src={resumePreview}
-          alt="Resume preview"
+          alt="Prévia do currículo"
           width={600}
           className="shadow-md lg:rotate-[1.5deg]"
         />

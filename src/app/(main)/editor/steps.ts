@@ -11,17 +11,17 @@ export const steps: {
   component: React.ComponentType<EditorFormProps>;
   key: string;
 }[] = [
-  { title: "General info", component: GeneralInfoForm, key: "general-info" },
-  { title: "Personal info", component: PersonalInfoForm, key: "personal-info" },
+  { title: "Informações gerais", component: GeneralInfoForm, key: "general-info" },
+  { title: "Informações pessoais", component: PersonalInfoForm, key: "personal-info" },
   {
-    title: "Work experience",
+    title: "Experiência profissional",
     component: WorkExperienceForm,
     key: "work-experience",
   },
-  { title: "Education", component: EducationForm, key: "education" },
-  { title: "Skills", component: SkillsForm, key: "skills" },
+  { title: "Educação", component: EducationForm, key: "education" },
+  { title: "Habilidades", component: SkillsForm, key: "skills" },
   {
-    title: "Summary",
+    title: "Resumo",
     component: SummaryForm,
     key: "summary",
   },

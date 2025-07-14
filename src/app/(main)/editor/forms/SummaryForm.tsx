@@ -37,10 +37,10 @@ export default function SummaryForm({
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div className="space-y-1.5 text-center">
-        <h2 className="text-2xl font-semibold">Professional summary</h2>
+        <h2 className="text-2xl font-semibold">Resumo profissional</h2>
         <p className="text-sm text-muted-foreground">
-          Write a short introduction for your resume or let the AI generate one
-          from your entered data.
+          Escreva uma breve introdução para seu currículo ou deixe a IA gerar uma
+          a partir dos seus dados inseridos.
         </p>
       </div>
       <Form {...form}>
@@ -50,11 +50,11 @@ export default function SummaryForm({
             name="summary"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Professional summary</FormLabel>
+                <FormLabel className="sr-only">Resumo profissional</FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}
-                    placeholder="A brief, engaging text about yourself"
+                    placeholder="Um texto breve e envolvente sobre você"
                   />
                 </FormControl>
                 <FormMessage />

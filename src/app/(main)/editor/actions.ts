@@ -19,7 +19,7 @@ export async function saveResume(values: ResumeValues) {
   const { userId } = await auth();
 
   if (!userId) {
-    throw new Error("User not authenticated");
+    throw new Error("Usuário não autenticado");
   }
 
   const subscriptionLevel = await getUserSubscriptionLevel(userId);
@@ -29,7 +29,7 @@ export async function saveResume(values: ResumeValues) {
 
     if (!canCreateResume(subscriptionLevel, resumeCount)) {
       throw new Error(
-        "Maximum resume count reached for this subscription level",
+        "Número máximo de currículos atingido para este nível de assinatura",
       );
     }
   }
@@ -39,7 +39,7 @@ export async function saveResume(values: ResumeValues) {
     : null;
 
   if (id && !existingResume) {
-    throw new Error("Resume not found");
+    throw new Error("Currículo não encontrado");
   }
 
   const hasCustomizations =
@@ -49,7 +49,7 @@ export async function saveResume(values: ResumeValues) {
       resumeValues.colorHex !== existingResume?.colorHex);
 
   if (hasCustomizations && !canUseCustomizations(subscriptionLevel)) {
-    throw new Error("Customizations not allowed for this subscription level");
+    throw new Error("Personalizações não permitidas para este nível de assinatura");
   }
 
   let newPhotoUrl: string | undefined | null = undefined;

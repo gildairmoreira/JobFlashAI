@@ -87,9 +87,9 @@ export default function WorkExperienceForm({
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div className="space-y-1.5 text-center">
-        <h2 className="text-2xl font-semibold">Work experience</h2>
+        <h2 className="text-2xl font-semibold">Experiência profissional</h2>
         <p className="text-sm text-muted-foreground">
-          Add as many work experiences as you like.
+          Adicione quantas experiências profissionais quiser.
         </p>
       </div>
       <Form {...form}>
@@ -128,7 +128,7 @@ export default function WorkExperienceForm({
                 })
               }
             >
-              Add work experience
+              Adicionar experiência profissional
             </Button>
           </div>
         </form>
@@ -172,7 +172,7 @@ function WorkExperienceItem({
       }}
     >
       <div className="flex justify-between gap-2">
-        <span className="font-semibold">Work experience {index + 1}</span>
+        <span className="font-semibold">Experiência profissional {index + 1}</span>
         <GripHorizontal
           className="size-5 cursor-grab text-muted-foreground focus:outline-none"
           {...attributes}
@@ -191,7 +191,7 @@ function WorkExperienceItem({
         name={`workExperiences.${index}.position`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Job title</FormLabel>
+            <FormLabel>Cargo</FormLabel>
             <FormControl>
               <Input {...field} autoFocus />
             </FormControl>
@@ -204,7 +204,7 @@ function WorkExperienceItem({
         name={`workExperiences.${index}.company`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Company</FormLabel>
+            <FormLabel>Empresa</FormLabel>
             <FormControl>
               <Input {...field} />
             </FormControl>
@@ -218,7 +218,7 @@ function WorkExperienceItem({
           name={`workExperiences.${index}.startDate`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Start date</FormLabel>
+              <FormLabel>Data de início</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -235,7 +235,7 @@ function WorkExperienceItem({
           name={`workExperiences.${index}.endDate`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>End date</FormLabel>
+              <FormLabel>Data de término</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -249,15 +249,15 @@ function WorkExperienceItem({
         />
       </div>
       <FormDescription>
-        Leave <span className="font-semibold">end date</span> empty if you are
-        currently working here.
+        Deixe a <span className="font-semibold">data de término</span> vazia se você
+        ainda trabalha aqui.
       </FormDescription>
       <FormField
         control={form.control}
         name={`workExperiences.${index}.description`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Description</FormLabel>
+            <FormLabel>Descrição</FormLabel>
             <FormControl>
               <Textarea {...field} />
             </FormControl>
@@ -266,7 +266,7 @@ function WorkExperienceItem({
         )}
       />
       <Button variant="destructive" type="button" onClick={() => remove(index)}>
-        Remove
+        Remover
       </Button>
     </div>
   );

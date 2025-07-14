@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const signature = req.headers.get("stripe-signature");
 
     if (!signature) {
-      return new Response("Signature is missing", { status: 400 });
+      return new Response("Assinatura está faltando", { status: 400 });
     }
 
     const event = stripe.webhooks.constructEvent(
@@ -38,10 +38,10 @@ export async function POST(req: NextRequest) {
         break;
     }
 
-    return new Response("Event received", { status: 200 });
+    return new Response("Evento recebido", { status: 200 });
   } catch (error) {
     console.error(error);
-    return new Response("Internal server error", { status: 500 });
+    return new Response("Erro interno do servidor", { status: 500 });
   }
 }
 
@@ -49,7 +49,7 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
   const userId = session.metadata?.userId;
 
   if (!userId) {
-    throw new Error("User ID is missing in session metadata");
+    throw new Error("ID do usuário está faltando nos metadados da sessão");
   }
 
   await (

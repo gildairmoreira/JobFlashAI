@@ -29,7 +29,7 @@ export default function ColorPicker({ color, onChange }: ColorPickerProps) {
         <Button
           variant="outline"
           size="icon"
-          title="Change resume color"
+          title="Alterar cor do currículo"
           onClick={() => {
             if (!canUseCustomizations(subscriptionLevel)) {
               premiumModal.setOpen(true);

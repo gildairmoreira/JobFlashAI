@@ -58,7 +58,7 @@ export default function GenerateWorkExperienceButton({
         }}
       >
         <WandSparklesIcon className="size-4" />
-        Smart fill (AI)
+        Preenchimento inteligente (IA)
       </Button>
       <InputDialog
         open={showInputDialog}
@@ -98,9 +98,17 @@ function InputDialog({
       onWorkExperienceGenerated(response);
     } catch (error) {
       console.error(error);
+      
+      let errorMessage = "Algo deu errado. Tente novamente.";
+      
+      if (error instanceof Error) {
+        // Usar a mensagem específica do erro se disponível
+        errorMessage = error.message;
+      }
+      
       toast({
         variant: "destructive",
-        description: "Something went wrong. Please try again.",
+        description: errorMessage,
       });
     }
   }
@@ -109,10 +117,10 @@ function InputDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Generate work experience</DialogTitle>
+          <DialogTitle>Gerar experiência de trabalho</DialogTitle>
           <DialogDescription>
-            Describe this work experience and the AI will generate an optimized
-            entry for you.
+            Descreva esta experiência de trabalho e a IA gerará uma entrada
+            otimizada para você.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -122,11 +130,11 @@ function InputDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Descrição</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder={`E.g. "from nov 2019 to dec 2020 I worked at google as a software engineer, my tasks were: ..."`}
+                      placeholder={`Ex: "de nov 2019 a dez 2020 trabalhei no Google como engenheiro de software, minhas tarefas eram: ..."`}
                       autoFocus
                     />
                   </FormControl>
@@ -135,7 +143,7 @@ function InputDialog({
               )}
             />
             <LoadingButton type="submit" loading={form.formState.isSubmitting}>
-              Generate
+              Gerar
             </LoadingButton>
           </form>
         </Form>

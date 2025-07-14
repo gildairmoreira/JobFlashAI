@@ -145,7 +145,7 @@ function SummarySection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Professional profile
+          Perfil profissional
         </p>
         <div className="whitespace-pre-line text-sm">{summary}</div>
       </div>
@@ -191,7 +191,7 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
               {exp.startDate && (
                 <span>
                   {formatDate(exp.startDate, "MM/yyyy")} -{" "}
-                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy") : "Present"}
+                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy") : "Presente"}
                 </span>
               )}
             </div>

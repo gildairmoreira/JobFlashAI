@@ -29,6 +29,6 @@ export const getUserSubscriptionLevel = cache(
       return "pro_plus";
     }
 
-    throw new Error("Invalid subscription");
+    throw new Error("Assinatura inválida");
   },
 );

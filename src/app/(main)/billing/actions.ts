@@ -8,7 +8,7 @@ export async function createCustomerPortalSession() {
   const user = await currentUser();
 
   if (!user) {
-    throw new Error("Unauthorized");
+    throw new Error("Não autorizado");
   }
 
   const stripeCustomerId = user.privateMetadata.stripeCustomerId as
@@ -16,7 +16,7 @@ export async function createCustomerPortalSession() {
     | undefined;
 
   if (!stripeCustomerId) {
-    throw new Error("Stripe customer ID not found");
+    throw new Error("ID do cliente Stripe não encontrado");
   }
 
   const session = await stripe.billingPortal.sessions.create({
@@ -25,7 +25,7 @@ export async function createCustomerPortalSession() {
   });
 
   if (!session.url) {
-    throw new Error("Failed to create customer portal session");
+    throw new Error("Falha ao criar sessão do portal do cliente");
   }
 
   return session.url;

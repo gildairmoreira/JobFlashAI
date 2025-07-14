@@ -36,7 +36,7 @@ export default function ResumeItem({ resume }: ResumeItemProps) {
 
   const reactToPrintFn = useReactToPrint({
     contentRef,
-    documentTitle: resume.title || "Resume",
+    documentTitle: resume.title || "Currículo",
   });
 
   const wasUpdated = resume.updatedAt !== resume.createdAt;
@@ -49,13 +49,13 @@ export default function ResumeItem({ resume }: ResumeItemProps) {
           className="inline-block w-full text-center"
         >
           <p className="line-clamp-1 font-semibold">
-            {resume.title || "No title"}
+            {resume.title || "Sem título"}
           </p>
           {resume.description && (
             <p className="line-clamp-2 text-sm">{resume.description}</p>
           )}
           <p className="text-xs text-muted-foreground">
-            {wasUpdated ? "Updated" : "Created"} on{" "}
+            {wasUpdated ? "Atualizado" : "Criado"} em{" "}
             {formatDate(resume.updatedAt, "MMM d, yyyy h:mm a")}
           </p>
         </Link>
@@ -102,14 +102,14 @@ function MoreMenu({ resumeId, onPrintClick }: MoreMenuProps) {
             onClick={() => setShowDeleteConfirmation(true)}
           >
             <Trash2 className="size-4" />
-            Delete
+            Excluir
           </DropdownMenuItem>
           <DropdownMenuItem
             className="flex items-center gap-2"
             onClick={onPrintClick}
           >
             <Printer className="size-4" />
-            Print
+            Imprimir
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -146,7 +146,7 @@ function DeleteConfirmationDialog({
         console.error(error);
         toast({
           variant: "destructive",
-          description: "Something went wrong. Please try again.",
+          description: "Algo deu errado. Tente novamente.",
         });
       }
     });
@@ -156,10 +156,10 @@ function DeleteConfirmationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete resume?</DialogTitle>
+          <DialogTitle>Excluir currículo?</DialogTitle>
           <DialogDescription>
-            This will permanently delete this resume. This action cannot be
-            undone.
+            Isso excluirá permanentemente este currículo. Esta ação não pode ser
+            desfeita.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -168,10 +168,10 @@ function DeleteConfirmationDialog({
             onClick={handleDelete}
             loading={isPending}
           >
-            Delete
+            Excluir
           </LoadingButton>
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            Cancelar
           </Button>
         </DialogFooter>
       </DialogContent>
