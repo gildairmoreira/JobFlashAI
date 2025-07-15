@@ -1,3 +1,4 @@
+import ClientThemeWrapper from "@/components/ClientThemeWrapper";
 import { Toaster } from "@/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ptBR } from "@clerk/localizations";
@@ -34,7 +35,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
-            <Toaster />
+            <ClientThemeWrapper>
+              <Toaster />
+            </ClientThemeWrapper>
           </ThemeProvider>
         </body>
       </html>

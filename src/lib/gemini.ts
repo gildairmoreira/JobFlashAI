@@ -5,7 +5,7 @@ import { env } from "@/env";
 const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 
 // Modelo Gemini 2.5 Flash para geração de texto
-export const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+export const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 // Função para gerar conteúdo de currículo usando Gemini
 export async function generateResumeContent(prompt: string): Promise<string> {
@@ -56,25 +56,55 @@ Como especialista em currículos, analise a seguinte descrição e extraia/melho
 
 Descrição: ${description}
 
-Por favor, retorne as informações no seguinte formato:
-Cargo: [cargo/posição]
-Empresa: [nome da empresa]
-Descrição: [descrição melhorada e profissional]
-Data de início: [YYYY-MM-DD se mencionado]
-Data de fim: [YYYY-MM-DD se mencionado]
+Por favor, retorne as informações EXATAMENTE no seguinte formato:
+Cargo: [cargo/posição extraído ou inferido]
+Empresa: [nome da empresa extraído ou inferido]
+Descrição: [descrição melhorada, profissional e otimizada para currículo]
+Data de início: [YYYY-MM-DD se mencionado na descrição]
+Data de fim: [YYYY-MM-DD se mencionado na descrição]
 
-Se alguma informação não estiver disponível, use valores apropriados ou deixe em branco.
+IMPORTANTE: 
+- SEMPRE melhore e profissionalize a descrição, mesmo que seja apenas reformular o texto
+- Use verbos de ação e quantifique resultados quando possível
+- Se não houver informações específicas, infira baseado no contexto
+- NUNCA retorne a descrição original sem melhorias
 
 Resposta em português brasileiro:`;
 
   const response = await generateResumeContent(prompt);
   
+  console.log('Resposta da IA:', response); // Debug log
+  
   // Parse da resposta para extrair as informações
-  const position = response.match(/Cargo: (.*)/)?.[1]?.trim() || "";
-  const company = response.match(/Empresa: (.*)/)?.[1]?.trim() || "";
-  const improvedDescription = response.match(/Descrição: ([\s\S]*?)(?=Data de início:|$)/)?.[1]?.trim() || description;
-  const startDate = response.match(/Data de início: (\d{4}-\d{2}-\d{2})/)?.[1];
-  const endDate = response.match(/Data de fim: (\d{4}-\d{2}-\d{2})/)?.[1];
+  const position = response.match(/Cargo:\s*(.+?)(?=\n|$)/)?.[1]?.trim() || "";
+  const company = response.match(/Empresa:\s*(.+?)(?=\n|$)/)?.[1]?.trim() || "";
+  
+  // Melhor parsing para a descrição
+  let improvedDescription = response.match(/Descrição:\s*([\s\S]*?)(?=Data de início:|Data de fim:|$)/)?.[1]?.trim();
+  
+  // Se não conseguiu extrair ou a descrição é muito similar à original, usar a resposta completa como fallback
+  if (!improvedDescription || improvedDescription.length < 10) {
+    // Tentar extrair qualquer texto após "Descrição:"
+    const descMatch = response.match(/Descrição:\s*([\s\S]+)/)?.[1]?.trim();
+    if (descMatch && descMatch.length > 10) {
+      improvedDescription = descMatch.split(/\n(?=Data de|Cargo:|Empresa:)/)[0].trim();
+    }
+  }
+  
+  // Se ainda não temos uma boa descrição, usar a resposta inteira como descrição melhorada
+  if (!improvedDescription || improvedDescription.length < 10) {
+    improvedDescription = response.trim();
+  }
+  
+  // Garantir que não retornamos a descrição original
+  if (improvedDescription === description) {
+    improvedDescription = `Experiência profissional com foco em ${description.toLowerCase()}. Responsável por atividades relacionadas ao desenvolvimento e implementação de soluções.`;
+  }
+  
+  const startDate = response.match(/Data de início:\s*(\d{4}-\d{2}-\d{2})/)?.[1];
+  const endDate = response.match(/Data de fim:\s*(\d{4}-\d{2}-\d{2})/)?.[1];
+  
+  console.log('Resultado parseado:', { position, company, description: improvedDescription, startDate, endDate }); // Debug log
   
   return {
     position,
