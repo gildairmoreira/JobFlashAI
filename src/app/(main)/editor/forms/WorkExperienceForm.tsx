@@ -223,7 +223,7 @@ function WorkExperienceItem({
                 <Input
                   {...field}
                   type="date"
-                  value={field.value?.slice(0, 10)}
+                  value={field.value?.slice(0, 10) || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -240,7 +240,7 @@ function WorkExperienceItem({
                 <Input
                   {...field}
                   type="date"
-                  value={field.value?.slice(0, 10)}
+                  value={field.value?.slice(0, 10) || ""}
                 />
               </FormControl>
               <FormMessage />

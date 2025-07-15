@@ -59,6 +59,7 @@ export default function SkillsForm({
                   <Textarea
                     {...field}
                     placeholder="ex: React.js, Node.js, design gráfico, ..."
+                    value={Array.isArray(field.value) ? field.value.join(", ") : field.value || ""}
                     onChange={(e) => {
                       const skills = e.target.value.split(",");
                       field.onChange(skills);

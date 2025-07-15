@@ -4,13 +4,11 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { generateProfessionalSummary, improveWorkExperience } from "@/lib/gemini";
 import { canUseAITools } from "@/lib/permissions";
-import { getUserSubscriptionLevel } from "@/lib/subscription";
 import {
   GenerateSummaryInput,
   generateSummarySchema,
   GenerateWorkExperienceInput,
   generateWorkExperienceSchema,
-  WorkExperience,
 } from "@/lib/validation";
 
 export async function generateSummary(input: GenerateSummaryInput) {
@@ -20,9 +18,7 @@ export async function generateSummary(input: GenerateSummaryInput) {
     throw new Error("Não autorizado");
   }
 
-  const subscriptionLevel = await getUserSubscriptionLevel();
-
-  if (!canUseAITools(subscriptionLevel)) {
+  if (!canUseAITools()) {
     throw new Error("Atualize sua assinatura para usar este recurso");
   }
 
@@ -49,9 +45,7 @@ export async function generateWorkExperience(
     throw new Error("Não autorizado");
   }
 
-  const subscriptionLevel = await getUserSubscriptionLevel();
-
-  if (!canUseAITools(subscriptionLevel)) {
+  if (!canUseAITools()) {
     throw new Error("Atualize sua assinatura para usar este recurso");
   }
 

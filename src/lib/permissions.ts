@@ -1,19 +1,14 @@
-import { SubscriptionLevel } from "./subscription";
-
-export function canCreateResume(
-  subscriptionLevel: SubscriptionLevel,
-  currentResumeCount: number,
-) {
+export function canCreateResume() {
   // Todas as funcionalidades liberadas - sem restrições
   return true;
 }
 
-export function canUseAITools(subscriptionLevel: SubscriptionLevel) {
+export function canUseAITools() {
   // Ferramentas de IA liberadas para todos
   return true;
 }
 
-export function canUseCustomizations(subscriptionLevel: SubscriptionLevel) {
+export function canUseCustomizations() {
   // Personalizações liberadas para todos
   return true;
 }

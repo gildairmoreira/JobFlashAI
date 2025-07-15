@@ -3,6 +3,7 @@ import useDimensions from "@/hooks/useDimensions";
 import { cn } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";
 import { formatDate } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "./ui/badge";
@@ -177,7 +178,7 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Work experience
+          Experiência Profissional
         </p>
         {workExperiencesNotEmpty.map((exp, index) => (
           <div key={index} className="break-inside-avoid space-y-1">
@@ -190,8 +191,8 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
               <span>{exp.position}</span>
               {exp.startDate && (
                 <span>
-                  {formatDate(exp.startDate, "MM/yyyy")} -{" "}
-                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy") : "Presente"}
+                  {formatDate(exp.startDate, "MM/yyyy", { locale: ptBR })} -{" "}
+                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy", { locale: ptBR }) : "Presente"}
                 </span>
               )}
             </div>
@@ -228,7 +229,7 @@ function EducationSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Education
+          Formação Acadêmica
         </p>
         {educationsNotEmpty.map((edu, index) => (
           <div key={index} className="break-inside-avoid space-y-1">
@@ -242,7 +243,7 @@ function EducationSection({ resumeData }: ResumeSectionProps) {
               {edu.startDate && (
                 <span>
                   {edu.startDate &&
-                    `${formatDate(edu.startDate, "MM/yyyy")} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy")}` : ""}`}
+                    `${formatDate(edu.startDate, "MM/yyyy", { locale: ptBR })} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy", { locale: ptBR })}` : ""}`}
                 </span>
               )}
             </div>
@@ -274,7 +275,7 @@ function SkillsSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Skills
+          Habilidades
         </p>
         <div className="flex break-inside-avoid flex-wrap gap-2">
           {skills.map((skill, index) => (

@@ -2,16 +2,14 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "@/env";
 
 // Configuração da API do Gemini
-const genAI = new GoogleGenerativeAI("AIzaSyBVsMZT-kadqknw2iAXCInth3EqJ6y3_JU");
+const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 
-// Modelo Gemini Pro para geração de texto
-export const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+// Modelo Gemini 1.5 Flash para geração de texto
+export const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Função para gerar conteúdo de currículo usando Gemini
 export async function generateResumeContent(prompt: string): Promise<string> {
   try {
-    // Chave API já configurada diretamente no código
-
     const result = await geminiModel.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
@@ -95,13 +93,13 @@ export async function generateProfessionalSummary({
   skills
 }: {
   jobTitle?: string;
-  workExperiences?: any[];
-  educations?: any[];
-  skills?: string;
+  workExperiences?: Array<{ position?: string; company?: string }>;
+  educations?: Array<{ degree?: string; school?: string }>;
+  skills?: string[];
 }): Promise<string> {
   const experienceText = workExperiences?.map(exp => `${exp.position || 'Cargo'} na ${exp.company || 'Empresa'}`).join(", ") || "Sem experiências informadas";
   const educationText = educations?.map(edu => `${edu.degree || 'Formação'} em ${edu.school || 'Instituição'}`).join(", ") || "Sem formação informada";
-  const skillsText = skills || "Sem habilidades informadas";
+  const skillsText = skills?.join(", ") || "Sem habilidades informadas";
   
   const prompt = `
 Crie um resumo profissional conciso e impactante baseado nas seguintes informações:
