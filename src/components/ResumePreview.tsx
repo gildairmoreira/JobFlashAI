@@ -9,9 +9,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "./ui/badge";
 
 interface ResumePreviewProps {
-  resumeData: ResumeValues;
-  contentRef?: React.Ref<HTMLDivElement>;
-  className?: string;
+  readonly resumeData: ResumeValues;
+  readonly contentRef?: React.Ref<HTMLDivElement>;
+  readonly className?: string;
 }
 
 export default function ResumePreview({
@@ -24,12 +24,12 @@ export default function ResumePreview({
   const { width } = useDimensions(containerRef);
 
   return (
-    <div
-      className={cn(
-        "aspect-[210/297] h-fit w-full bg-white text-black",
-        className,
-      )}
+    <div className={cn(
+      "aspect-[210/297] h-fit w-full bg-white text-black",
+      className,
+    )}
       ref={containerRef}
+      suppressHydrationWarning
     >
       <div
         className={cn("space-y-6 p-6", !width && "invisible")}
@@ -38,6 +38,7 @@ export default function ResumePreview({
         }}
         ref={contentRef}
         id="resumePreviewContent"
+        suppressHydrationWarning
       >
         <PersonalInfoHeader resumeData={resumeData} />
         <SummarySection resumeData={resumeData} />
@@ -50,7 +51,7 @@ export default function ResumePreview({
 }
 
 interface ResumeSectionProps {
-  resumeData: ResumeValues;
+  readonly resumeData: ResumeValues;
 }
 
 function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
@@ -77,7 +78,7 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
   }, [photo]);
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-6" suppressHydrationWarning>
       {photoSrc && (
         <Image
           src={photoSrc}
@@ -190,7 +191,7 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
             >
               <span>{exp.position}</span>
               {exp.startDate && (
-                <span>
+                <span suppressHydrationWarning>
                   {formatDate(exp.startDate, "MM/yyyy", { locale: ptBR })} -{" "}
                   {exp.endDate ? formatDate(exp.endDate, "MM/yyyy", { locale: ptBR }) : "Presente"}
                 </span>
@@ -241,7 +242,7 @@ function EducationSection({ resumeData }: ResumeSectionProps) {
             >
               <span>{edu.degree}</span>
               {edu.startDate && (
-                <span>
+                <span suppressHydrationWarning>
                   {edu.startDate &&
                     `${formatDate(edu.startDate, "MM/yyyy", { locale: ptBR })} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy", { locale: ptBR })}` : ""}`}
                 </span>

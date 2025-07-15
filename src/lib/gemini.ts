@@ -4,8 +4,8 @@ import { env } from "@/env";
 // Configuração da API do Gemini
 const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 
-// Modelo Gemini 1.5 Flash para geração de texto
-export const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+// Modelo Gemini 2.5 Flash para geração de texto
+export const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 // Função para gerar conteúdo de currículo usando Gemini
 export async function generateResumeContent(prompt: string): Promise<string> {

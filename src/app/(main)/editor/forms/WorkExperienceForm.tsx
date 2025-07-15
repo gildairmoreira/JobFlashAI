@@ -37,10 +37,15 @@ import { useEffect } from "react";
 import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 import GenerateWorkExperienceButton from "./GenerateWorkExperienceButton";
 
+interface WorkExperienceFormProps {
+  readonly resumeData: EditorFormProps['resumeData'];
+  readonly setResumeData: EditorFormProps['setResumeData'];
+}
+
 export default function WorkExperienceForm({
   resumeData,
   setResumeData,
-}: EditorFormProps) {
+}: WorkExperienceFormProps) {
   const form = useForm<WorkExperienceValues>({
     resolver: zodResolver(workExperienceSchema),
     defaultValues: {
@@ -55,7 +60,7 @@ export default function WorkExperienceForm({
       setResumeData({
         ...resumeData,
         workExperiences:
-          values.workExperiences?.filter((exp) => exp !== undefined) || [],
+          values.workExperiences?.filter((exp): exp is NonNullable<typeof exp> => exp !== undefined) ?? [],
       });
     });
     return unsubscribe;
@@ -138,10 +143,10 @@ export default function WorkExperienceForm({
 }
 
 interface WorkExperienceItemProps {
-  id: string;
-  form: UseFormReturn<WorkExperienceValues>;
-  index: number;
-  remove: (index: number) => void;
+  readonly id: string;
+  readonly form: UseFormReturn<WorkExperienceValues>;
+  readonly index: number;
+  readonly remove: (index: number) => void;
 }
 
 function WorkExperienceItem({
@@ -223,7 +228,7 @@ function WorkExperienceItem({
                 <Input
                   {...field}
                   type="date"
-                  value={field.value?.slice(0, 10) || ""}
+                  value={field.value?.slice(0, 10) ?? ""}
                 />
               </FormControl>
               <FormMessage />
@@ -240,7 +245,7 @@ function WorkExperienceItem({
                 <Input
                   {...field}
                   type="date"
-                  value={field.value?.slice(0, 10) || ""}
+                  value={field.value?.slice(0, 10) ?? ""}
                 />
               </FormControl>
               <FormMessage />

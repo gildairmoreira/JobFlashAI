@@ -1,0 +1,103 @@
+/* Estilos para impressão */
+@media print {
+  /* Ocultar elementos desnecessários durante a impressão */
+  header,
+  nav,
+  footer,
+  .breadcrumb,
+  .no-print,
+  button,
+  .button,
+  .btn {
+    display: none !important;
+  }
+
+  /* Configurações gerais da página */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  /* Configurar o layout para impressão */
+  .resume-preview {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Quebras de página */
+  .page-break {
+    page-break-before: always;
+  }
+
+  .no-page-break {
+    page-break-inside: avoid;
+  }
+
+  /* Otimizar texto para impressão */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    margin-top: 0;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Garantir que as cores sejam preservadas */
+  .text-primary,
+  .border-primary {
+    color: inherit !important;
+    border-color: inherit !important;
+  }
+
+  /* Ajustar imagens */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Ocultar elementos específicos do editor */
+  .editor-sidebar,
+  .editor-toolbar,
+  .form-container {
+    display: none !important;
+  }
+
+  /* Configurar o currículo para impressão */
+  .resume-preview {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    box-shadow: none !important;
+    background: white !important;
+    z-index: 9999 !important;
+  }
+
+  /* Ocultar completamente a seção de preview */
+  .resume-preview-section {
+    position: static !important;
+  }
+
+  /* Garantir que apenas o conteúdo do currículo seja visível */
+  .resume-preview-section > div:first-child {
+    display: none !important;
+  }
+}

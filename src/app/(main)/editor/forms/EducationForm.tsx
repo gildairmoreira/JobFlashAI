@@ -34,14 +34,19 @@ import { GripHorizontal } from "lucide-react";
 import { useEffect } from "react";
 import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 
+interface EducationFormProps {
+  readonly resumeData: EditorFormProps['resumeData'];
+  readonly setResumeData: EditorFormProps['setResumeData'];
+}
+
 export default function EducationForm({
   resumeData,
   setResumeData,
-}: EditorFormProps) {
+}: EducationFormProps) {
   const form = useForm<EducationValues>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      educations: resumeData.educations || [],
+      educations: resumeData.educations ?? [],
     },
   });
 
@@ -51,7 +56,7 @@ export default function EducationForm({
       if (!isValid) return;
       setResumeData({
         ...resumeData,
-        educations: values.educations?.filter((edu) => edu !== undefined) || [],
+        educations: values.educations?.filter((edu): edu is NonNullable<typeof edu> => edu !== undefined) ?? [],
       });
     });
     return unsubscribe;
@@ -133,10 +138,10 @@ export default function EducationForm({
 }
 
 interface EducationItemProps {
-  id: string;
-  form: UseFormReturn<EducationValues>;
-  index: number;
-  remove: (index: number) => void;
+  readonly id: string;
+  readonly form: UseFormReturn<EducationValues>;
+  readonly index: number;
+  readonly remove: (index: number) => void;
 }
 
 function EducationItem({ id, form, index, remove }: EducationItemProps) {
@@ -206,7 +211,7 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                 <Input
                   {...field}
                   type="date"
-                  value={field.value?.slice(0, 10) || ""}
+                  value={field.value?.slice(0, 10) ?? ""}
                 />
               </FormControl>
               <FormMessage />
@@ -223,7 +228,7 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                 <Input
                   {...field}
                   type="date"
-                  value={field.value?.slice(0, 10) || ""}
+                  value={field.value?.slice(0, 10) ?? ""}
                 />
               </FormControl>
               <FormMessage />

@@ -12,8 +12,8 @@ export const BorderStyles = {
 const borderStyles = Object.values(BorderStyles);
 
 interface BorderStyleButtonProps {
-  borderStyle: string | undefined;
-  onChange: (borderStyle: string) => void;
+  readonly borderStyle: string | undefined;
+  readonly onChange: (borderStyle: string) => void;
 }
 
 export default function BorderStyleButton({

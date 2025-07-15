@@ -67,6 +67,8 @@ export const educationSchema = z.object({
 
 export type EducationValues = z.infer<typeof educationSchema>;
 
+export type Education = NonNullable<z.infer<typeof educationSchema>["educations"]>[number];
+
 export const skillsSchema = z.object({
   skills: z.array(z.string().trim()).optional(),
 });
@@ -93,6 +95,9 @@ export const resumeSchema = z.object({
 export type ResumeValues = Omit<z.infer<typeof resumeSchema>, "photo"> & {
   id?: string;
   photo?: File | string | null;
+  educations?: Education[];
+  workExperiences?: WorkExperience[];
+  skills?: string[];
 };
 
 export const generateWorkExperienceSchema = z.object({

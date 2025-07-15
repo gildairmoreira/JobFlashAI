@@ -9,8 +9,8 @@ import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
 import { generateSummary } from "./actions";
 
 interface GenerateSummaryButtonProps {
-  resumeData: ResumeValues;
-  onSummaryGenerated: (summary: string) => void;
+  readonly resumeData: ResumeValues;
+  readonly onSummaryGenerated: (summary: string) => void;
 }
 
 export default function GenerateSummaryButton({
@@ -26,7 +26,7 @@ export default function GenerateSummaryButton({
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
-    if (!canUseAITools(subscriptionLevel)) {
+    if (!canUseAITools()) {
       premiumModal.setOpen(true);
       return;
     }

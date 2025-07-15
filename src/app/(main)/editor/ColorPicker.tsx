@@ -11,8 +11,8 @@ import { useState } from "react";
 import { Color, ColorChangeHandler, TwitterPicker } from "react-color";
 
 interface ColorPickerProps {
-  color: Color | undefined;
-  onChange: ColorChangeHandler;
+  readonly color: Color | undefined;
+  readonly onChange: ColorChangeHandler;
 }
 
 export default function ColorPicker({ color, onChange }: ColorPickerProps) {

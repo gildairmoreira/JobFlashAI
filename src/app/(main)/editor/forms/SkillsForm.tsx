@@ -14,10 +14,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+interface SkillsFormProps {
+  readonly resumeData: EditorFormProps['resumeData'];
+  readonly setResumeData: EditorFormProps['setResumeData'];
+}
+
 export default function SkillsForm({
   resumeData,
   setResumeData,
-}: EditorFormProps) {
+}: SkillsFormProps) {
   const form = useForm<SkillsValues>({
     resolver: zodResolver(skillsSchema),
     defaultValues: {
@@ -33,9 +38,9 @@ export default function SkillsForm({
         ...resumeData,
         skills:
           values.skills
-            ?.filter((skill) => skill !== undefined)
+            ?.filter((skill): skill is string => skill !== undefined)
             .map((skill) => skill.trim())
-            .filter((skill) => skill !== "") || [],
+            .filter((skill) => skill !== "") ?? [],
       });
     });
     return unsubscribe;
@@ -59,7 +64,7 @@ export default function SkillsForm({
                   <Textarea
                     {...field}
                     placeholder="ex: React.js, Node.js, design gráfico, ..."
-                    value={Array.isArray(field.value) ? field.value.join(", ") : field.value || ""}
+                    value={Array.isArray(field.value) ? field.value.join(", ") : field.value ?? ""}
                     onChange={(e) => {
                       const skills = e.target.value.split(",");
                       field.onChange(skills);

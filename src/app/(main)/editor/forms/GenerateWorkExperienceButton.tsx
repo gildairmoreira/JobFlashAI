@@ -32,7 +32,7 @@ import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
 import { generateWorkExperience } from "./actions";
 
 interface GenerateWorkExperienceButtonProps {
-  onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
+  readonly onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
 }
 
 export default function GenerateWorkExperienceButton({
@@ -50,7 +50,7 @@ export default function GenerateWorkExperienceButton({
         variant="outline"
         type="button"
         onClick={() => {
-          if (!canUseAITools(subscriptionLevel)) {
+          if (!canUseAITools()) {
             premiumModal.setOpen(true);
             return;
           }
@@ -73,9 +73,9 @@ export default function GenerateWorkExperienceButton({
 }
 
 interface InputDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
+  readonly onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
 }
 
 function InputDialog({

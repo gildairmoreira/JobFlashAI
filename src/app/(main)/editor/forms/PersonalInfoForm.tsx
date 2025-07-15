@@ -14,20 +14,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 
+interface PersonalInfoFormProps {
+  readonly resumeData: EditorFormProps['resumeData'];
+  readonly setResumeData: EditorFormProps['setResumeData'];
+}
+
 export default function PersonalInfoForm({
   resumeData,
   setResumeData,
-}: EditorFormProps) {
+}: PersonalInfoFormProps) {
   const form = useForm<PersonalInfoValues>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: {
-      firstName: resumeData.firstName || "",
-      lastName: resumeData.lastName || "",
-      jobTitle: resumeData.jobTitle || "",
-      city: resumeData.city || "",
-      country: resumeData.country || "",
-      phone: resumeData.phone || "",
-      email: resumeData.email || "",
+      firstName: resumeData.firstName ?? "",
+      lastName: resumeData.lastName ?? "",
+      jobTitle: resumeData.jobTitle ?? "",
+      city: resumeData.city ?? "",
+      country: resumeData.country ?? "",
+      phone: resumeData.phone ?? "",
+      email: resumeData.email ?? "",
     },
   });
 

@@ -14,14 +14,19 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import GenerateSummaryButton from "./GenerateSummaryButton";
 
+interface SummaryFormProps {
+  readonly resumeData: EditorFormProps['resumeData'];
+  readonly setResumeData: EditorFormProps['setResumeData'];
+}
+
 export default function SummaryForm({
   resumeData,
   setResumeData,
-}: EditorFormProps) {
+}: SummaryFormProps) {
   const form = useForm<SummaryValues>({
     resolver: zodResolver(summarySchema),
     defaultValues: {
-      summary: resumeData.summary || "",
+      summary: resumeData.summary ?? "",
     },
   });
 
