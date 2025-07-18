@@ -2,9 +2,13 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string; // Adicionando explicitamente a propriedade className
+}
+
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -17,9 +21,13 @@ const Card = React.forwardRef<
 ))
 Card.displayName = "Card"
 
+interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string; // Adicionando explicitamente a propriedade className
+}
+
 const CardHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardHeaderProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -29,9 +37,13 @@ const CardHeader = React.forwardRef<
 ))
 CardHeader.displayName = "CardHeader"
 
+interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string; // Adicionando explicitamente a propriedade className
+}
+
 const CardTitle = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardTitleProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -41,9 +53,13 @@ const CardTitle = React.forwardRef<
 ))
 CardTitle.displayName = "CardTitle"
 
+interface CardDescriptionProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string; // Adicionando explicitamente a propriedade className
+}
+
 const CardDescription = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardDescriptionProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -53,17 +69,25 @@ const CardDescription = React.forwardRef<
 ))
 CardDescription.displayName = "CardDescription"
 
+interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string; // Adicionando explicitamente a propriedade className
+}
+
 const CardContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardContentProps
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
 ))
 CardContent.displayName = "CardContent"
 
+interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string; // Adicionando explicitamente a propriedade className
+}
+
 const CardFooter = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardFooterProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -73,4 +97,11 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+}

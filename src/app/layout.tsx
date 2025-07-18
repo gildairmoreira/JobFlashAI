@@ -1,7 +1,7 @@
+import React from "react";
 import ClientThemeWrapper from "@/components/ClientThemeWrapper";
 import { Toaster } from "@/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ptBR } from "@clerk/localizations";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   },
   description:
     "JobFlashAI é a maneira mais fácil de criar um currículo profissional que vai te ajudar a conseguir o emprego dos seus sonhos.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -25,17 +29,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={ptBR}>
+    <ClerkProvider
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+    >
       <html lang="pt-BR" suppressHydrationWarning>
+        <head>
+          <script 
+            defer 
+            src="https://cloud.umami.is/script.js" 
+            data-website-id="fe0709ff-f9d4-4237-830f-da156fb7349e"
+          ></script>
+        </head>
         <body className={inter.className}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
+            defaultTheme="dark"
             disableTransitionOnChange
           >
-            {children}
             <ClientThemeWrapper>
+              {children}
               <Toaster />
             </ClientThemeWrapper>
           </ThemeProvider>

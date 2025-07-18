@@ -44,8 +44,8 @@ export default function Navbar() {
           <Image
             src={logo}
             alt="JobFlashAI Logo"
-            width={35}
-            height={35}
+            width={45}
+            height={45}
             className="rounded-full"
           />
           <span className="text-xl font-bold tracking-tight">
