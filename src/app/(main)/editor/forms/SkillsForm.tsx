@@ -14,15 +14,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-interface SkillsFormProps {
-  readonly resumeData: EditorFormProps['resumeData'];
-  readonly setResumeData: EditorFormProps['setResumeData'];
-}
-
 export default function SkillsForm({
   resumeData,
   setResumeData,
-}: SkillsFormProps) {
+}: EditorFormProps) {
   const form = useForm<SkillsValues>({
     resolver: zodResolver(skillsSchema),
     defaultValues: {
@@ -38,9 +33,9 @@ export default function SkillsForm({
         ...resumeData,
         skills:
           values.skills
-            ?.filter((skill): skill is string => skill !== undefined)
+            ?.filter((skill) => skill !== undefined)
             .map((skill) => skill.trim())
-            .filter((skill) => skill !== "") ?? [],
+            .filter((skill) => skill !== "") || [],
       });
     });
     return unsubscribe;
@@ -50,7 +45,7 @@ export default function SkillsForm({
     <div className="mx-auto max-w-xl space-y-6">
       <div className="space-y-1.5 text-center">
         <h2 className="text-2xl font-semibold">Habilidades</h2>
-        <p className="text-sm text-muted-foreground">No que você é bom?</p>
+        <p className="text-sm text-muted-foreground">Quais são suas habilidades?</p>
       </div>
       <Form {...form}>
         <form className="space-y-3">
@@ -63,8 +58,7 @@ export default function SkillsForm({
                 <FormControl>
                   <Textarea
                     {...field}
-                    placeholder="ex: React.js, Node.js, design gráfico, ..."
-                    value={Array.isArray(field.value) ? field.value.join(", ") : field.value ?? ""}
+                    placeholder="ex.: React.js, Node.js, design gráfico, ..."
                     onChange={(e) => {
                       const skills = e.target.value.split(",");
                       field.onChange(skills);

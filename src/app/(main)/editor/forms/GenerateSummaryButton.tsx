@@ -5,17 +5,20 @@ import { canUseAITools } from "@/lib/permissions";
 import { ResumeValues } from "@/lib/validation";
 import { WandSparklesIcon } from "lucide-react";
 import { useState } from "react";
+import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
 import { generateSummary } from "./actions";
 
 interface GenerateSummaryButtonProps {
-  readonly resumeData: ResumeValues;
-  readonly onSummaryGenerated: (summary: string) => void;
+  resumeData: ResumeValues;
+  onSummaryGenerated: (summary: string) => void;
 }
 
 export default function GenerateSummaryButton({
   resumeData,
   onSummaryGenerated,
 }: GenerateSummaryButtonProps) {
+  const subscriptionLevel = useSubscriptionLevel();
+
   const premiumModal = usePremiumModal();
 
   const { toast } = useToast();
@@ -23,7 +26,7 @@ export default function GenerateSummaryButton({
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
-    if (!canUseAITools()) {
+    if (!canUseAITools(subscriptionLevel)) {
       premiumModal.setOpen(true);
       return;
     }
@@ -34,17 +37,9 @@ export default function GenerateSummaryButton({
       onSummaryGenerated(aiResponse);
     } catch (error) {
       console.error(error);
-      
-      let errorMessage = "Algo deu errado. Tente novamente.";
-      
-      if (error instanceof Error) {
-        // Usar a mensagem específica do erro se disponível
-        errorMessage = error.message;
-      }
-      
       toast({
         variant: "destructive",
-        description: errorMessage,
+        description: "Something went wrong. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -59,7 +54,7 @@ export default function GenerateSummaryButton({
       loading={loading}
     >
       <WandSparklesIcon className="size-4" />
-      Gerar (IA)
+      Generate (AI)
     </LoadingButton>
   );
 }

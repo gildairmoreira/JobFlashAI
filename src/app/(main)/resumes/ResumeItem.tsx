@@ -55,7 +55,7 @@ export default function ResumeItem({ resume }: ResumeItemProps) {
             <p className="line-clamp-2 text-sm">{resume.description}</p>
           )}
           <p className="text-xs text-muted-foreground">
-            {wasUpdated ? "Atualizado" : "Criado"} em{" "}
+            {wasUpdated ? "Atualizado" : "Criado"} em
             {formatDate(resume.updatedAt, "MMM d, yyyy h:mm a")}
           </p>
         </Link>
@@ -146,7 +146,7 @@ function DeleteConfirmationDialog({
         console.error(error);
         toast({
           variant: "destructive",
-          description: "Algo deu errado. Tente novamente.",
+          description: "Algo deu errado. Por favor, tente novamente.",
         });
       }
     });
@@ -158,8 +158,7 @@ function DeleteConfirmationDialog({
         <DialogHeader>
           <DialogTitle>Excluir currículo?</DialogTitle>
           <DialogDescription>
-            Isso excluirá permanentemente este currículo. Esta ação não pode ser
-            desfeita.
+            Isso excluirá permanentemente este currículo. Esta ação não pode ser desfeita.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

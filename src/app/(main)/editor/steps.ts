@@ -21,7 +21,7 @@ export const steps: {
   { title: "Educação", component: EducationForm, key: "education" },
   { title: "Habilidades", component: SkillsForm, key: "skills" },
   {
-    title: "Resumo",
+    title: "Perfil profissional",
     component: SummaryForm,
     key: "summary",
   },

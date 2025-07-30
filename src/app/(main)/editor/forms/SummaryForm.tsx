@@ -14,19 +14,14 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import GenerateSummaryButton from "./GenerateSummaryButton";
 
-interface SummaryFormProps {
-  readonly resumeData: EditorFormProps['resumeData'];
-  readonly setResumeData: EditorFormProps['setResumeData'];
-}
-
 export default function SummaryForm({
   resumeData,
   setResumeData,
-}: SummaryFormProps) {
+}: EditorFormProps) {
   const form = useForm<SummaryValues>({
     resolver: zodResolver(summarySchema),
     defaultValues: {
-      summary: resumeData.summary ?? "",
+      summary: resumeData.summary || "",
     },
   });
 
@@ -42,10 +37,10 @@ export default function SummaryForm({
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div className="space-y-1.5 text-center">
-        <h2 className="text-2xl font-semibold">Resumo profissional</h2>
+        <h2 className="text-2xl font-semibold">Perfil profissional</h2>
         <p className="text-sm text-muted-foreground">
-          Escreva uma breve introdução para seu currículo ou deixe a IA gerar uma
-          a partir dos seus dados inseridos.
+          Escreva uma breve introdução para o seu currículo ou deixe a IA gerar uma
+          a partir dos dados inseridos.
         </p>
       </div>
       <Form {...form}>
@@ -55,7 +50,7 @@ export default function SummaryForm({
             name="summary"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Resumo profissional</FormLabel>
+                <FormLabel className="sr-only">Perfil profissional</FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}

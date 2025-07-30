@@ -5,9 +5,9 @@ import BorderStyleButton from "./BorderStyleButton";
 import ColorPicker from "./ColorPicker";
 
 interface ResumePreviewSectionProps {
-  readonly resumeData: ResumeValues;
-  readonly setResumeData: (data: ResumeValues) => void;
-  readonly className?: string;
+  resumeData: ResumeValues;
+  setResumeData: (data: ResumeValues) => void;
+  className?: string;
 }
 
 export default function ResumePreviewSection({
@@ -17,9 +17,9 @@ export default function ResumePreviewSection({
 }: ResumePreviewSectionProps) {
   return (
     <div
-      className={cn("group relative hidden w-full md:flex md:w-1/2 resume-preview-section", className)}
+      className={cn("group relative hidden w-full md:flex md:w-1/2", className)}
     >
-      <div className="absolute left-1 top-1 flex flex-none flex-col gap-3 opacity-50 transition-opacity group-hover:opacity-100 lg:left-3 lg:top-3 xl:opacity-100 no-print">
+      <div className="absolute left-1 top-1 flex flex-none flex-col gap-3 opacity-50 transition-opacity group-hover:opacity-100 lg:left-3 lg:top-3 xl:opacity-100">
         <ColorPicker
           color={resumeData.colorHex}
           onChange={(color) =>
@@ -36,7 +36,7 @@ export default function ResumePreviewSection({
       <div className="flex w-full justify-center overflow-y-auto bg-secondary p-3">
         <ResumePreview
           resumeData={resumeData}
-          className="max-w-2xl shadow-md resume-preview"
+          className="max-w-2xl shadow-md"
         />
       </div>
     </div>

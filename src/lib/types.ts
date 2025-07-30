@@ -2,8 +2,8 @@ import { Prisma } from "@prisma/client";
 import { ResumeValues } from "./validation";
 
 export interface EditorFormProps {
-  readonly resumeData: ResumeValues;
-  readonly setResumeData: (data: ResumeValues) => void;
+  resumeData: ResumeValues;
+  setResumeData: (data: ResumeValues) => void;
 }
 
 export const resumeDataInclude = {

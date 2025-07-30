@@ -15,11 +15,11 @@ export const personalInfoSchema = z.object({
     .refine(
       (file) =>
         !file || (file instanceof File && file.type.startsWith("image/")),
-      "Deve ser um arquivo de imagem",
+      "Must be an image file",
     )
     .refine(
       (file) => !file || file.size <= 1024 * 1024 * 4,
-      "O arquivo deve ter menos de 4MB",
+      "File must be less than 4MB",
     ),
   firstName: optionalString,
   lastName: optionalString,
@@ -67,8 +67,6 @@ export const educationSchema = z.object({
 
 export type EducationValues = z.infer<typeof educationSchema>;
 
-export type Education = NonNullable<z.infer<typeof educationSchema>["educations"]>[number];
-
 export const skillsSchema = z.object({
   skills: z.array(z.string().trim()).optional(),
 });
@@ -95,17 +93,14 @@ export const resumeSchema = z.object({
 export type ResumeValues = Omit<z.infer<typeof resumeSchema>, "photo"> & {
   id?: string;
   photo?: File | string | null;
-  educations?: Education[];
-  workExperiences?: WorkExperience[];
-  skills?: string[];
 };
 
 export const generateWorkExperienceSchema = z.object({
   description: z
     .string()
     .trim()
-    .min(1, "Obrigatório")
-    .min(20, "Deve ter pelo menos 20 caracteres"),
+    .min(1, "Required")
+    .min(20, "Must be at least 20 characters"),
 });
 
 export type GenerateWorkExperienceInput = z.infer<

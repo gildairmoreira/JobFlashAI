@@ -1,14 +1,19 @@
-export function canCreateResume() {
-  // Todas as funcionalidades liberadas - sem restrições
+import { SubscriptionLevel } from "./subscription";
+
+export function canCreateResume(
+  subscriptionLevel: SubscriptionLevel,
+  currentResumeCount: number,
+) {
+  // Temporariamente permitir criação ilimitada de currículos
   return true;
 }
 
-export function canUseAITools() {
-  // Ferramentas de IA liberadas para todos
+export function canUseAITools(subscriptionLevel: SubscriptionLevel) {
+  // Temporariamente permitir uso de ferramentas de IA para todos
   return true;
 }
 
-export function canUseCustomizations() {
-  // Personalizações liberadas para todos
+export function canUseCustomizations(subscriptionLevel: SubscriptionLevel) {
+  // Temporariamente permitir customizações para todos
   return true;
 }

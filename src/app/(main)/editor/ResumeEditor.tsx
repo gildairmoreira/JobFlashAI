@@ -80,7 +80,6 @@ export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
         showSmResumePreview={showSmResumePreview}
         setShowSmResumePreview={setShowSmResumePreview}
         isSaving={isSaving}
-        resumeData={resumeData}
       />
     </div>
   );

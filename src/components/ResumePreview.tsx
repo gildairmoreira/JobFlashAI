@@ -3,15 +3,14 @@ import useDimensions from "@/hooks/useDimensions";
 import { cn } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";
 import { formatDate } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "./ui/badge";
 
 interface ResumePreviewProps {
-  readonly resumeData: ResumeValues;
-  readonly contentRef?: React.Ref<HTMLDivElement>;
-  readonly className?: string;
+  resumeData: ResumeValues;
+  contentRef?: React.Ref<HTMLDivElement>;
+  className?: string;
 }
 
 export default function ResumePreview({
@@ -24,12 +23,12 @@ export default function ResumePreview({
   const { width } = useDimensions(containerRef);
 
   return (
-    <div className={cn(
-      "aspect-[210/297] h-fit w-full bg-white text-black",
-      className,
-    )}
+    <div
+      className={cn(
+        "aspect-[210/297] h-fit w-full bg-white text-black",
+        className,
+      )}
       ref={containerRef}
-      suppressHydrationWarning
     >
       <div
         className={cn("space-y-6 p-6", !width && "invisible")}
@@ -38,7 +37,6 @@ export default function ResumePreview({
         }}
         ref={contentRef}
         id="resumePreviewContent"
-        suppressHydrationWarning
       >
         <PersonalInfoHeader resumeData={resumeData} />
         <SummarySection resumeData={resumeData} />
@@ -51,7 +49,7 @@ export default function ResumePreview({
 }
 
 interface ResumeSectionProps {
-  readonly resumeData: ResumeValues;
+  resumeData: ResumeValues;
 }
 
 function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
@@ -78,7 +76,7 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
   }, [photo]);
 
   return (
-    <div className="flex items-center gap-6" suppressHydrationWarning>
+    <div className="flex items-center gap-6">
       {photoSrc && (
         <Image
           src={photoSrc}
@@ -179,7 +177,7 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Experiência Profissional
+          Experiência profissional
         </p>
         {workExperiencesNotEmpty.map((exp, index) => (
           <div key={index} className="break-inside-avoid space-y-1">
@@ -191,9 +189,9 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
             >
               <span>{exp.position}</span>
               {exp.startDate && (
-                <span suppressHydrationWarning>
-                  {formatDate(exp.startDate, "MM/yyyy", { locale: ptBR })} -{" "}
-                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy", { locale: ptBR }) : "Presente"}
+                <span>
+                  {formatDate(exp.startDate, "MM/yyyy")} -{" "}
+                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy") : "Present"}
                 </span>
               )}
             </div>
@@ -230,7 +228,7 @@ function EducationSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Formação Acadêmica
+          Educação
         </p>
         {educationsNotEmpty.map((edu, index) => (
           <div key={index} className="break-inside-avoid space-y-1">
@@ -242,9 +240,9 @@ function EducationSection({ resumeData }: ResumeSectionProps) {
             >
               <span>{edu.degree}</span>
               {edu.startDate && (
-                <span suppressHydrationWarning>
+                <span>
                   {edu.startDate &&
-                    `${formatDate(edu.startDate, "MM/yyyy", { locale: ptBR })} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy", { locale: ptBR })}` : ""}`}
+                    `${formatDate(edu.startDate, "MM/yyyy")} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy")}` : ""}`}
                 </span>
               )}
             </div>
@@ -276,7 +274,7 @@ function SkillsSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Habilidades
+          Skills
         </p>
         <div className="flex break-inside-avoid flex-wrap gap-2">
           {skills.map((skill, index) => (

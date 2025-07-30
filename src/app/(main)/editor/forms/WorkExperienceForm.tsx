@@ -37,15 +37,10 @@ import { useEffect } from "react";
 import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 import GenerateWorkExperienceButton from "./GenerateWorkExperienceButton";
 
-interface WorkExperienceFormProps {
-  readonly resumeData: EditorFormProps['resumeData'];
-  readonly setResumeData: EditorFormProps['setResumeData'];
-}
-
 export default function WorkExperienceForm({
   resumeData,
   setResumeData,
-}: WorkExperienceFormProps) {
+}: EditorFormProps) {
   const form = useForm<WorkExperienceValues>({
     resolver: zodResolver(workExperienceSchema),
     defaultValues: {
@@ -60,7 +55,7 @@ export default function WorkExperienceForm({
       setResumeData({
         ...resumeData,
         workExperiences:
-          values.workExperiences?.filter((exp): exp is NonNullable<typeof exp> => exp !== undefined) ?? [],
+          values.workExperiences?.filter((exp) => exp !== undefined) || [],
       });
     });
     return unsubscribe;
@@ -143,10 +138,10 @@ export default function WorkExperienceForm({
 }
 
 interface WorkExperienceItemProps {
-  readonly id: string;
-  readonly form: UseFormReturn<WorkExperienceValues>;
-  readonly index: number;
-  readonly remove: (index: number) => void;
+  id: string;
+  form: UseFormReturn<WorkExperienceValues>;
+  index: number;
+  remove: (index: number) => void;
 }
 
 function WorkExperienceItem({
@@ -225,11 +220,7 @@ function WorkExperienceItem({
             <FormItem>
               <FormLabel>Data de início</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="date"
-                  value={field.value?.slice(0, 10) ?? ""}
-                />
+                <Input type="date" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -242,20 +233,16 @@ function WorkExperienceItem({
             <FormItem>
               <FormLabel>Data de término</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="date"
-                  value={field.value?.slice(0, 10) ?? ""}
-                />
+                <Input type="date" {...field} />
               </FormControl>
+              <FormDescription>Deixe em branco se for o emprego atual.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
       <FormDescription>
-        Deixe a <span className="font-semibold">data de término</span> vazia se você
-        ainda trabalha aqui.
+        Deixe a <span className="font-semibold">data de término</span> vazia se você ainda trabalha aqui.
       </FormDescription>
       <FormField
         control={form.control}

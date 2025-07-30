@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { Button, ButtonProps } from "./ui/button";
 
 interface LoadingButtonProps extends ButtonProps {
-  readonly loading: boolean;
+  loading: boolean;
 }
 
 export default function LoadingButton({

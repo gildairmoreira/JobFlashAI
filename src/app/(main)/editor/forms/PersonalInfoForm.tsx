@@ -14,25 +14,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 
-interface PersonalInfoFormProps {
-  readonly resumeData: EditorFormProps['resumeData'];
-  readonly setResumeData: EditorFormProps['setResumeData'];
-}
-
 export default function PersonalInfoForm({
   resumeData,
   setResumeData,
-}: PersonalInfoFormProps) {
+}: EditorFormProps) {
   const form = useForm<PersonalInfoValues>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: {
-      firstName: resumeData.firstName ?? "",
-      lastName: resumeData.lastName ?? "",
-      jobTitle: resumeData.jobTitle ?? "",
-      city: resumeData.city ?? "",
-      country: resumeData.country ?? "",
-      phone: resumeData.phone ?? "",
-      email: resumeData.email ?? "",
+      firstName: resumeData.firstName || "",
+      lastName: resumeData.lastName || "",
+      jobTitle: resumeData.jobTitle || "",
+      city: resumeData.city || "",
+      country: resumeData.country || "",
+      phone: resumeData.phone || "",
+      email: resumeData.email || "",
     },
   });
 
@@ -97,7 +92,7 @@ export default function PersonalInfoForm({
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome</FormLabel>
+                  <FormLabel>Primeiro nome</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -178,7 +173,7 @@ export default function PersonalInfoForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>E-mail</FormLabel>
                 <FormControl>
                   <Input {...field} type="email" />
                 </FormControl>

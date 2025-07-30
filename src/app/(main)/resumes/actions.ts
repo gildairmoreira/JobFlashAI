@@ -9,7 +9,7 @@ export async function deleteResume(id: string) {
   const { userId } = await auth();
 
   if (!userId) {
-    throw new Error("Usuário não autenticado");
+    throw new Error("User not authenticated");
   }
 
   const resume = await prisma.resume.findUnique({
@@ -20,7 +20,7 @@ export async function deleteResume(id: string) {
   });
 
   if (!resume) {
-    throw new Error("Currículo não encontrado");
+    throw new Error("Resume not found");
   }
 
   if (resume.photoUrl) {
