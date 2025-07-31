@@ -14,14 +14,11 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import GenerateSummaryButton from "./GenerateSummaryButton";
 
-export default function SummaryForm({
-  resumeData,
-  setResumeData,
-}: EditorFormProps) {
+export default function SummaryForm({ resumeData, setResumeData }: Readonly<EditorFormProps>) {
   const form = useForm<SummaryValues>({
     resolver: zodResolver(summarySchema),
     defaultValues: {
-      summary: resumeData.summary || "",
+      summary: resumeData.summary ?? "",
     },
   });
 
@@ -55,6 +52,7 @@ export default function SummaryForm({
                   <Textarea
                     {...field}
                     placeholder="Um texto breve e envolvente sobre você"
+                    rows={6}
                   />
                 </FormControl>
                 <FormMessage />

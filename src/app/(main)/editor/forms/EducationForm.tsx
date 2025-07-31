@@ -174,7 +174,7 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
         name={`educations.${index}.degree`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Grau</FormLabel>
+            <FormLabel>Curso</FormLabel>
             <FormControl>
               <Input {...field} autoFocus />
             </FormControl>

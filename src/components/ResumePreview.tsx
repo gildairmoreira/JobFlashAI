@@ -42,6 +42,7 @@ export default function ResumePreview({
         <SummarySection resumeData={resumeData} />
         <WorkExperienceSection resumeData={resumeData} />
         <EducationSection resumeData={resumeData} />
+        <CustomSectionsSection resumeData={resumeData} />
         <SkillsSection resumeData={resumeData} />
       </div>
     </div>
@@ -62,6 +63,7 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
     country,
     phone,
     email,
+    socialLinks,
     colorHex,
     borderStyle,
   } = resumeData;
@@ -119,6 +121,20 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
           {country}
           {(city || country) && (phone || email) ? " • " : ""}
           {[phone, email].filter(Boolean).join(" • ")}
+          {socialLinks?.filter(link => link.label && link.url).map((link, index) => (
+            <span key={index}>
+              {" • "}
+              <a 
+                href={link.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline hover:no-underline"
+                style={{ color: colorHex }}
+              >
+                {link.label}
+              </a>
+            </span>
+          ))}
         </p>
       </div>
     </div>
@@ -247,6 +263,60 @@ function EducationSection({ resumeData }: ResumeSectionProps) {
               )}
             </div>
             <p className="text-xs font-semibold">{edu.school}</p>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function CustomSectionsSection({ resumeData }: ResumeSectionProps) {
+  const { customSections, colorHex } = resumeData;
+
+  const customSectionsNotEmpty = customSections?.filter(
+    (section) => Object.values(section).filter(Boolean).length > 0,
+  );
+
+  if (!customSectionsNotEmpty?.length) return null;
+
+  // Simple markdown to HTML conversion
+  const formatContent = (content: string) => {
+    return content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+      .replace(/^\*\s+(.*)$/gm, '• $1') // Bullet points
+      .replace(/\n/g, '<br>'); // Line breaks
+  };
+
+  return (
+    <>
+      <hr
+        className="border-2"
+        style={{
+          borderColor: colorHex,
+        }}
+      />
+      <div className="space-y-3">
+        {customSectionsNotEmpty.map((section, index) => (
+          <div key={index} className="break-inside-avoid space-y-1.5">
+            {section.title && (
+              <p
+                className="text-lg font-semibold"
+                style={{
+                  color: colorHex,
+                }}
+              >
+                {section.title}
+              </p>
+            )}
+            {section.content && (
+              <div 
+                className="text-sm"
+                dangerouslySetInnerHTML={{
+                  __html: formatContent(section.content)
+                }}
+              />
+            )}
           </div>
         ))}
       </div>

@@ -32,10 +32,12 @@ model Resume {
   country     String?
   phone       String?
   email       String?
+  socialLinks Json?   @default("[]")
 
   workExperiences WorkExperience[]
   educations      Education[]
   skills          String[]
+  customSections   CustomSection[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -78,6 +80,21 @@ model Education {
   @@map("educations")
 }
 
+model CustomSection {
+  id String @id @default(cuid())
+
+  title String?
+  content String?
+
+  resumeId String
+  resume   Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("custom_sections")
+}
+
 model UserSubscription {
   id                      String   @id @default(cuid())
   userId                  String   @unique
@@ -91,3 +108,6 @@ model UserSubscription {
 
   @@map("user_subscriptions")
 }
+
+// Add to Resume model:
+// customSections CustomSection[]

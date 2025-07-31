@@ -77,6 +77,7 @@ export async function saveResume(values: ResumeValues) {
       data: {
         ...resumeValues,
         photoUrl: newPhotoUrl,
+        socialLinks: resumeValues.socialLinks || [],
         workExperiences: {
           deleteMany: {},
           create: workExperiences?.map((exp) => ({
@@ -91,6 +92,12 @@ export async function saveResume(values: ResumeValues) {
             ...edu,
             startDate: edu.startDate ? new Date(edu.startDate) : undefined,
             endDate: edu.endDate ? new Date(edu.endDate) : undefined,
+          })),
+        },
+        customSections: {
+          deleteMany: {},
+          create: resumeValues.customSections?.map((section) => ({
+            ...section,
           })),
         },
         updatedAt: new Date(),
@@ -102,6 +109,7 @@ export async function saveResume(values: ResumeValues) {
         ...resumeValues,
         userId,
         photoUrl: newPhotoUrl,
+        socialLinks: resumeValues.socialLinks || [],
         workExperiences: {
           create: workExperiences?.map((exp) => ({
             ...exp,
@@ -114,6 +122,11 @@ export async function saveResume(values: ResumeValues) {
             ...edu,
             startDate: edu.startDate ? new Date(edu.startDate) : undefined,
             endDate: edu.endDate ? new Date(edu.endDate) : undefined,
+          })),
+        },
+        customSections: {
+          create: resumeValues.customSections?.map((section) => ({
+            ...section,
           })),
         },
       },

@@ -5,6 +5,7 @@ import PersonalInfoForm from "./forms/PersonalInfoForm";
 import SkillsForm from "./forms/SkillsForm";
 import SummaryForm from "./forms/SummaryForm";
 import WorkExperienceForm from "./forms/WorkExperienceForm";
+import CustomSectionsForm from "./forms/CustomSectionsForm";
 
 export const steps: {
   title: string;
@@ -24,5 +25,10 @@ export const steps: {
     title: "Perfil profissional",
     component: SummaryForm,
     key: "summary",
+  },
+  {
+    title: "Seções adicionais",
+    component: CustomSectionsForm,
+    key: "custom-sections",
   },
 ];

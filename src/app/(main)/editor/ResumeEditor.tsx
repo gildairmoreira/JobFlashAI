@@ -75,12 +75,14 @@ export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
         </div>
       </main>
       <Footer
-        currentStep={currentStep}
-        setCurrentStep={setStep}
-        showSmResumePreview={showSmResumePreview}
-        setShowSmResumePreview={setShowSmResumePreview}
-        isSaving={isSaving}
-      />
+          currentStep={currentStep}
+          setCurrentStep={setStep}
+          showSmResumePreview={showSmResumePreview}
+          setShowSmResumePreview={setShowSmResumePreview}
+          isSaving={isSaving}
+          resumeData={resumeData}
+          resumeTitle={resumeData.title || "Currículo"}
+        />
     </div>
   );
 }

@@ -8,7 +8,7 @@ import usePremiumModal from "@/hooks/usePremiumModal";
 import { canUseCustomizations } from "@/lib/permissions";
 import { PaletteIcon } from "lucide-react";
 import { useState } from "react";
-import { Color, ColorChangeHandler, TwitterPicker } from "react-color";
+import { Color, ColorChangeHandler, SketchPicker } from "react-color";
 import { useSubscriptionLevel } from "../SubscriptionLevelProvider";
 
 interface ColorPickerProps {
@@ -42,10 +42,18 @@ export default function ColorPicker({ color, onChange }: ColorPickerProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="border-none bg-transparent shadow-none"
+        className="w-auto p-0 border-none bg-transparent shadow-none"
         align="end"
       >
-        <TwitterPicker color={color} onChange={onChange} triangle="top-right" />
+        <SketchPicker 
+          color={color} 
+          onChange={onChange}
+          disableAlpha
+          presetColors={[
+            '#000000', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+          ]}
+        />
       </PopoverContent>
     </Popover>
   );
