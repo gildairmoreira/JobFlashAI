@@ -18,18 +18,18 @@ import { useForm, useFieldArray } from "react-hook-form";
 export default function PersonalInfoForm({
   resumeData,
   setResumeData,
-}: EditorFormProps) {
+}: Readonly<EditorFormProps>) {
   const form = useForm<PersonalInfoValues>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: {
-      firstName: resumeData.firstName || "",
-      lastName: resumeData.lastName || "",
-      jobTitle: resumeData.jobTitle || "",
-      city: resumeData.city || "",
-      country: resumeData.country || "",
-      phone: resumeData.phone || "",
-      email: resumeData.email || "",
-      socialLinks: resumeData.socialLinks || [],
+      firstName: resumeData.firstName ?? "",
+      lastName: resumeData.lastName ?? "",
+      jobTitle: resumeData.jobTitle ?? "",
+      city: resumeData.city ?? "",
+      country: resumeData.country ?? "",
+      phone: resumeData.phone ?? "",
+      email: resumeData.email ?? "",
+      socialLinks: resumeData.socialLinks ?? [],
     },
   });
 
@@ -42,7 +42,8 @@ export default function PersonalInfoForm({
     const { unsubscribe } = form.watch(async (values) => {
       const isValid = await form.trigger();
       if (!isValid) return;
-      setResumeData({ ...resumeData, ...values });
+      const filteredSocialLinks = (values.socialLinks ?? []).filter((link): link is NonNullable<typeof link> => link != null && (!!link.label?.trim()?.length || !!link.url?.trim()?.length));
+      setResumeData({ ...resumeData, ...values, socialLinks: filteredSocialLinks });
     });
     return unsubscribe;
   }, [form, resumeData, setResumeData]);

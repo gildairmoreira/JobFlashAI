@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ResumeValues } from "@/lib/validation";
-import { Printer, X } from "lucide-react";
+import { Printer } from "lucide-react";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import ResumePreview from "./ResumePreview";

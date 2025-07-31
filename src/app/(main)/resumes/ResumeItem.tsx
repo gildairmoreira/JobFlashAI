@@ -31,12 +31,13 @@ interface ResumeItemProps {
   resume: ResumeServerData;
 }
 
-export default function ResumeItem({ resume }: ResumeItemProps) {
+export default function ResumeItem({ resume }: Readonly<ResumeItemProps>) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const reactToPrintFn = useReactToPrint({
     contentRef,
-    documentTitle: resume.title || "Currículo",
+    documentTitle: resume.title ?? "Currículo",
   });
 
   const wasUpdated = resume.updatedAt !== resume.createdAt;
@@ -44,15 +45,21 @@ export default function ResumeItem({ resume }: ResumeItemProps) {
   return (
     <div className="group relative rounded-lg border border-transparent bg-secondary p-3 transition-colors hover:border-border">
       <div className="space-y-3">
-        const router = useRouter();
-
         <div
           onClick={() => router.push(`/editor?resumeId=${resume.id}`)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              router.push(`/editor?resumeId=${resume.id}`);
+              e.preventDefault();
+            }
+          }}
+          role="button"
+          tabIndex={0}
           className="inline-block w-full cursor-pointer"
         >
           <div className="text-center">
             <p className="line-clamp-1 font-semibold">
-              {resume.title || "Sem título"}
+              {resume.title ?? "Sem título"}
             </p>
             {resume.description && (
               <p className="line-clamp-2 text-sm">{resume.description}</p>
@@ -82,7 +89,7 @@ interface MoreMenuProps {
   onPrintClick: () => void;
 }
 
-function MoreMenu({ resumeId, onPrintClick }: MoreMenuProps) {
+function MoreMenu({ resumeId, onPrintClick }: Readonly<MoreMenuProps>) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   return (
@@ -133,7 +140,7 @@ function DeleteConfirmationDialog({
   resumeId,
   open,
   onOpenChange,
-}: DeleteConfirmationDialogProps) {
+}: Readonly<DeleteConfirmationDialogProps>) {
   const { toast } = useToast();
 
   const [isPending, startTransition] = useTransition();

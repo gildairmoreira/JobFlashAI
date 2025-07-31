@@ -128,7 +128,7 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
                 href={link.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="underline hover:no-underline"
+                className="underline cursor-pointer"
                 style={{ color: colorHex }}
               >
                 {link.label}

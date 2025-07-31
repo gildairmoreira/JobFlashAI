@@ -40,7 +40,7 @@ import GenerateWorkExperienceButton from "./GenerateWorkExperienceButton";
 export default function WorkExperienceForm({
   resumeData,
   setResumeData,
-}: EditorFormProps) {
+}: Readonly<EditorFormProps>) {
   const form = useForm<WorkExperienceValues>({
     resolver: zodResolver(workExperienceSchema),
     defaultValues: {
@@ -55,7 +55,7 @@ export default function WorkExperienceForm({
       setResumeData({
         ...resumeData,
         workExperiences:
-          values.workExperiences?.filter((exp) => exp !== undefined) || [],
+          values.workExperiences?.filter((exp): exp is NonNullable<typeof exp> => exp !== undefined) || [],
       });
     });
     return unsubscribe;
@@ -149,7 +149,7 @@ function WorkExperienceItem({
   form,
   index,
   remove,
-}: WorkExperienceItemProps) {
+}: Readonly<WorkExperienceItemProps>) {
   const {
     attributes,
     listeners,

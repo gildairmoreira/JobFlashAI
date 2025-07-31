@@ -36,12 +36,8 @@ export default function GenerateCustomSectionButton({ onSectionGenerated }: Read
       // Parse the AI response to extract title and content
       // Como a IA agora gera apenas conteúdo sem título, usar toda a resposta como content
       const lines = aiResponse.trim().split('\n');
-      let title = lines[0]?.trim() || 'Seção Personalizada';
-      let content = lines.slice(1).join('\n').trim();
-      
-      if (!content) {
-        content = 'Conteúdo gerado pela IA baseado na descrição fornecida.';
-      }
+      const title = lines[0]?.trim() || 'Seção Personalizada';
+      const content = lines.slice(1).join('\n').trim() || 'Conteúdo gerado pela IA baseado na descrição fornecida.';
       
       onSectionGenerated(title, content);
       setOpen(false);
@@ -65,7 +61,7 @@ export default function GenerateCustomSectionButton({ onSectionGenerated }: Read
         <DialogHeader>
           <DialogTitle>Gerar seção customizada</DialogTitle>
           <DialogDescription>
-            Descreva em linguagem natural o que você quer na seção, como "Seção de projetos com 3 projetos e links". A IA gerará tanto o título quanto o conteúdo da seção automaticamente.
+            Descreva em linguagem natural o que você quer na seção, como &quot;Seção de projetos com 3 projetos e links&quot;. A IA gerará tanto o título quanto o conteúdo da seção automaticamente.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

@@ -47,9 +47,10 @@ export default function CustomSectionsForm({ resumeData, setResumeData }: Readon
     const { unsubscribe } = form.watch(async (values) => {
       const isValid = await form.trigger();
       if (!isValid) return;
+      const filteredCustomSections = (values.customSections ?? []).filter((section): section is NonNullable<typeof section> => section != null && (!!section.title?.trim()?.length || !!section.content?.trim()?.length));
       const filteredValues = {
         ...values,
-        customSections: values.customSections?.filter(section => section && (section.title?.trim() || section.content?.trim())) ?? [],
+        customSections: filteredCustomSections,
       };
       setResumeData({ ...resumeData, ...filteredValues });
     });
