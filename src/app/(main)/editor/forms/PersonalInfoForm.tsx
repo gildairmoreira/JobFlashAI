@@ -11,18 +11,14 @@ import { Input } from "@/components/ui/input";
 import { EditorFormProps } from "@/lib/types";
 import { personalInfoSchema, PersonalInfoValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
-
-interface PersonalInfoFormProps {
-  readonly resumeData: EditorFormProps['resumeData'];
-  readonly setResumeData: EditorFormProps['setResumeData'];
-}
+import { useForm, useFieldArray } from "react-hook-form";
 
 export default function PersonalInfoForm({
   resumeData,
   setResumeData,
-}: PersonalInfoFormProps) {
+}: Readonly<EditorFormProps>) {
   const form = useForm<PersonalInfoValues>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: {
@@ -33,14 +29,21 @@ export default function PersonalInfoForm({
       country: resumeData.country ?? "",
       phone: resumeData.phone ?? "",
       email: resumeData.email ?? "",
+      socialLinks: resumeData.socialLinks ?? [],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "socialLinks",
   });
 
   useEffect(() => {
     const { unsubscribe } = form.watch(async (values) => {
       const isValid = await form.trigger();
       if (!isValid) return;
-      setResumeData({ ...resumeData, ...values });
+      const filteredSocialLinks = (values.socialLinks ?? []).filter((link): link is NonNullable<typeof link> => link != null && (!!link.label?.trim()?.length || !!link.url?.trim()?.length));
+      setResumeData({ ...resumeData, ...values, socialLinks: filteredSocialLinks });
     });
     return unsubscribe;
   }, [form, resumeData, setResumeData]);
@@ -72,6 +75,7 @@ export default function PersonalInfoForm({
                         fieldValues.onChange(file);
                       }}
                       ref={photoInputRef}
+                      style={{ cursor: 'pointer' }}
                     />
                   </FormControl>
                   <Button
@@ -97,7 +101,7 @@ export default function PersonalInfoForm({
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome</FormLabel>
+                  <FormLabel>Primeiro nome</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -178,7 +182,7 @@ export default function PersonalInfoForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>E-mail</FormLabel>
                 <FormControl>
                   <Input {...field} type="email" />
                 </FormControl>
@@ -186,6 +190,61 @@ export default function PersonalInfoForm({
               </FormItem>
             )}
           />
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <FormLabel>Links sociais</FormLabel>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => append({ label: "", url: "" })}
+                className="flex items-center gap-2"
+              >
+                <Plus className="size-4" />
+                Adicionar link
+              </Button>
+            </div>
+            
+            {fields.map((field, index) => (
+              <div key={field.id} className="grid grid-cols-3 gap-2 items-end">
+                <FormField
+                  control={form.control}
+                  name={`socialLinks.${index}.label`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rótulo</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="LinkedIn" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`socialLinks.${index}.url`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>URL</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="https://linkedin.com/in/..." type="url" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => remove(index)}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </form>
       </Form>
     </div>

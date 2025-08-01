@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { FileUserIcon, PenLineIcon, DownloadIcon } from "lucide-react";
+import { FileUserIcon, PenLineIcon, Printer } from "lucide-react";
 import Link from "next/link";
-import { steps } from "./steps";
-import { useState } from "react";
-import ResumePreviewModal from "@/components/ResumePreviewModal";
+import React, { useState } from "react";
+import PrintModal from "@/components/PrintModal";
 import { ResumeValues } from "@/lib/validation";
+import { steps } from "./steps";
 
 interface FooterProps {
   readonly currentStep: string;
@@ -13,7 +13,8 @@ interface FooterProps {
   readonly showSmResumePreview: boolean;
   readonly setShowSmResumePreview: (show: boolean) => void;
   readonly isSaving: boolean;
-  readonly resumeData: ResumeValues;
+  readonly resumeData?: ResumeValues;
+  readonly resumeTitle?: string;
 }
 
 export default function Footer({
@@ -23,8 +24,9 @@ export default function Footer({
   setShowSmResumePreview,
   isSaving,
   resumeData,
+  resumeTitle = "Currículo",
 }: FooterProps) {
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
   const previousStep = steps.find(
     (_, index) => steps[index + 1]?.key === currentStep,
   )?.key;
@@ -33,46 +35,45 @@ export default function Footer({
     (_, index) => steps[index - 1]?.key === currentStep,
   )?.key;
 
-  const isLastStep = currentStep === steps[steps.length - 1].key;
-
-  const handleFinalize = () => {
-    setShowPreviewModal(true);
-  };
+  const isLastStep = currentStep === "custom-sections";
 
   return (
-    <footer className="w-full border-t px-3 py-5">
-      <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="secondary"
-            onClick={
-              previousStep ? () => setCurrentStep(previousStep) : undefined
-            }
-            disabled={!previousStep}
-          >
-            Passo anterior
-          </Button>
-          {isLastStep ? (
-            <Button onClick={handleFinalize} className="gap-2">
-              <DownloadIcon className="h-4 w-4" />
-              Finalizar
-            </Button>
-          ) : (
+    <>
+      <footer className="w-full border-t px-3 py-5">
+        <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3">
+          <div className="flex items-center gap-3">
             <Button
-              onClick={nextStep ? () => setCurrentStep(nextStep) : undefined}
-              disabled={!nextStep}
+              variant="secondary"
+              onClick={previousStep ? () => setCurrentStep(previousStep) : undefined}
+              disabled={!previousStep}
             >
-              Próximo passo
+              Passo anterior
             </Button>
-          )}
-        </div>
+            {isLastStep ? (
+              <Button
+                onClick={() => setShowPrintModal(true)}
+                className="flex items-center gap-2"
+                disabled={!resumeData}
+              >
+                <Printer className="size-4" />
+                Imprimir
+              </Button>
+            ) : (
+              <Button
+                onClick={nextStep ? () => setCurrentStep(nextStep) : undefined}
+                disabled={!nextStep}
+              >
+                Próximo passo
+              </Button>
+            )}
+          </div>
         <Button
           variant="outline"
           size="icon"
           onClick={() => setShowSmResumePreview(!showSmResumePreview)}
           className="md:hidden"
           title={
-            showSmResumePreview ? "Mostrar formulário" : "Mostrar visualização do currículo"
+            showSmResumePreview ? "Mostrar formulário de entrada" : "Mostrar prévia do currículo"
           }
         >
           {showSmResumePreview ? <PenLineIcon /> : <FileUserIcon />}
@@ -91,12 +92,15 @@ export default function Footer({
           </p>
         </div>
       </div>
-      
-      <ResumePreviewModal
-        isOpen={showPreviewModal}
-        onClose={() => setShowPreviewModal(false)}
-        resumeData={resumeData}
-      />
     </footer>
+    {resumeData && (
+      <PrintModal
+        open={showPrintModal}
+        onOpenChange={setShowPrintModal}
+        resumeData={resumeData}
+        resumeTitle={resumeTitle}
+      />
+    )}
+  </>
   );
 }

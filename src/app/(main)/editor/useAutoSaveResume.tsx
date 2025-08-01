@@ -4,7 +4,7 @@ import useDebounce from "@/hooks/useDebounce";
 import { fileReplacer } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { saveResume } from "./actions";
 
 export default function useAutoSaveResume(resumeData: ResumeValues) {

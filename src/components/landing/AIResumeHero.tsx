@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Sparkles, Zap, FileText, ArrowRight, Briefcase } from 'lucide-react';
@@ -31,7 +31,11 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
   const [, setIsHovered] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const [clickEffects, setClickEffects] = useState<ClickEffect[]>([]);
-
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const rotatingWords = ["Profissional", "Moderno", "Inteligente", "Personalizado"];
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -69,7 +73,7 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
   return (
     <>
       <NavBar />
-      <section className={cn("relative h-screen flex items-center justify-center overflow-hidden bg-black", className)}>
+      <section className={cn("relative h-screen flex items-center justify-center overflow-hidden bg-black", className || "")}>
         {/* Grid Pattern Background */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute inset-0 bg-grid-pattern"></div>
@@ -119,46 +123,48 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
         </div>
 
         {/* Floating icons */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[
-            { Icon: Zap, delay: 0 },
-            { Icon: FileText, delay: 0.5 },
-            { Icon: Briefcase, delay: 1 },
-            { Icon: Zap, delay: 1.5 },
-            { Icon: FileText, delay: 2 },
-            { Icon: Briefcase, delay: 2.5 },
-            { Icon: Zap, delay: 3 },
-            { Icon: FileText, delay: 3.5 },
-            { Icon: Briefcase, delay: 4 },
-            { Icon: Zap, delay: 4.5 },
-          ].map(({ Icon, delay }, i) => (
-            <motion.div
-              key={`floating-icon-${i}`}
-              className="absolute text-blue-500/20"
-              initial={{ 
-                opacity: 0, 
-                scale: 0,
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-              }}
-              animate={{
-                opacity: [0, 0.6, 0],
-                scale: [0, 1, 0],
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: Math.random() * 8 + 6,
-                repeat: Infinity,
-                delay: delay,
-                ease: "linear",
-              }}
-            >
-              <Icon className="w-6 h-6" />
-            </motion.div>
-          ))}
-        </div>
+        {mounted && (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[
+              { Icon: Zap, delay: 0 },
+              { Icon: FileText, delay: 0.5 },
+              { Icon: Briefcase, delay: 1 },
+              { Icon: Zap, delay: 1.5 },
+              { Icon: FileText, delay: 2 },
+              { Icon: Briefcase, delay: 2.5 },
+              { Icon: Zap, delay: 3 },
+              { Icon: FileText, delay: 3.5 },
+              { Icon: Briefcase, delay: 4 },
+              { Icon: Zap, delay: 4.5 },
+            ].map(({ Icon, delay }, i) => (
+              <motion.div
+                key={`floating-icon-${i}`}
+                className="absolute text-blue-500/20"
+                initial={{ 
+                  opacity: 0, 
+                  scale: 0,
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                  y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+                }}
+                animate={{
+                  opacity: [0, 0.6, 0],
+                  scale: [0, 1, 0],
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                  y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+                  rotate: [0, 360],
+                }}
+                transition={{
+                  duration: Math.random() * 8 + 6,
+                  repeat: Infinity,
+                  delay: delay,
+                  ease: "linear",
+                }}
+              >
+                <Icon className="w-6 h-6" />
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         <motion.div
           className="relative z-20 text-center px-4 max-w-6xl mx-auto flex flex-col justify-center items-center h-full"
@@ -244,9 +250,12 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
               variant="outline"
               size="lg"
               className="px-8 py-6 text-lg font-semibold rounded-full border-2 border-white/20 hover:bg-white/10 text-white transition-all duration-300"
+              asChild
             >
-              <FileText className="w-5 h-5 mr-2" />
-              Ver Exemplos
+              <Link href="#veja-nossa-ia-em-acao">
+                <FileText className="w-5 h-5 mr-2" />
+                Ver Exemplos
+              </Link>
             </Button>
           </motion.div>
         </motion.div>

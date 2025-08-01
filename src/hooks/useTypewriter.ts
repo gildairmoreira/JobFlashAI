@@ -54,52 +54,59 @@ export const useTypewriter = ({
     if (words.length === 0) return;
 
     const currentWord = words[currentWordIndex];
-    
+
+    const handleTyping = () => {
+      if (displayText.length < currentWord.length) {
+        setDisplayText(currentWord.slice(0, displayText.length + 1));
+        timeoutRef.current = setTimeout(typeNextChar, typeSpeed);
+      } else {
+        setIsWaiting(true);
+        timeoutRef.current = setTimeout(() => {
+          setIsWaiting(false);
+          setIsDeleting(true);
+          typeNextChar();
+        }, pauseBeforeDelete);
+      }
+    };
+
+    const handleDeleting = () => {
+      if (displayText.length > 0) {
+        setDisplayText(displayText.slice(0, -1));
+        timeoutRef.current = setTimeout(typeNextChar, deleteSpeed);
+      } else {
+        handleNextWord();
+      }
+    };
+
+    const handleNextWord = () => {
+      setIsDeleting(false);
+      const nextIndex = (currentWordIndex + 1) % words.length;
+
+      if (nextIndex === 0) {
+        if (typeof loop === 'number') {
+          const nextLoopCount = loopCount + 1;
+          if (nextLoopCount >= loop) {
+            setIsDone(true);
+            return;
+          }
+          setLoopCount(nextLoopCount);
+        } else if (!loop) {
+          setIsDone(true);
+          return;
+        }
+      }
+
+      setCurrentWordIndex(nextIndex);
+      timeoutRef.current = setTimeout(typeNextChar, typeSpeed);
+    };
+
     const typeNextChar = () => {
       if (isWaiting) return;
-      
+
       if (!isDeleting) {
-        // Typing phase
-        if (displayText.length < currentWord.length) {
-          setDisplayText(currentWord.slice(0, displayText.length + 1));
-          timeoutRef.current = setTimeout(typeNextChar, typeSpeed);
-        } else {
-          // Word complete, wait before deleting
-          setIsWaiting(true);
-          timeoutRef.current = setTimeout(() => {
-            setIsWaiting(false);
-            setIsDeleting(true);
-            typeNextChar();
-          }, pauseBeforeDelete);
-        }
+        handleTyping();
       } else {
-        // Deleting phase
-        if (displayText.length > 0) {
-          setDisplayText(displayText.slice(0, -1));
-          timeoutRef.current = setTimeout(typeNextChar, deleteSpeed);
-        } else {
-          // Word deleted, move to next word
-          setIsDeleting(false);
-          const nextIndex = (currentWordIndex + 1) % words.length;
-          
-          // Handle loop logic
-          if (nextIndex === 0) {
-            if (typeof loop === 'number') {
-              const nextLoopCount = loopCount + 1;
-              if (nextLoopCount >= loop) {
-                setIsDone(true);
-                return;
-              }
-              setLoopCount(nextLoopCount);
-            } else if (loop === false) {
-              setIsDone(true);
-              return;
-            }
-          }
-          
-          setCurrentWordIndex(nextIndex);
-          timeoutRef.current = setTimeout(typeNextChar, typeSpeed);
-        }
+        handleDeleting();
       }
     };
 

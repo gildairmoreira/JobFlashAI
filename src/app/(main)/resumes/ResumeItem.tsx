@@ -22,8 +22,8 @@ import { ResumeServerData } from "@/lib/types";
 import { mapToResumeValues } from "@/lib/utils";
 import { formatDate } from "date-fns";
 import { MoreVertical, Printer, Trash2 } from "lucide-react";
-import Link from "next/link";
-import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import React, { useRef, useState, useTransition } from "react";
 import { useReactToPrint } from "react-to-print";
 import { deleteResume } from "./actions";
 
@@ -31,12 +31,13 @@ interface ResumeItemProps {
   resume: ResumeServerData;
 }
 
-export default function ResumeItem({ resume }: ResumeItemProps) {
+export default function ResumeItem({ resume }: Readonly<ResumeItemProps>) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const reactToPrintFn = useReactToPrint({
     contentRef,
-    documentTitle: resume.title || "Currículo",
+    documentTitle: resume.title ?? "Currículo",
   });
 
   const wasUpdated = resume.updatedAt !== resume.createdAt;
@@ -44,32 +45,39 @@ export default function ResumeItem({ resume }: ResumeItemProps) {
   return (
     <div className="group relative rounded-lg border border-transparent bg-secondary p-3 transition-colors hover:border-border">
       <div className="space-y-3">
-        <Link
-          href={`/editor?resumeId=${resume.id}`}
-          className="inline-block w-full text-center"
+        <div
+          onClick={() => router.push(`/editor?resumeId=${resume.id}`)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              router.push(`/editor?resumeId=${resume.id}`);
+              e.preventDefault();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          className="inline-block w-full cursor-pointer"
         >
-          <p className="line-clamp-1 font-semibold">
-            {resume.title || "Sem título"}
-          </p>
-          {resume.description && (
-            <p className="line-clamp-2 text-sm">{resume.description}</p>
-          )}
-          <p className="text-xs text-muted-foreground">
-            {wasUpdated ? "Atualizado" : "Criado"} em{" "}
-            {formatDate(resume.updatedAt, "MMM d, yyyy h:mm a")}
-          </p>
-        </Link>
-        <Link
-          href={`/editor?resumeId=${resume.id}`}
-          className="relative inline-block w-full"
-        >
-          <ResumePreview
-            resumeData={mapToResumeValues(resume)}
-            contentRef={contentRef}
-            className="overflow-hidden shadow-sm transition-shadow group-hover:shadow-lg"
-          />
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
-        </Link>
+          <div className="text-center">
+            <p className="line-clamp-1 font-semibold">
+              {resume.title ?? "Sem título"}
+            </p>
+            {resume.description && (
+              <p className="line-clamp-2 text-sm">{resume.description}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {wasUpdated ? "Atualizado" : "Criado"} em
+              {formatDate(resume.updatedAt, "MMM d, yyyy h:mm a")}
+            </p>
+          </div>
+          <div className="relative mt-3">
+            <ResumePreview
+              resumeData={mapToResumeValues(resume)}
+              contentRef={contentRef}
+              className="overflow-hidden shadow-sm transition-shadow group-hover:shadow-lg"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+          </div>
+        </div>
       </div>
       <MoreMenu resumeId={resume.id} onPrintClick={reactToPrintFn} />
     </div>
@@ -81,7 +89,7 @@ interface MoreMenuProps {
   onPrintClick: () => void;
 }
 
-function MoreMenu({ resumeId, onPrintClick }: MoreMenuProps) {
+function MoreMenu({ resumeId, onPrintClick }: Readonly<MoreMenuProps>) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   return (
@@ -132,7 +140,7 @@ function DeleteConfirmationDialog({
   resumeId,
   open,
   onOpenChange,
-}: DeleteConfirmationDialogProps) {
+}: Readonly<DeleteConfirmationDialogProps>) {
   const { toast } = useToast();
 
   const [isPending, startTransition] = useTransition();
@@ -146,7 +154,7 @@ function DeleteConfirmationDialog({
         console.error(error);
         toast({
           variant: "destructive",
-          description: "Algo deu errado. Tente novamente.",
+          description: "Algo deu errado. Por favor, tente novamente.",
         });
       }
     });
@@ -158,8 +166,7 @@ function DeleteConfirmationDialog({
         <DialogHeader>
           <DialogTitle>Excluir currículo?</DialogTitle>
           <DialogDescription>
-            Isso excluirá permanentemente este currículo. Esta ação não pode ser
-            desfeita.
+            Isso excluirá permanentemente este currículo. Esta ação não pode ser desfeita.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

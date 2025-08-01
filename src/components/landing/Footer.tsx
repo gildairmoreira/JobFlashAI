@@ -20,33 +20,23 @@ const Footer: React.FC = () => {
       ],
     },
     {
-      title: 'Empresa',
-      links: [
-        { name: 'Sobre nós', href: '#' },
-        { name: 'Carreiras', href: '#' },
-        { name: 'Blog', href: '#' },
-        { name: 'Imprensa', href: '#' },
-        { name: 'Parceiros', href: '#' },
-      ],
-    },
-    {
       title: 'Suporte',
       links: [
-        { name: 'Ajuda', href: '#' },
-        { name: 'Contato', href: '#' },
-        { name: 'FAQ', href: '#' },
-        { name: 'Tutoriais', href: '#' },
-        { name: 'Status', href: '#' },
+        { name: 'Ajuda', href: '/suporte/ajuda' },
+        { name: 'Contato', href: '/suporte/contato' },
+        { name: 'FAQ', href: '/suporte/faq' },
+        { name: 'Tutoriais', href: '/suporte/tutoriais' },
+        { name: 'Status', href: '/suporte/status' },
       ],
     },
     {
       title: 'Legal',
       links: [
-        { name: 'Termos', href: '#' },
-        { name: 'Privacidade', href: '#' },
-        { name: 'Cookies', href: '#' },
-        { name: 'Licenças', href: '#' },
-        { name: 'Configurações', href: '#' },
+        { name: 'Termos', href: '/legal/termos' },
+        { name: 'Privacidade', href: '/legal/privacidade' },
+        { name: 'Cookies', href: '/legal/cookies' },
+        { name: 'Licenças', href: '/legal/licencas' },
+        { name: 'Configurações', href: '/legal/configuracoes' },
       ],
     },
   ];
@@ -120,13 +110,13 @@ const Footer: React.FC = () => {
           
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link 
-              href="#"
+              href="/legal/termos"
               className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
               Termos de Serviço
             </Link>
             <Link 
-              href="#"
+              href="/legal/privacidade"
               className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
               Privacidade

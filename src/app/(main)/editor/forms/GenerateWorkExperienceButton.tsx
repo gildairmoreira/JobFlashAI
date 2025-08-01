@@ -26,17 +26,20 @@ import {
 } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WandSparklesIcon } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
 import { generateWorkExperience } from "./actions";
 
 interface GenerateWorkExperienceButtonProps {
-  readonly onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
+  onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
 }
 
 export default function GenerateWorkExperienceButton({
   onWorkExperienceGenerated,
 }: GenerateWorkExperienceButtonProps) {
+  const subscriptionLevel = useSubscriptionLevel();
+
   const premiumModal = usePremiumModal();
 
   const [showInputDialog, setShowInputDialog] = useState(false);
@@ -47,7 +50,7 @@ export default function GenerateWorkExperienceButton({
         variant="outline"
         type="button"
         onClick={() => {
-          if (!canUseAITools()) {
+          if (!canUseAITools(subscriptionLevel || null)) {
             premiumModal.setOpen(true);
             return;
           }
@@ -70,9 +73,9 @@ export default function GenerateWorkExperienceButton({
 }
 
 interface InputDialogProps {
-  readonly open: boolean;
-  readonly onOpenChange: (open: boolean) => void;
-  readonly onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
 }
 
 function InputDialog({
@@ -95,17 +98,9 @@ function InputDialog({
       onWorkExperienceGenerated(response);
     } catch (error) {
       console.error(error);
-      
-      let errorMessage = "Algo deu errado. Tente novamente.";
-      
-      if (error instanceof Error) {
-        // Usar a mensagem específica do erro se disponível
-        errorMessage = error.message;
-      }
-      
       toast({
         variant: "destructive",
-        description: errorMessage,
+        description: "Something went wrong. Please try again.",
       });
     }
   }
@@ -114,10 +109,9 @@ function InputDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Gerar experiência de trabalho</DialogTitle>
+          <DialogTitle>Gerar experiência profissional</DialogTitle>
           <DialogDescription>
-            Descreva esta experiência de trabalho e a IA gerará uma entrada
-            otimizada para você.
+            Descreva esta experiência profissional e a IA gerará uma entrada otimizada para você.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -131,7 +125,7 @@ function InputDialog({
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder={`Ex: "de nov 2019 a dez 2020 trabalhei no Google como engenheiro de software, minhas tarefas eram: ..."`}
+                      placeholder={`Ex.: "de nov 2019 a dez 2020 trabalhei no Google como engenheiro de software, minhas tarefas eram: ..."`}
                       autoFocus
                     />
                   </FormControl>
@@ -139,7 +133,7 @@ function InputDialog({
                 </FormItem>
               )}
             />
-            <LoadingButton type="submit" loading={form.formState.isSubmitting}>
+            <LoadingButton loading={form.formState.isSubmitting}>
               Gerar
             </LoadingButton>
           </form>

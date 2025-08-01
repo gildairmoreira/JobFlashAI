@@ -34,19 +34,14 @@ import { GripHorizontal } from "lucide-react";
 import { useEffect } from "react";
 import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 
-interface EducationFormProps {
-  readonly resumeData: EditorFormProps['resumeData'];
-  readonly setResumeData: EditorFormProps['setResumeData'];
-}
-
 export default function EducationForm({
   resumeData,
   setResumeData,
-}: EducationFormProps) {
+}: EditorFormProps) {
   const form = useForm<EducationValues>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      educations: resumeData.educations ?? [],
+      educations: resumeData.educations || [],
     },
   });
 
@@ -56,7 +51,7 @@ export default function EducationForm({
       if (!isValid) return;
       setResumeData({
         ...resumeData,
-        educations: values.educations?.filter((edu): edu is NonNullable<typeof edu> => edu !== undefined) ?? [],
+        educations: values.educations?.filter((edu) => edu !== undefined) || [],
       });
     });
     return unsubscribe;
@@ -90,7 +85,7 @@ export default function EducationForm({
       <div className="space-y-1.5 text-center">
         <h2 className="text-2xl font-semibold">Educação</h2>
         <p className="text-sm text-muted-foreground">
-          Adicione quantas formações quiser.
+          Adicione quantas formações educacionais desejar.
         </p>
       </div>
       <Form {...form}>
@@ -138,10 +133,10 @@ export default function EducationForm({
 }
 
 interface EducationItemProps {
-  readonly id: string;
-  readonly form: UseFormReturn<EducationValues>;
-  readonly index: number;
-  readonly remove: (index: number) => void;
+  id: string;
+  form: UseFormReturn<EducationValues>;
+  index: number;
+  remove: (index: number) => void;
 }
 
 function EducationItem({ id, form, index, remove }: EducationItemProps) {
@@ -179,7 +174,7 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
         name={`educations.${index}.degree`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Grau</FormLabel>
+            <FormLabel>Curso</FormLabel>
             <FormControl>
               <Input {...field} autoFocus />
             </FormControl>
@@ -211,7 +206,7 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                 <Input
                   {...field}
                   type="date"
-                  value={field.value?.slice(0, 10) ?? ""}
+                  value={field.value?.slice(0, 10)}
                 />
               </FormControl>
               <FormMessage />
@@ -228,7 +223,7 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                 <Input
                   {...field}
                   type="date"
-                  value={field.value?.slice(0, 10) ?? ""}
+                  value={field.value?.slice(0, 10)}
                 />
               </FormControl>
               <FormMessage />

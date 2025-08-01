@@ -1,39 +1,48 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Zap, Shield } from 'lucide-react';
+import Link from 'next/link';
 
 const CTASection: React.FC = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950 opacity-70" />
       
       {/* Animated particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 rounded-full bg-blue-500 opacity-20"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              opacity: [0.2, 0.5, 0.2],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
+      {mounted && (
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 rounded-full bg-blue-500 opacity-20"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -20, 0],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100 dark:border-gray-700">
@@ -77,12 +86,16 @@ const CTASection: React.FC = () => {
               </div>
               
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Criar Meu Currículo Grátis
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white" asChild>
+                  <Link href="/resumes">
+                    Criar Meu Currículo Grátis
+                  </Link>
                 </Button>
                 
-                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
-                  Ver Exemplos
+                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10" asChild>
+                  <Link href="#veja-nossa-ia-em-acao">
+                    Ver Exemplos
+                  </Link>
                 </Button>
               </div>
             </motion.div>

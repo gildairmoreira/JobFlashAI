@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Inter } from "next/font/google";
+import React from 'react';
+import { Toaster } from '@/components/ui/toaster';
+import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export default function LandingPageLayout({
   children,

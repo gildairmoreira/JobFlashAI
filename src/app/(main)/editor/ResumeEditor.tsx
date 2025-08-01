@@ -5,7 +5,7 @@ import { ResumeServerData } from "@/lib/types";
 import { cn, mapToResumeValues } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 import Footer from "./Footer";
 import ResumePreviewSection from "./ResumePreviewSection";
@@ -75,13 +75,14 @@ export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
         </div>
       </main>
       <Footer
-        currentStep={currentStep}
-        setCurrentStep={setStep}
-        showSmResumePreview={showSmResumePreview}
-        setShowSmResumePreview={setShowSmResumePreview}
-        isSaving={isSaving}
-        resumeData={resumeData}
-      />
+          currentStep={currentStep}
+          setCurrentStep={setStep}
+          showSmResumePreview={showSmResumePreview}
+          setShowSmResumePreview={setShowSmResumePreview}
+          isSaving={isSaving}
+          resumeData={resumeData}
+          resumeTitle={resumeData.title || "Currículo"}
+        />
     </div>
   );
 }

@@ -14,20 +14,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-interface GeneralInfoFormProps {
-  readonly resumeData: EditorFormProps['resumeData'];
-  readonly setResumeData: EditorFormProps['setResumeData'];
-}
-
 export default function GeneralInfoForm({
   resumeData,
   setResumeData,
-}: GeneralInfoFormProps) {
+}: EditorFormProps) {
   const form = useForm<GeneralInfoValues>({
     resolver: zodResolver(generalInfoSchema),
     defaultValues: {
-      title: resumeData.title ?? "",
-      description: resumeData.description ?? "",
+      title: resumeData.title || "",
+      description: resumeData.description || "",
     },
   });
 

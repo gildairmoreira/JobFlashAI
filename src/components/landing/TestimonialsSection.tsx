@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
@@ -92,7 +92,7 @@ const TestimonialsSection = () => {
                 <div className="flex mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star 
-                      key={i} 
+                      key={`star-${i}`} 
                       className={i < testimonials[currentIndex].rating 
                         ? "text-yellow-400 fill-yellow-400" 
                         : "text-gray-300 dark:text-gray-600"} 
@@ -102,7 +102,7 @@ const TestimonialsSection = () => {
                 </div>
                 
                 <blockquote className="text-xl italic text-gray-700 dark:text-gray-300 mb-6">
-                  "{testimonials[currentIndex].content}"
+                  &quot;{testimonials[currentIndex].content}&quot;
                 </blockquote>
                 
                 <div>
@@ -140,7 +140,7 @@ const TestimonialsSection = () => {
           <div className="flex justify-center mt-6 gap-2">
             {testimonials.map((_, index) => (
               <button
-                key={index}
+                key={`dot-${index}`}
                 onClick={() => setCurrentIndex(index)}
                 className={`w-3 h-3 rounded-full ${index === currentIndex ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}
                 aria-label={`Ver depoimento ${index + 1}`}

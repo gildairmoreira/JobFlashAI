@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useScroll } from 'framer-motion';
+import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { Home, Layers, FileText, User, Menu, X } from 'lucide-react';
 import logo from '@/assets/logos/logo.png';
 import { useUser } from '@clerk/nextjs';
@@ -62,7 +61,7 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Image src={logo} alt="JobFlashAI Logo" width={40} height={40} className="rounded-lg" />
+                <Image src={logo} alt="JobFlashAI Logo" width={60} height={60} className="rounded-lg" />
               </motion.div>
               <span className="font-bold text-lg text-white hidden sm:inline" style={{textShadow: '1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'}}>JobFlashAI</span>
             </Link>

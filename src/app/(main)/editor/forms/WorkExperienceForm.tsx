@@ -33,19 +33,14 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GripHorizontal } from "lucide-react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 import GenerateWorkExperienceButton from "./GenerateWorkExperienceButton";
-
-interface WorkExperienceFormProps {
-  readonly resumeData: EditorFormProps['resumeData'];
-  readonly setResumeData: EditorFormProps['setResumeData'];
-}
 
 export default function WorkExperienceForm({
   resumeData,
   setResumeData,
-}: WorkExperienceFormProps) {
+}: Readonly<EditorFormProps>) {
   const form = useForm<WorkExperienceValues>({
     resolver: zodResolver(workExperienceSchema),
     defaultValues: {
@@ -59,8 +54,7 @@ export default function WorkExperienceForm({
       if (!isValid) return;
       setResumeData({
         ...resumeData,
-        workExperiences:
-          values.workExperiences?.filter((exp): exp is NonNullable<typeof exp> => exp !== undefined) ?? [],
+        workExperiences: values.workExperiences?.filter((exp): exp is NonNullable<typeof exp> => exp !== undefined) || [],
       });
     });
     return unsubscribe;
@@ -72,7 +66,11 @@ export default function WorkExperienceForm({
   });
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -154,7 +152,7 @@ function WorkExperienceItem({
   form,
   index,
   remove,
-}: WorkExperienceItemProps) {
+}: Readonly<WorkExperienceItemProps>) {
   const {
     attributes,
     listeners,
@@ -225,11 +223,7 @@ function WorkExperienceItem({
             <FormItem>
               <FormLabel>Data de início</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="date"
-                  value={field.value?.slice(0, 10) ?? ""}
-                />
+                <Input type="date" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -242,20 +236,16 @@ function WorkExperienceItem({
             <FormItem>
               <FormLabel>Data de término</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="date"
-                  value={field.value?.slice(0, 10) ?? ""}
-                />
+                <Input type="date" {...field} />
               </FormControl>
+              <FormDescription>Deixe em branco se for o emprego atual.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
       <FormDescription>
-        Deixe a <span className="font-semibold">data de término</span> vazia se você
-        ainda trabalha aqui.
+        Deixe a <span className="font-semibold">data de término</span> vazia se você ainda trabalha aqui.
       </FormDescription>
       <FormField
         control={form.control}

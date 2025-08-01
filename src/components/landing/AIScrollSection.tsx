@@ -10,7 +10,7 @@ import resumePreview from '@/assets/hero/resume-preview.jpg';
 
 const AIScrollSection: React.FC = () => {
   return (
-    <div className="py-20 bg-gray-50 dark:bg-gray-900">
+    <div className="py-20 bg-gray-50 dark:bg-gray-900" id="veja-nossa-ia-em-acao">
       <div className="max-w-7xl mx-auto px-4">
         {/* Título da seção */}
         <div className="max-w-3xl mx-auto mb-16 text-center">

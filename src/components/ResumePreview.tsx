@@ -3,15 +3,14 @@ import useDimensions from "@/hooks/useDimensions";
 import { cn } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";
 import { formatDate } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "./ui/badge";
 
 interface ResumePreviewProps {
-  readonly resumeData: ResumeValues;
-  readonly contentRef?: React.Ref<HTMLDivElement>;
-  readonly className?: string;
+  resumeData: ResumeValues;
+  contentRef?: React.Ref<HTMLDivElement>;
+  className?: string;
 }
 
 export default function ResumePreview({
@@ -24,12 +23,12 @@ export default function ResumePreview({
   const { width } = useDimensions(containerRef);
 
   return (
-    <div className={cn(
-      "aspect-[210/297] h-fit w-full bg-white text-black",
-      className,
-    )}
+    <div
+      className={cn(
+        "aspect-[210/297] h-fit w-full bg-white text-black",
+        className,
+      )}
       ref={containerRef}
-      suppressHydrationWarning
     >
       <div
         className={cn("space-y-6 p-6", !width && "invisible")}
@@ -38,12 +37,12 @@ export default function ResumePreview({
         }}
         ref={contentRef}
         id="resumePreviewContent"
-        suppressHydrationWarning
       >
         <PersonalInfoHeader resumeData={resumeData} />
         <SummarySection resumeData={resumeData} />
         <WorkExperienceSection resumeData={resumeData} />
         <EducationSection resumeData={resumeData} />
+        <CustomSectionsSection resumeData={resumeData} />
         <SkillsSection resumeData={resumeData} />
       </div>
     </div>
@@ -51,7 +50,7 @@ export default function ResumePreview({
 }
 
 interface ResumeSectionProps {
-  readonly resumeData: ResumeValues;
+  resumeData: ResumeValues;
 }
 
 function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
@@ -64,6 +63,7 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
     country,
     phone,
     email,
+    socialLinks,
     colorHex,
     borderStyle,
   } = resumeData;
@@ -78,7 +78,7 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
   }, [photo]);
 
   return (
-    <div className="flex items-center gap-6" suppressHydrationWarning>
+    <div className="flex items-center gap-6">
       {photoSrc && (
         <Image
           src={photoSrc}
@@ -121,6 +121,20 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
           {country}
           {(city || country) && (phone || email) ? " • " : ""}
           {[phone, email].filter(Boolean).join(" • ")}
+          {socialLinks?.filter(link => link.label && link.url).map((link, index) => (
+            <span key={index}>
+              {" • "}
+              <a 
+                href={link.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline cursor-pointer"
+                style={{ color: colorHex }}
+              >
+                {link.label}
+              </a>
+            </span>
+          ))}
         </p>
       </div>
     </div>
@@ -179,7 +193,7 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Experiência Profissional
+          Experiência profissional
         </p>
         {workExperiencesNotEmpty.map((exp, index) => (
           <div key={index} className="break-inside-avoid space-y-1">
@@ -191,9 +205,9 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
             >
               <span>{exp.position}</span>
               {exp.startDate && (
-                <span suppressHydrationWarning>
-                  {formatDate(exp.startDate, "MM/yyyy", { locale: ptBR })} -{" "}
-                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy", { locale: ptBR }) : "Presente"}
+                <span>
+                  {formatDate(exp.startDate, "MM/yyyy")} -{" "}
+                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy") : "Present"}
                 </span>
               )}
             </div>
@@ -230,7 +244,7 @@ function EducationSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Formação Acadêmica
+          Educação
         </p>
         {educationsNotEmpty.map((edu, index) => (
           <div key={index} className="break-inside-avoid space-y-1">
@@ -242,13 +256,67 @@ function EducationSection({ resumeData }: ResumeSectionProps) {
             >
               <span>{edu.degree}</span>
               {edu.startDate && (
-                <span suppressHydrationWarning>
+                <span>
                   {edu.startDate &&
-                    `${formatDate(edu.startDate, "MM/yyyy", { locale: ptBR })} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy", { locale: ptBR })}` : ""}`}
+                    `${formatDate(edu.startDate, "MM/yyyy")} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy")}` : ""}`}
                 </span>
               )}
             </div>
             <p className="text-xs font-semibold">{edu.school}</p>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function CustomSectionsSection({ resumeData }: ResumeSectionProps) {
+  const { customSections, colorHex } = resumeData;
+
+  const customSectionsNotEmpty = customSections?.filter(
+    (section) => Object.values(section).filter(Boolean).length > 0,
+  );
+
+  if (!customSectionsNotEmpty?.length) return null;
+
+  // Simple markdown to HTML conversion
+  const formatContent = (content: string) => {
+    return content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+      .replace(/^\*\s+(.*)$/gm, '• $1') // Bullet points
+      .replace(/\n/g, '<br>'); // Line breaks
+  };
+
+  return (
+    <>
+      <hr
+        className="border-2"
+        style={{
+          borderColor: colorHex,
+        }}
+      />
+      <div className="space-y-3">
+        {customSectionsNotEmpty.map((section, index) => (
+          <div key={index} className="break-inside-avoid space-y-1.5">
+            {section.title && (
+              <p
+                className="text-lg font-semibold"
+                style={{
+                  color: colorHex,
+                }}
+              >
+                {section.title}
+              </p>
+            )}
+            {section.content && (
+              <div 
+                className="text-sm"
+                dangerouslySetInnerHTML={{
+                  __html: formatContent(section.content)
+                }}
+              />
+            )}
           </div>
         ))}
       </div>
@@ -276,7 +344,7 @@ function SkillsSection({ resumeData }: ResumeSectionProps) {
             color: colorHex,
           }}
         >
-          Habilidades
+          Skills
         </p>
         <div className="flex break-inside-avoid flex-wrap gap-2">
           {skills.map((skill, index) => (
