@@ -1,10 +1,9 @@
 "use client";
 
-import { env } from "@/env";
 import { useToast } from "@/hooks/use-toast";
 import usePremiumModal from "@/hooks/usePremiumModal";
 import { Check } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { createCheckoutSession } from "./actions";
@@ -23,7 +22,11 @@ export default function PremiumModal() {
     try {
       setLoading(true);
       const redirectUrl = await createCheckoutSession(priceId);
-      window.location.href = redirectUrl;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        throw new Error('URL de redirecionamento não encontrada');
+      }
     } catch (error) {
       console.error(error);
       toast({

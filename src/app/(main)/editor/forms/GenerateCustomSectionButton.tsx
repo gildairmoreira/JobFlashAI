@@ -5,7 +5,7 @@ import LoadingButton from "@/components/LoadingButton";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MessageSquare } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { generateCustomSection } from "./actions";
@@ -83,7 +83,7 @@ export default function GenerateCustomSectionButton({ onSectionGenerated }: Read
                 </FormItem>
               )}
             />
-            <LoadingButton loading={loading} type="submit">
+            <LoadingButton loading={loading}>
               Gerar
             </LoadingButton>
           </form>

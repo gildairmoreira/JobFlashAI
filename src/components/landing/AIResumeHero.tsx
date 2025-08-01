@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Sparkles, Zap, FileText, ArrowRight, Briefcase } from 'lucide-react';
@@ -28,10 +28,14 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
   const { scrollY } = useScroll();
   const opacity = useTransform(scrollY, [0, 400], [1, 0.6]);
   const scale = useTransform(scrollY, [0, 400], [1, 0.95]);
-  const [isHovered, setIsHovered] = useState(false);
+  const [, setIsHovered] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const [clickEffects, setClickEffects] = useState<ClickEffect[]>([]);
-
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const rotatingWords = ["Profissional", "Moderno", "Inteligente", "Personalizado"];
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -69,10 +73,10 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
   return (
     <>
       <NavBar />
-      <section className={cn("relative h-screen flex items-center justify-center overflow-hidden bg-black", className ?? "")}>
+      <section className={cn("relative h-screen flex items-center justify-center overflow-hidden bg-black", className || "")}>
         {/* Grid Pattern Background */}
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute inset-0 bg-grid-pattern"></button>
+          <div className="absolute inset-0 bg-grid-pattern"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
         </div>
@@ -94,13 +98,15 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
         <div className="absolute inset-0 bg-black/60" />
 
         {/* Interactive Background */}
-        <button 
-  ref={backgroundRef} 
-  className="absolute inset-0 overflow-hidden cursor-pointer" 
-  onClick={handleBackgroundClick}
-  onKeyDown={handleKeyDown}
-  aria-label="Interactive background - click to create visual effects"
->
+        <div 
+          ref={backgroundRef} 
+          className="absolute inset-0 overflow-hidden cursor-pointer" 
+          onClick={handleBackgroundClick}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          role="button"
+          aria-label="Interactive background - click to create visual effects"
+        >
           {clickEffects.map((effect) => (
             <motion.div
               key={`effect-${effect.id}`}
@@ -117,46 +123,48 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
         </div>
 
         {/* Floating icons */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[
-            { Icon: Zap, delay: 0 },
-            { Icon: FileText, delay: 0.5 },
-            { Icon: Briefcase, delay: 1 },
-            { Icon: Zap, delay: 1.5 },
-            { Icon: FileText, delay: 2 },
-            { Icon: Briefcase, delay: 2.5 },
-            { Icon: Zap, delay: 3 },
-            { Icon: FileText, delay: 3.5 },
-            { Icon: Briefcase, delay: 4 },
-            { Icon: Zap, delay: 4.5 },
-          ].map(({ Icon, delay }, i) => (
-            <motion.div
-              key={`floating-icon-${delay}-${i}`}
-              className="absolute text-blue-500/20"
-              initial={{ 
-                opacity: 0, 
-                scale: 0,
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-              }}
-              animate={{
-                opacity: [0, 0.6, 0],
-                scale: [0, 1, 0],
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: Math.random() * 8 + 6,
-                repeat: Infinity,
-                delay: delay,
-                ease: "linear",
-              }}
-            >
-              <Icon className="w-6 h-6" />
-            </motion.div>
-          ))}
-        </div>
+        {mounted && (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[
+              { Icon: Zap, delay: 0 },
+              { Icon: FileText, delay: 0.5 },
+              { Icon: Briefcase, delay: 1 },
+              { Icon: Zap, delay: 1.5 },
+              { Icon: FileText, delay: 2 },
+              { Icon: Briefcase, delay: 2.5 },
+              { Icon: Zap, delay: 3 },
+              { Icon: FileText, delay: 3.5 },
+              { Icon: Briefcase, delay: 4 },
+              { Icon: Zap, delay: 4.5 },
+            ].map(({ Icon, delay }, i) => (
+              <motion.div
+                key={`floating-icon-${i}`}
+                className="absolute text-blue-500/20"
+                initial={{ 
+                  opacity: 0, 
+                  scale: 0,
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                  y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+                }}
+                animate={{
+                  opacity: [0, 0.6, 0],
+                  scale: [0, 1, 0],
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                  y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+                  rotate: [0, 360],
+                }}
+                transition={{
+                  duration: Math.random() * 8 + 6,
+                  repeat: Infinity,
+                  delay: delay,
+                  ease: "linear",
+                }}
+              >
+                <Icon className="w-6 h-6" />
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         <motion.div
           className="relative z-20 text-center px-4 max-w-6xl mx-auto flex flex-col justify-center items-center h-full"

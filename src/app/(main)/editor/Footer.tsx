@@ -2,19 +2,19 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FileUserIcon, PenLineIcon, Printer } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
 import PrintModal from "@/components/PrintModal";
 import { ResumeValues } from "@/lib/validation";
 import { steps } from "./steps";
 
 interface FooterProps {
-  currentStep: string;
-  setCurrentStep: (step: string) => void;
-  showSmResumePreview: boolean;
-  setShowSmResumePreview: (show: boolean) => void;
-  isSaving: boolean;
-  resumeData?: ResumeValues;
-  resumeTitle?: string;
+  readonly currentStep: string;
+  readonly setCurrentStep: (step: string) => void;
+  readonly showSmResumePreview: boolean;
+  readonly setShowSmResumePreview: (show: boolean) => void;
+  readonly isSaving: boolean;
+  readonly resumeData?: ResumeValues;
+  readonly resumeTitle?: string;
 }
 
 export default function Footer({

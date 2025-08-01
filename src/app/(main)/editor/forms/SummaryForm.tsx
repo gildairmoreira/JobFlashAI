@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { EditorFormProps } from "@/lib/types";
 import { summarySchema, SummaryValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import GenerateSummaryButton from "./GenerateSummaryButton";
 
@@ -23,7 +23,7 @@ export default function SummaryForm({ resumeData, setResumeData }: Readonly<Edit
   });
 
   useEffect(() => {
-    const { unsubscribe } = form.watch(async (values) => {
+    const { unsubscribe } = form.watch(async (values: SummaryValues) => {
       const isValid = await form.trigger();
       if (!isValid) return;
       setResumeData({ ...resumeData, ...values });

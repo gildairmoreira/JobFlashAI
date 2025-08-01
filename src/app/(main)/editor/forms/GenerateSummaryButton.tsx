@@ -4,7 +4,7 @@ import usePremiumModal from "@/hooks/usePremiumModal";
 import { canUseAITools } from "@/lib/permissions";
 import { ResumeValues } from "@/lib/validation";
 import { WandSparklesIcon } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
 import { generateSummary } from "./actions";
 
@@ -26,7 +26,7 @@ export default function GenerateSummaryButton({
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
-    if (!canUseAITools(subscriptionLevel)) {
+    if (!canUseAITools(subscriptionLevel || null)) {
       premiumModal.setOpen(true);
       return;
     }
@@ -49,7 +49,6 @@ export default function GenerateSummaryButton({
   return (
     <LoadingButton
       variant="outline"
-      type="button"
       onClick={handleClick}
       loading={loading}
     >

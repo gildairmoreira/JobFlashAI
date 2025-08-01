@@ -26,7 +26,7 @@ import {
 } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WandSparklesIcon } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
 import { generateWorkExperience } from "./actions";
@@ -50,7 +50,7 @@ export default function GenerateWorkExperienceButton({
         variant="outline"
         type="button"
         onClick={() => {
-          if (!canUseAITools(subscriptionLevel)) {
+          if (!canUseAITools(subscriptionLevel || null)) {
             premiumModal.setOpen(true);
             return;
           }
@@ -133,7 +133,7 @@ function InputDialog({
                 </FormItem>
               )}
             />
-            <LoadingButton type="submit" loading={form.formState.isSubmitting}>
+            <LoadingButton loading={form.formState.isSubmitting}>
               Gerar
             </LoadingButton>
           </form>

@@ -1,19 +1,19 @@
 'use server';
 
-import mercadopago from 'mercadopago';
+import { MercadoPagoConfig, PreApproval } from 'mercadopago';
 import { env } from '@/env';
-import { auth } from '@clerk/nextjs/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function createCheckoutSession(planType: string) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('Usuário não autenticado');
 
   const user = await currentUser();
   const email = user?.emailAddresses[0]?.emailAddress;
   if (!email) throw new Error('Email do usuário não encontrado');
 
-  mercadopago.configure({ access_token: env.MERCADO_PAGO_ACCESS_TOKEN });
+  const client = new MercadoPagoConfig({ accessToken: env.MERCADO_PAGO_ACCESS_TOKEN });
+  const preapproval = new PreApproval(client);
 
   let amount = 29.90; // Valor padrão para Pro
   let reason = 'Assinatura Pro Mensal';
@@ -41,6 +41,6 @@ export async function createCheckoutSession(planType: string) {
     },
   };
 
-  const response = await mercadopago.preapproval.create(preapprovalData);
-  return response.body.init_point;
+  const response = await preapproval.create({ body: preapprovalData });
+  return response.init_point;
 }

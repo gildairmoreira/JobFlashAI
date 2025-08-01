@@ -23,7 +23,7 @@ import { mapToResumeValues } from "@/lib/utils";
 import { formatDate } from "date-fns";
 import { MoreVertical, Printer, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import React, { useRef, useState, useTransition } from "react";
 import { useReactToPrint } from "react-to-print";
 import { deleteResume } from "./actions";
 

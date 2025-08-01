@@ -33,7 +33,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GripHorizontal } from "lucide-react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 import GenerateWorkExperienceButton from "./GenerateWorkExperienceButton";
 
@@ -54,8 +54,7 @@ export default function WorkExperienceForm({
       if (!isValid) return;
       setResumeData({
         ...resumeData,
-        workExperiences:
-          values.workExperiences?.filter((exp): exp is NonNullable<typeof exp> => exp !== undefined) || [],
+        workExperiences: values.workExperiences?.filter((exp): exp is NonNullable<typeof exp> => exp !== undefined) || [],
       });
     });
     return unsubscribe;
@@ -67,7 +66,11 @@ export default function WorkExperienceForm({
   });
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -138,10 +141,10 @@ export default function WorkExperienceForm({
 }
 
 interface WorkExperienceItemProps {
-  id: string;
-  form: UseFormReturn<WorkExperienceValues>;
-  index: number;
-  remove: (index: number) => void;
+  readonly id: string;
+  readonly form: UseFormReturn<WorkExperienceValues>;
+  readonly index: number;
+  readonly remove: (index: number) => void;
 }
 
 function WorkExperienceItem({

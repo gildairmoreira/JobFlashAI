@@ -1,6 +1,6 @@
 import { env } from '@/env';
-import mercadopago from 'mercadopago';
-import prisma from '@/lib/prisma'; // Changed to default import
+import { MercadoPagoConfig, PreApproval } from 'mercadopago';
+import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 
@@ -30,9 +30,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false }, { status: 400 });
   }
 
-  const client = new mercadopago.MercadoPagoConfig({ accessToken: env.MERCADO_PAGO_ACCESS_TOKEN });
-  const preapproval = new mercadopago.PreApproval(client);
-
+  const client = new MercadoPagoConfig({ accessToken: env.MERCADO_PAGO_ACCESS_TOKEN });
+  
   // Fetch preapproval details if needed
   const eventData = JSON.parse(body);
 
