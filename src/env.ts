@@ -15,7 +15,7 @@ export const env = createEnv({
     BLOB_READ_WRITE_TOKEN: z.string().min(1),
     GEMINI_API_KEY: z.string().min(1),
     MERCADO_PAGO_ACCESS_TOKEN: z.string().min(1),
-    MERCADO_PAGO_WEBHOOK_SECRET: z.string().min(1),
+    MERCADO_PAGO_WEBHOOK_SECRET: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),

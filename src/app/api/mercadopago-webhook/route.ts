@@ -1,5 +1,5 @@
 import { env } from '@/env';
-import { MercadoPagoConfig, PreApproval } from 'mercadopago';
+/* import { MercadoPagoConfig, PreApproval } from 'mercadopago'; */
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
@@ -20,6 +20,10 @@ export async function POST(request: Request) {
     if (key.trim() === 'v1') hash = value.trim();
   });
 
+  if (!env.MERCADO_PAGO_WEBHOOK_SECRET) {
+    console.error('Missing webhook secret');
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
   const manifest = `id:${dataId},timestamp:${ts},request-id:${requestId}`;
   const expectedHash = crypto.createHmac('sha256', env.MERCADO_PAGO_WEBHOOK_SECRET)
     .update(manifest)
@@ -30,8 +34,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false }, { status: 400 });
   }
 
-  const client = new MercadoPagoConfig({ accessToken: env.MERCADO_PAGO_ACCESS_TOKEN });
-  
   // Fetch preapproval details if needed
   const eventData = JSON.parse(body);
 

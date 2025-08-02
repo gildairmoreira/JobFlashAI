@@ -1,7 +1,7 @@
 "use server";
 
 import { canUseAITools } from "@/lib/permissions";
-import { getUserSubscriptionLevel } from "@/lib/subscription";
+
 import gemini from "@/lib/gemini";
 import {
   GenerateSummaryInput,
@@ -19,9 +19,7 @@ export async function generateSummary(input: GenerateSummaryInput) {
     throw new Error("Não autorizado");
   }
 
-  const subscriptionLevel = await getUserSubscriptionLevel(userId);
-
-  if (!canUseAITools(subscriptionLevel)) {
+  if (!canUseAITools()) {
     throw new Error("Atualize sua assinatura para usar este recurso");
   }
 
@@ -88,9 +86,7 @@ export async function generateWorkExperience(
     throw new Error("Unauthorized");
   }
 
-  const subscriptionLevel = await getUserSubscriptionLevel(userId);
-
-  if (!canUseAITools(subscriptionLevel)) {
+  if (!canUseAITools()) {
     throw new Error("Upgrade your subscription to use this feature");
   }
 
@@ -141,9 +137,7 @@ export async function generateCustomSection(input: { description: string }) {
     throw new Error("Não autorizado");
   }
 
-  const subscriptionLevel = await getUserSubscriptionLevel(userId);
-
-  if (!canUseAITools(subscriptionLevel)) {
+  if (!canUseAITools()) {
     throw new Error("Atualize sua assinatura para usar este recurso");
   }
 

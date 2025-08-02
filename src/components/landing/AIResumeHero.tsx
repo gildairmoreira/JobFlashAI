@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -82,16 +83,16 @@ const AIResumeHero: React.FC<AIResumeHeroProps> = ({ className }) => {
         </div>
         {/* Background Gradient Animation */}
         <BackgroundGradientAnimation
-          firstColor="59, 130, 246"
-          secondColor="37, 99, 235"
-          thirdColor="29, 78, 216"
-          fourthColor="147, 197, 253"
-          fifthColor="59, 130, 246"
-          pointerColor="37, 99, 235"
-          size="80%"
-          blendingValue="hard-light"
+          firstColor='59, 130, 246'
+          secondColor='37, 99, 235'
+          thirdColor='29, 78, 216'
+          fourthColor='147, 197, 253'
+          fifthColor='59, 130, 246'
+          pointerColor='37, 99, 235'
+          size='80%'
+          blendingValue='hard-light'
           interactive={true}
-          containerClassName="absolute inset-0"
+          containerClassName='absolute inset-0'
         />
 
         {/* Dark overlay for better text readability */}

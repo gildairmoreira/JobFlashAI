@@ -3,7 +3,7 @@
 import React, { use } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowLeft, HelpCircle, Mail, MessageCircle, BookOpen, Activity, Phone, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Mail, MessageCircle, BookOpen, Activity, Phone, CheckCircle } from 'lucide-react';
 import Footer from '@/components/landing/Footer';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';

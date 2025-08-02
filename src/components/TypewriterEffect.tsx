@@ -8,8 +8,6 @@ interface TypewriterEffectProps {
   typeSpeed?: number;
   deleteSpeed?: number;
   delayBetweenWords?: number;
-  loop?: boolean | number;
-  cursorClassName?: string;
 }
 
 const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
@@ -17,9 +15,7 @@ const TypewriterEffect: React.FC<TypewriterEffectProps> = ({
   className = "",
   typeSpeed = 100,
   deleteSpeed = 50,
-  delayBetweenWords = 1500,
-  loop = true,
-  cursorClassName = "inline-block w-0.5 h-[1em] bg-current ml-1"
+  delayBetweenWords = 1500
 }) => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentText, setCurrentText] = useState("");

@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Termos de Serviço",
 };
 
+/* eslint-disable react/no-unescaped-entities */
 export default function Page() {
   return (
     <main className="mx-auto max-w-prose space-y-6 p-3 py-6">

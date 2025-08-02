@@ -5,7 +5,8 @@ import { cache } from "react";
 export type SubscriptionLevel = "free" | "pro" | "pro_plus";
 
 export const getUserSubscriptionLevel = cache(
-  async (userId: string): Promise<SubscriptionLevel> => {
+  /* async (userId: string): Promise<SubscriptionLevel> => { */
+  async (): Promise<SubscriptionLevel> => {
     // Temporariamente retornar 'pro_plus' para todos os usuários
     return "pro_plus";
   },

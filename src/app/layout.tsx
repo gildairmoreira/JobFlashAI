@@ -23,7 +23,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={ptBR as any}>
+          // Justification: Temporary 'as any' due to type mismatch in Clerk's localization types. To be resolved in future updates.
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      <ClerkProvider localization={ptBR as any}>
       <html lang="en" suppressHydrationWarning>
         <body className={inter.className}>
           <ThemeProvider

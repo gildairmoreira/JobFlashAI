@@ -9,7 +9,7 @@ import { canUseCustomizations } from "@/lib/permissions";
 import { PaletteIcon } from "lucide-react";
 import React, { useState } from "react";
 import { SketchPicker, Color, ColorChangeHandler } from "react-color";
-import { useSubscriptionLevel } from "../SubscriptionLevelProvider";
+
 
 interface ColorPickerProps {
   readonly color: Color | undefined;
@@ -17,8 +17,6 @@ interface ColorPickerProps {
 }
 
 export default function ColorPicker({ color, onChange }: ColorPickerProps) {
-  const subscriptionLevel = useSubscriptionLevel();
-
   const premiumModal = usePremiumModal();
 
   const [showPopover, setShowPopover] = useState(false);
@@ -31,7 +29,7 @@ export default function ColorPicker({ color, onChange }: ColorPickerProps) {
           size="icon"
           title="Change resume color"
           onClick={() => {
-            if (!canUseCustomizations(subscriptionLevel || null)) {
+            if (!canUseCustomizations()) {
               premiumModal.setOpen(true);
               return;
             }

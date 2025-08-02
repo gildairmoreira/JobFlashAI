@@ -28,7 +28,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { WandSparklesIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
+//import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
+
 import { generateWorkExperience } from "./actions";
 
 interface GenerateWorkExperienceButtonProps {
@@ -38,7 +39,7 @@ interface GenerateWorkExperienceButtonProps {
 export default function GenerateWorkExperienceButton({
   onWorkExperienceGenerated,
 }: GenerateWorkExperienceButtonProps) {
-  const subscriptionLevel = useSubscriptionLevel();
+  //const subscriptionLevel = useSubscriptionLevel();
 
   const premiumModal = usePremiumModal();
 
@@ -50,7 +51,8 @@ export default function GenerateWorkExperienceButton({
         variant="outline"
         type="button"
         onClick={() => {
-          if (!canUseAITools(subscriptionLevel || null)) {
+          //if (!canUseAITools(subscriptionLevel || null)) {
+          if (!canUseAITools()) {
             premiumModal.setOpen(true);
             return;
           }
