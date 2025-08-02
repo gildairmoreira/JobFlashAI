@@ -61,7 +61,7 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Image src={logo} alt="JobFlashAI Logo" width={60} height={60} className="rounded-lg" />
+                <Image src={logo} alt="JobFlashAI Logo" width={50} height={50} className="rounded-lg" />
               </motion.div>
               <span className="font-bold text-lg text-white hidden sm:inline" style={{textShadow: '1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'}}>JobFlashAI</span>
             </Link>

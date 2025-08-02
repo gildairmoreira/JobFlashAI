@@ -19,8 +19,8 @@ export default function Navbar() {
           <Image
             src={logo}
             alt="Logo"
-            width={60}
-            height={60}
+            width={50}
+            height={50}
             className="rounded-full"
           />
           <span className="text-xl font-bold tracking-tight">

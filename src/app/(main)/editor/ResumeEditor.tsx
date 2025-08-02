@@ -43,7 +43,7 @@ export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
 
   return (
     <div className="flex grow flex-col">
-      <header className="space-y-1.5 border-b px-3 py-5 text-center">
+      <header className="hidden md:block space-y-1.5 border-b px-3 py-5 text-center">
         <h1 className="text-2xl font-bold">Crie seu currículo</h1>
         <p className="text-sm text-muted-foreground">
           Siga os passos abaixo para criar seu currículo. Seu progresso será
