@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Brain } from 'lucide-react';
-import resumePreview from '@/assets/hero/resume-preview.jpg';
+import resumePreview from '@/assets/hero/resume-preview.png';
 
 
 
