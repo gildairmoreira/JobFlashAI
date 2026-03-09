@@ -20,9 +20,17 @@ type Props = {
   onSectionGenerated: (title: string, content: string) => void;
 };
 
+import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
+import usePremiumModal from "@/hooks/usePremiumModal";
+import { canUseAITools } from "@/lib/permissions";
+
 export default function GenerateCustomSectionButton({ onSectionGenerated }: Readonly<Props>) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const subscriptionLevel = useSubscriptionLevel();
+  const premiumModal = usePremiumModal();
+  const isPremium = canUseAITools(subscriptionLevel);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -33,12 +41,10 @@ export default function GenerateCustomSectionButton({ onSectionGenerated }: Read
     setLoading(true);
     try {
       const aiResponse = await generateCustomSection({ description: values.description });
-      // Parse the AI response to extract title and content
-      // Como a IA agora gera apenas conteúdo sem título, usar toda a resposta como content
       const lines = aiResponse.trim().split('\n');
       const title = lines[0]?.trim() || 'Seção Personalizada';
       const content = lines.slice(1).join('\n').trim() || 'Conteúdo gerado pela IA baseado na descrição fornecida.';
-      
+
       onSectionGenerated(title, content);
       setOpen(false);
       form.reset();
@@ -49,14 +55,20 @@ export default function GenerateCustomSectionButton({ onSectionGenerated }: Read
     }
   };
 
+  const handleOpenDialog = () => {
+    if (!isPremium) {
+      premiumModal.setOpen(true);
+    } else {
+      setOpen(true);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <MessageSquare className="mr-2 size-4" />
-          Preenchimento inteligente (IA)
-        </Button>
-      </DialogTrigger>
+      <Button variant="outline" size="sm" type="button" onClick={handleOpenDialog}>
+        <MessageSquare className="mr-2 size-4" />
+        {isPremium ? "Gerar seção com IA" : "Desbloquear com Assinatura"}
+      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Gerar seção customizada</DialogTitle>

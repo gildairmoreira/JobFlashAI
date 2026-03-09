@@ -2,7 +2,7 @@ import { env } from "@/env";
 import { cache } from "react";
 import prisma from "./prisma";
 
-export type SubscriptionLevel = "free" | "pro" | "pro_plus";
+export type SubscriptionLevel = "free" | "pro" | "lifetime" | "frozen" | "banned";
 
 export const getUserSubscriptionLevel = cache(
   async (userId: string): Promise<SubscriptionLevel> => {
@@ -12,15 +12,32 @@ export const getUserSubscriptionLevel = cache(
       },
     });
 
-    if (!subscription || subscription.currentPeriodEnd < new Date()) {
-      return "free";
+    if (!subscription) {
+      return "free"; // Default if not found
     }
 
-    if (subscription) {
-      // For now, any active subscription is treated as "pro"
-      return "pro";
+    // Checking status
+    if (subscription.status === "BANNED") {
+      return "banned";
     }
 
-    throw new Error("Invalid subscription");
+    if (subscription.status === "FROZEN") {
+      return "frozen";
+    }
+
+    // Checking Expiration for PRO and LIFETIME (which now acts as Monthly)
+    if (subscription.planType === "PRO" || subscription.planType === "LIFETIME") {
+      if (subscription.currentPeriodEnd && subscription.currentPeriodEnd < new Date()) {
+        // Expired -> auto freeze
+        await prisma.userSubscription.update({
+          where: { id: subscription.id },
+          data: { status: "FROZEN" }
+        });
+        return "frozen";
+      }
+      return subscription.planType.toLowerCase() as SubscriptionLevel;
+    }
+
+    return "free";
   },
 );

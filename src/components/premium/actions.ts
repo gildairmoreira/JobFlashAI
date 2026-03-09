@@ -1,7 +1,5 @@
 'use server';
 
-import { MercadoPagoConfig, PreApproval } from 'mercadopago';
-import { env } from '@/env';
 import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function createCheckoutSession(planType: string) {
@@ -12,35 +10,17 @@ export async function createCheckoutSession(planType: string) {
   const email = user?.emailAddresses[0]?.emailAddress;
   if (!email) throw new Error('Email do usuário não encontrado');
 
-  const client = new MercadoPagoConfig({ accessToken: env.MERCADO_PAGO_ACCESS_TOKEN });
-  const preapproval = new PreApproval(client);
+  // Use actual Cakto payment links
+  const CAKTO_PRO_CHECKOUT_URL = process.env.CAKTO_PRO_CHECKOUT_URL || "https://pay.cakto.com.br/t5u3oq5_799648";
+  const CAKTO_LIFETIME_CHECKOUT_URL = process.env.CAKTO_LIFETIME_CHECKOUT_URL || "https://pay.cakto.com.br/okwgghz_799577";
 
-  let amount = 29.90; // Valor padrão para Pro
-  let reason = 'Assinatura Pro Mensal';
-  if (planType === 'pro-plus') {
-    amount = 49.90;
-    reason = 'Assinatura Pro Plus Mensal';
-  }
+  let checkoutUrl = planType === 'pro' ? CAKTO_PRO_CHECKOUT_URL : CAKTO_LIFETIME_CHECKOUT_URL;
 
-  const preapprovalData = {
-    reason: reason,
-    auto_recurring: {
-      frequency: 1,
-      frequency_type: 'months',
-      transaction_amount: amount,
-      currency_id: 'BRL',
-    },
-    back_urls: {
-      success: `${env.NEXT_PUBLIC_BASE_URL}/billing/success`,
-      failure: `${env.NEXT_PUBLIC_BASE_URL}/billing/cancel`,
-      pending: `${env.NEXT_PUBLIC_BASE_URL}/billing/pending`,
-    },
-    payer_email: email,
-    payment_methods_allowed: {
-      payment_types: [{ id: 'pix' }, { id: 'credit_card' }, { id: 'debit_card' }, { id: 'boleto' }],
-    },
-  };
+  // Append user data to the URL so that Cakto fires the webhook with clerk_user_id
+  const urlParams = new URLSearchParams({
+    "metadata[clerk_user_id]": userId,
+    "email": email, // Pre-fill email
+  });
 
-  const response = await preapproval.create({ body: preapprovalData });
-  return response.init_point;
+  return `${checkoutUrl}?${urlParams.toString()}`;
 }

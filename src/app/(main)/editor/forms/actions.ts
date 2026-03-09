@@ -1,7 +1,7 @@
 "use server";
 
 import { canUseAITools } from "@/lib/permissions";
-import openai from "@/lib/openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "@/lib/prisma";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import {
@@ -12,6 +12,23 @@ import {
   WorkExperience,
 } from "@/lib/validation";
 import { auth } from "@clerk/nextjs/server";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+export async function getUserAILimits() {
+  const { userId } = await auth();
+  if (!userId) return { exp: 0, summary: 0, custom: 0 };
+
+  const userUsage = await prisma.userUsage.findUnique({
+    where: { userId },
+  });
+
+  return {
+    exp: userUsage?.aiExperienceUses || 0,
+    summary: userUsage?.aiSummaryUses || 0, // Assume these exist or default to 0
+    custom: userUsage?.aiCustomUses || 0,   // Assume these exist or default to 0
+  };
+}
 
 export async function generateSummary(input: GenerateSummaryInput) {
   const { userId } = await auth();
@@ -65,15 +82,13 @@ export async function generateSummary(input: GenerateSummaryInput) {
       ${skills}
     `;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemMessage },
-      { role: "user", content: userMessage },
-    ],
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: systemMessage,
   });
 
-  const aiResponse = response.choices[0].message.content;
+  const response = await model.generateContent(userMessage);
+  const aiResponse = response.response.text();
 
   if (!aiResponse) {
     throw new Error("Falha ao gerar resposta da IA");
@@ -129,15 +144,13 @@ export async function generateWorkExperience(
   ${description}
   `;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemMessage },
-      { role: "user", content: userMessage },
-    ],
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: systemMessage,
   });
 
-  const aiResponse = response.choices[0].message.content;
+  const response = await model.generateContent(userMessage);
+  const aiResponse = response.response.text();
 
   if (!aiResponse) {
     throw new Error("Falha ao gerar resposta da IA");
@@ -191,15 +204,13 @@ export async function generateCustomSection(input: { description: string }) {
 
   const userMessage = `Crie uma seção personalizada para currículo baseada na seguinte descrição: ${description}`;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemMessage },
-      { role: "user", content: userMessage },
-    ],
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: systemMessage,
   });
 
-  const aiResponse = response.choices[0].message.content;
+  const response = await model.generateContent(userMessage);
+  const aiResponse = response.response.text();
 
   if (!aiResponse) {
     throw new Error("Falha ao gerar resposta da IA");

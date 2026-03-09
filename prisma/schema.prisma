@@ -95,13 +95,34 @@ model CustomSection {
   @@map("custom_sections")
 }
 
+enum Role {
+  USER
+  ADMIN
+  MASTER_ADMIN
+}
+
+enum PlanType {
+  FREE
+  PRO
+  LIFETIME
+}
+
+enum SubStatus {
+  ACTIVE
+  FROZEN
+  BANNED
+}
+
 model UserSubscription {
   id                      String   @id @default(cuid())
   userId                  String   @unique
-  mercadoPagoPreapprovalId String   @unique
-  mercadoPagoPlanId       String
-  currentPeriodEnd        DateTime
-  cancelAtPeriodEnd       Boolean  @default(false)
+  role                    Role     @default(USER)
+
+  planType                PlanType @default(FREE)
+  caktoTransactionId      String?  @unique // Cakto Payment or Subscription identifier
+  status                  SubStatus @default(ACTIVE) // Can freeze/ban users
+
+  currentPeriodEnd        DateTime? // Expiration for PRO; Null for LIFETIME or FREE
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

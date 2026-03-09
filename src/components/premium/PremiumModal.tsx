@@ -55,7 +55,7 @@ export default function PremiumModal() {
           <p>Obtenha uma assinatura premium para desbloquear mais recursos.</p>
           <div className="flex">
             <div className="flex w-1/2 flex-col space-y-5">
-              <h3 className="text-center text-lg font-bold">Premium</h3>
+              <h3 className="text-center text-lg font-bold">Semanal (R$ 19,90)</h3>
               <ul className="list-inside space-y-2">
                 {premiumFeatures.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
@@ -72,13 +72,13 @@ export default function PremiumModal() {
                 }
                 disabled={loading}
               >
-                Obter Premium
+                Obter Semanal
               </Button>
             </div>
             <div className="mx-6 border-l" />
             <div className="flex w-1/2 flex-col space-y-5">
               <h3 className="bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-center text-lg font-bold text-transparent">
-                Premium Plus
+                Mensal (R$ 49,90)
               </h3>
               <ul className="list-inside space-y-2">
                 {premiumPlusFeatures.map((feature) => (
@@ -97,7 +97,7 @@ export default function PremiumModal() {
                 }
                 disabled={loading}
               >
-                Obter Premium Plus
+                Obter Mensal
               </Button>
             </div>
           </div>

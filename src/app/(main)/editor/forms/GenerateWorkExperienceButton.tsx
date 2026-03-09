@@ -26,10 +26,10 @@ import {
 } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WandSparklesIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-// Not checking subscription here because WorkExp has 1 free usage
-import { generateWorkExperience } from "./actions";
+import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
+import { getUserAILimits, generateWorkExperience } from "./actions";
 
 interface GenerateWorkExperienceButtonProps {
   onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
@@ -38,11 +38,31 @@ interface GenerateWorkExperienceButtonProps {
 export default function GenerateWorkExperienceButton({
   onWorkExperienceGenerated,
 }: GenerateWorkExperienceButtonProps) {
-  //const subscriptionLevel = useSubscriptionLevel();
-
+  const subscriptionLevel = useSubscriptionLevel();
   const premiumModal = usePremiumModal();
-
   const [showInputDialog, setShowInputDialog] = useState(false);
+  const [hasUsedFree, setHasUsedFree] = useState(false);
+
+  useEffect(() => {
+    if (!canUseAITools(subscriptionLevel)) {
+      getUserAILimits().then((limits) => {
+        if (limits.exp >= 1) {
+          setHasUsedFree(true);
+        }
+      }).catch(console.error);
+    }
+  }, [subscriptionLevel]);
+
+  const isFreePlan = !canUseAITools(subscriptionLevel);
+
+  let buttonText = "Gerar preenchimento com IA";
+  if (isFreePlan) {
+    if (hasUsedFree) {
+      buttonText = "Desbloquear com Assinatura";
+    } else {
+      buttonText = "Preenchimento inteligente (IA - 1x Grátis)";
+    }
+  }
 
   return (
     <>
@@ -50,11 +70,15 @@ export default function GenerateWorkExperienceButton({
         variant="outline"
         type="button"
         onClick={() => {
-          setShowInputDialog(true);
+          if (isFreePlan && hasUsedFree) {
+            premiumModal.setOpen(true);
+          } else {
+            setShowInputDialog(true);
+          }
         }}
       >
-        <WandSparklesIcon className="size-4" />
-        Preenchimento inteligente (IA - 1x Grátis)
+        <WandSparklesIcon className="size-4 mr-2" />
+        {buttonText}
       </Button>
       <InputDialog
         open={showInputDialog}
@@ -62,6 +86,10 @@ export default function GenerateWorkExperienceButton({
         onWorkExperienceGenerated={(workExperience) => {
           onWorkExperienceGenerated(workExperience);
           setShowInputDialog(false);
+          // Auto update state after successful generation
+          if (isFreePlan) {
+            setHasUsedFree(true);
+          }
         }}
         onPremiumRequired={() => {
           setShowInputDialog(false);

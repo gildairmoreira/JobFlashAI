@@ -19,25 +19,53 @@ interface PricingPlan {
 const PricingSection: React.FC = () => {
   const plans: PricingPlan[] = [
     {
-      name: 'Entrevista Garantida',
-      description: 'Tenha o currículo perfeito em minutos. Modelo único pago uma vez, uso ilimitado por 1 semana.',
-      price: 'R$19',
-      period: 'acesso vitalício ao currículo gerado',
+      name: 'Free',
+      description: 'Para quem quer testar e criar seu primeiro rascunho.',
+      price: 'R$0',
+      period: 'grátis',
+      features: [
+        { name: 'Limite de 1 currículo ativo', included: true },
+        { name: 'Apenas 1 uso gratuito da IA (Experiência)', included: true },
+        { name: 'Download PDF (Com marca d\'água)', included: true },
+        { name: 'Cores, Foto e Links Sociais', included: false },
+        { name: 'Análise detalhada de competências', included: false },
+      ],
+      cta: 'Começar Grátis',
+    },
+    {
+      name: 'Acesso Pro - 7 Dias',
+      description: 'Para quem precisa dessa vaga urgente. Destrave a IA e construa até 3 versões do seu currículo.',
+      price: 'R$19,90',
+      period: 'por 7 dias',
       features: [
         { name: 'Criação ilimitada com IA (por 7 dias)', included: true },
+        { name: 'Até 3 currículos simultâneos', included: true },
         { name: 'Modelo validado por Recrutadores Tech', included: true },
-        { name: 'Exportação em PDF Otimizado por ATS', included: true },
+        { name: 'Exportação em PDF sem marca d\'água Otimizado ATS', included: true },
         { name: 'Análise detalhada de competências', included: true },
-        { name: 'Suporte VIP', included: true },
       ],
       cta: 'Criar Meu Currículo',
       popular: true,
+    },
+    {
+      name: 'Acesso Mensal',
+      description: 'Tenha seu arsenal de IA ativo mês a mês. Cancele quando quiser.',
+      price: 'R$49,90',
+      period: 'por mês',
+      features: [
+        { name: 'Acesso ilimitado a todos os recursos atuais', included: true },
+        { name: 'Currículos ilimitados para sempre', included: true },
+        { name: 'Uso de IA Ilimitada', included: true },
+        { name: 'Design e personalização totais', included: true },
+        { name: 'Suporte VIP e Atualizações', included: true },
+      ],
+      cta: 'Assinar Plano Mensal',
     }
   ];
 
   return (
     <section className="py-24 bg-white border-y border-stone-100" id="precos">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
@@ -57,21 +85,24 @@ const PricingSection: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="max-w-md mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
-              className="bg-[#FAF9F7] rounded-[2rem] p-10 shadow-2xl border-2 border-blue-500/20 relative"
+              className={`bg-[#FAF9F7] rounded-[2rem] p-10 shadow-2xl relative flex flex-col ${plan.popular ? 'border-2 border-blue-500' : 'border border-stone-200'
+                }`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
-              <div className="absolute -top-5 left-0 right-0 flex justify-center">
-                <span className="bg-blue-500 text-white text-sm font-bold px-6 py-2 rounded-full shadow-md uppercase tracking-wide">
-                  Mais Escolhido
-                </span>
-              </div>
+              {plan.popular && (
+                <div className="absolute -top-5 left-0 right-0 flex justify-center">
+                  <span className="bg-blue-500 text-white text-sm font-bold px-6 py-2 rounded-full shadow-md uppercase tracking-wide">
+                    Mais Escolhido
+                  </span>
+                </div>
+              )}
 
               <div className="text-center mb-8 mt-2">
                 <h3 className="text-2xl font-bold text-stone-900 mb-3">{plan.name}</h3>
@@ -83,7 +114,7 @@ const PricingSection: React.FC = () => {
                 <span className="text-stone-500 font-medium ml-2">{plan.period}</span>
               </div>
 
-              <ul className="space-y-4 mb-10">
+              <ul className="space-y-4 mb-10 flex-grow">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-4">
                     {feature.included ? (
@@ -99,7 +130,8 @@ const PricingSection: React.FC = () => {
               </ul>
 
               <Button
-                className="w-full bg-stone-900 hover:bg-stone-800 text-white shadow-xl py-7 rounded-2xl text-lg group transition-all"
+                className={`w-full text-white shadow-xl py-7 rounded-2xl text-lg group transition-all mt-auto ${plan.popular ? 'bg-blue-600 hover:bg-blue-700' : 'bg-stone-900 hover:bg-stone-800'
+                  }`}
                 asChild
               >
                 <Link href="/resumes">
@@ -110,6 +142,10 @@ const PricingSection: React.FC = () => {
             </motion.div>
           ))}
         </div>
+
+        <p className="text-center text-xs text-stone-400 mt-12 max-w-2xl mx-auto">
+          Pagamentos processados de forma 100% segura. Cancele as assinaturas recorrentes a qualquer momento.
+        </p>
       </div>
     </section>
   );

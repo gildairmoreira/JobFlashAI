@@ -8,6 +8,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSubscriptionLevel } from "@/app/(main)/SubscriptionLevelProvider";
 import { Badge } from "./ui/badge";
 
+import logo from "@/assets/logo.png";
+
 interface ResumePreviewProps {
   resumeData: ResumeValues;
   contentRef?: React.Ref<HTMLDivElement>;
@@ -27,7 +29,7 @@ export default function ResumePreview({
   return (
     <div
       className={cn(
-        "aspect-[210/297] h-fit w-full bg-white text-black",
+        "aspect-[210/297] h-fit w-full bg-white text-black relative",
         className,
       )}
       ref={containerRef}
@@ -48,9 +50,21 @@ export default function ResumePreview({
         <SkillsSection resumeData={resumeData} />
 
         {subscriptionLevel === "free" && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 opacity-10">
-            <div className="rotate-[-45deg] bg-black text-white px-8 py-2 text-6xl font-bold tracking-widest uppercase">
-              JobFlash
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 opacity-[0.1]">
+            <div className="flex flex-col items-center gap-2 rotate-[-45deg] border-[12px] border-gray-400 p-8 rounded-full">
+              <Image
+                src={logo}
+                alt="Watermark Logo"
+                width={150}
+                height={150}
+                className="grayscale opacity-50"
+              />
+              <div className="text-7xl font-black tracking-tighter uppercase mt-2 text-gray-500">
+                JobFlash
+              </div>
+              <div className="text-xl font-bold tracking-[0.3em] uppercase text-gray-400">
+                FREE TIER
+              </div>
             </div>
           </div>
         )}

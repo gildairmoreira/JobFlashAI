@@ -46,14 +46,17 @@ export default function GenerateSummaryButton({
     }
   }
 
+  const isPremium = canUseAITools(subscriptionLevel);
+
   return (
     <LoadingButton
       variant="outline"
+      type="button"
       onClick={handleClick}
       loading={loading}
     >
-      <WandSparklesIcon className="size-4" />
-      Generate (AI)
+      <WandSparklesIcon className="size-4 mr-2" />
+      {isPremium ? "Gerar resumo com IA" : "Desbloquear com Assinatura"}
     </LoadingButton>
   );
 }

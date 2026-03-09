@@ -4,7 +4,7 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/api/mercadopago-webhook",
+  "/api/cakto/webhook(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

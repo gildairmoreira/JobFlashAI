@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "img.clerk.com"
+      },
+      {
+        protocol: "https",
         hostname: "w0mlmrgwbziwquaq.public.blob.vercel-storage.com"
       },
       {
