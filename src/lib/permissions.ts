@@ -8,6 +8,8 @@ export function canCreateResume(
     free: 1,
     pro: 3,
     lifetime: Infinity,
+    frozen: 0,
+    banned: 0,
   };
 
   const maxResumes = maxResumeMap[subscriptionLevel];
