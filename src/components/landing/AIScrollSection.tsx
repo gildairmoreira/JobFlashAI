@@ -3,93 +3,89 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Brain } from 'lucide-react';
-import resumePreview from '@/assets/hero/resume-preview.png';
-
-
+import { Target, Brain, FileCheck } from 'lucide-react';
+import resumePreview from '@/assets/hero/new-resume-preview.jpg';
 
 const AIScrollSection: React.FC = () => {
   return (
-    <div className="py-20 bg-gray-50 dark:bg-gray-900" id="veja-nossa-ia-em-acao">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Título da seção */}
-        <div className="max-w-3xl mx-auto mb-16 text-center">
+    <section className="py-24 bg-white border-y border-stone-100" id="veja-nossa-ia-em-acao">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="flex items-center justify-center gap-2 text-blue-600 mb-4"
+            className="space-y-8"
           >
-            <Brain className="w-6 h-6" />
-            <span className="text-sm uppercase tracking-wider font-semibold">
-              Inteligência Artificial Avançada
-            </span>
+            <div>
+              <h2 className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-3">
+                O Mecanismo Único
+              </h2>
+              <h3 className="text-3xl md:text-5xl font-extrabold text-stone-900 leading-tight">
+                Como nossa IA vence os robôs de recrutamento
+              </h3>
+            </div>
+
+            <p className="text-lg md:text-xl text-stone-600 font-light leading-relaxed">
+              A maioria dos currículos nunca é lida por um humano, sendo reprovada no primeiro filtro.
+              Invertemos essa lógica aplicando a mesma inteligência que os recrutadores utilizam.
+            </p>
+
+            <ul className="space-y-8 mt-10">
+              <li className="flex gap-5">
+                <div className="flex-shrink-0 w-14 h-14 flex items-center justify-center rounded-2xl bg-[#FAF9F7] text-stone-800 border border-stone-200">
+                  <Brain className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-stone-900">Análise Cognitiva</h4>
+                  <p className="text-stone-600 mt-2 leading-relaxed">Extraímos da sua experiência as palavras-chave que os sistemas (ATS) procuram.</p>
+                </div>
+              </li>
+              <li className="flex gap-5">
+                <div className="flex-shrink-0 w-14 h-14 flex items-center justify-center rounded-2xl bg-[#FAF9F7] text-stone-800 border border-stone-200">
+                  <Target className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-stone-900">Otimização Cirúrgica</h4>
+                  <p className="text-stone-600 mt-2 leading-relaxed">Reestruturamos suas frases focando inteiramente em métricas, resultados e impacto real.</p>
+                </div>
+              </li>
+              <li className="flex gap-5">
+                <div className="flex-shrink-0 w-14 h-14 flex items-center justify-center rounded-2xl bg-[#FAF9F7] text-stone-800 border border-stone-200">
+                  <FileCheck className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-stone-900">Design Validado</h4>
+                  <p className="text-stone-600 mt-2 leading-relaxed">Layout simples e eficiente. O modelo exato que Headhunters exigem, sem distrações visuais.</p>
+                </div>
+              </li>
+            </ul>
           </motion.div>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-100 dark:to-white bg-clip-text text-transparent mb-6"
+            className="relative"
           >
-            Veja Nossa IA em Ação
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto"
-          >
-            Nossa tecnologia analisa seu perfil profissional e cria um currículo personalizado que destaca suas competências e experiências de forma impactante.
-          </motion.p>
-        </div>
-
-        {/* Card com preview do currículo */}
-        <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          viewport={{ once: true }}
-          whileHover={{ scale: 1.02, y: -10 }}
-          className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700"
-        >
-          <div className="p-8">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Currículo Gerado por IA
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Veja como nossa IA cria currículos profissionais e otimizados
-              </p>
-            </div>
-            
-            <div className="relative rounded-xl overflow-hidden shadow-lg">
-              <Image 
-                src={resumePreview} 
-                alt="Preview de currículo gerado pela IA" 
-                width={800} 
-                height={1000} 
-                className="w-full h-auto object-contain"
+            <div className="rounded-3xl border border-stone-200 bg-[#FAF9F7] p-2 sm:p-8 shadow-2xl relative overflow-hidden">
+              <Image
+                src={resumePreview}
+                alt="Preview de currículo gerado pela IA"
+                width={800}
+                height={1000}
+                className="w-full h-auto object-contain rounded-2xl sm:rounded-xl border border-stone-200 shadow-md"
                 priority
               />
-              
-              {/* Overlay com efeito de brilho */}
-              <motion.div
-                initial={{ x: '-100%' }}
-                whileInView={{ x: '100%' }}
-                transition={{ duration: 1.5, delay: 0.5 }}
-                viewport={{ once: true }}
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-              />
+              <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-3xl pointer-events-none"></div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

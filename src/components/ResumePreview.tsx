@@ -1,4 +1,4 @@
-import { BorderStyles } from "@/app/(main)/editor/BorderStyleButton";
+ import { BorderStyles } from "@/app/(main)/editor/BorderStyleButton";
 import useDimensions from "@/hooks/useDimensions";
 import { cn } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";

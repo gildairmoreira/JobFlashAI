@@ -27,9 +27,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-          // Justification: Temporary 'as any' due to type mismatch in Clerk's localization types. To be resolved in future updates.
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      <ClerkProvider localization={ptBR as any}>
+    // Justification: Temporary 'as any' due to type mismatch in Clerk's localization types. To be resolved in future updates.
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    <ClerkProvider localization={ptBR as any}>
       <html lang="pt-br" suppressHydrationWarning>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-X4RVT0YTBC" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -41,7 +41,7 @@ export default function RootLayout({
             gtag('config', 'G-X4RVT0YTBC');
           `}
         </Script>
-        <body className={inter.className}>
+        <body className={inter.className} suppressHydrationWarning>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

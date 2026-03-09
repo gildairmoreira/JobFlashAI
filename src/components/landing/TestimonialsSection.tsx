@@ -1,155 +1,65 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
-import menPhoto from '@/assets/testimonials/men1.png';
-import men2Photo from '@/assets/testimonials/men2.png';
-import womanPhoto from '@/assets/testimonials/woman1.jpg';
 
-const TestimonialsSection = () => {
+const TestimonialsSection: React.FC = () => {
   const testimonials = [
     {
-      content: "O JobFlash transformou completamente minha busca de emprego. Criei um currículo profissional em minutos e consegui três entrevistas na primeira semana de envio!",
-      name: "Carlos Silva",
-      position: "Desenvolvedor Full Stack",
-      company: "TechBrasil",
-      rating: 5,
-      image: menPhoto
+      name: 'João Silva',
+      role: 'Desenvolvedor Senior',
+      content: 'Passei 3 meses enviando o modelo que fiz no Word. Nenhuma resposta. Usei a IA, o layout mudou para o padrão do mercado e tive 4 entrevistas na mesma semana.',
     },
     {
-      content: "Estava há meses tentando conseguir entrevistas sem sucesso. Com o currículo gerado pelo JobFlash, finalmente passei pelos filtros ATS e consegui meu emprego dos sonhos!",
-      name: "Ana Oliveira",
-      position: "Gerente de Marketing",
-      company: "Global Marketing",
-      rating: 5,
-      image: womanPhoto
+      name: 'Maria Souza',
+      role: 'Gerente de Produto',
+      content: 'A forma como a IA reescreveu minhas experiências focando em resultados foi absurda. Eu nunca saberia usar as palavras-chave da forma como ela usou.',
     },
     {
-      content: "Como profissional em transição de carreira, estava preocupado em como apresentar minhas habilidades. O JobFlash destacou perfeitamente minhas competências transferíveis!",
-      name: "Pedro Santos",
-      position: "Analista de Dados",
-      company: "DataFuture",
-      rating: 4,
-      image: men2Photo
+      name: 'Pedro Alves',
+      role: 'Analista de Dados',
+      content: 'Eu não sou designer. Ter um currículo lindo, limpo e direto ao ponto gerado em 5 minutos salvou minha busca por vaga.',
     }
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
   return (
-    <div className="py-20 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4">
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            O que nossos usuários dizem
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Milhares de profissionais já transformaram suas carreiras com nossos currículos otimizados por IA.
+    <section className="py-24 bg-[#FAF9F7] border-y border-stone-100" id="avaliacoes">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-stone-900 mb-4 tracking-tight">Histórias Reais de Sucesso</h2>
+          <p className="text-lg text-stone-600 font-light max-w-2xl mx-auto">
+            Não acredite apenas em nós. Veja o que desenvolvedores e analistas têm a dizer.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="relative">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.5 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto"
-          >
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 dark:bg-gray-700">
-                <Image 
-                  src={testimonials[currentIndex].image} 
-                  alt={`Foto de ${testimonials[currentIndex].name}`} 
-                  width={128} 
-                  height={128} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              
-              <div className="flex-1">
-                <div className="flex mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((t, idx) => (
+            <motion.div
+              key={idx}
+              className="bg-white p-8 rounded-3xl border border-stone-200 shadow-sm leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1, duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <div className="mb-6">
+                {/* 5 stars */}
+                <div className="flex text-blue-400 gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={`star-${i}`} 
-                      className={i < testimonials[currentIndex].rating 
-                        ? "text-yellow-400 fill-yellow-400" 
-                        : "text-gray-300 dark:text-gray-600"} 
-                      size={24} 
-                    />
+                    <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" /></svg>
                   ))}
                 </div>
-                
-                <blockquote className="text-xl italic text-gray-700 dark:text-gray-300 mb-6">
-                  &quot;{testimonials[currentIndex].content}&quot;
-                </blockquote>
-                
-                <div>
-                  <p className="font-bold text-gray-900 dark:text-white">
-                    {testimonials[currentIndex].name}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {testimonials[currentIndex].position}, {testimonials[currentIndex].company}
-                  </p>
-                </div>
+                <p className="text-stone-700 font-light italic text-lg">"{t.content}"</p>
               </div>
-            </div>
-          </motion.div>
-          
-          <div className="flex justify-center mt-8 gap-4">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handlePrev}
-              className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleNext}
-              className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </motion.button>
-          </div>
-          
-          <div className="flex justify-center mt-6 gap-2">
-            {testimonials.map((_, index) => (
-              <button
-                key={`dot-${index}`}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full ${index === currentIndex ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}
-                aria-label={`Ver depoimento ${index + 1}`}
-              />
-            ))}
-          </div>
+              <div className="mt-auto">
+                <p className="font-bold text-stone-900">{t.name}</p>
+                <p className="text-sm font-light text-stone-500">{t.role}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

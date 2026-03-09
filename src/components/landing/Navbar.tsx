@@ -21,17 +21,15 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
 
   useEffect(() => {
     const unsubscribe = scrollY.onChange((latest) => {
-      // Só mostra a navbar quando rolar para fora da seção hero (altura da tela)
-      setIsVisible(latest > window.innerHeight - 100);
-      setScrolled(latest > window.innerHeight);
+      setIsVisible(latest > 50);
+      setScrolled(latest > 50);
     });
 
     return () => unsubscribe();
   }, [scrollY]);
 
-  // Apply the visibility class based on scroll position
-  const navbarClass = `fixed top-4 left-0 right-0 mx-auto w-[95%] max-w-6xl z-50 ${className} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'}`;
-
+  // Keep navbar always visible but with transition on scroll
+  const navbarClass = `fixed top-4 left-0 right-0 mx-auto w-[95%] max-w-6xl z-[100] transition-all duration-300 ${className} ${scrolled ? 'translate-y-0' : 'translate-y-0'}`;
 
   const navItems = [
     { icon: Home, label: "Início", href: "#home" },
@@ -44,39 +42,34 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
     <AnimatePresence>
       <motion.nav
         className={navbarClass}
-        initial={{ opacity: 0, y: -20, scale: 0.9 }}
-        animate={{ 
-          opacity: isVisible ? 1 : 0, 
-          y: isVisible ? 0 : -20, 
-          scale: 1,
-          boxShadow: scrolled ? "0 10px 30px rgba(0, 0, 0, 0.2)" : "0 0px 0px rgba(0, 0, 0, 0)"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          boxShadow: scrolled ? "0 10px 30px rgba(0, 0, 0, 0.05)" : "0 0px 0px rgba(0, 0, 0, 0)"
         }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-full px-6 py-3 shadow-lg">
+        <div className={`rounded-full px-6 py-3 transition-colors duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl border border-stone-200 shadow-sm' : 'bg-transparent'}`}>
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Image src={logo} alt="JobFlashAI Logo" width={50} height={50} className="rounded-lg" />
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Image src={logo} alt="JobFlashAI Logo" width={40} height={40} className="rounded-lg shadow-sm" />
               </motion.div>
-              <span className="font-bold text-lg text-white hidden sm:inline" style={{textShadow: '1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'}}>JobFlashAI</span>
+              <span className="font-extrabold text-xl text-stone-900 hidden sm:inline tracking-tight">JobFlash</span>
             </Link>
 
             {/* Navigation Links - Desktop */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-8">
               {navItems.map((item) => (
                 <motion.a
                   key={item.label}
                   href={item.href}
-                  className="flex items-center gap-2 text-sm text-white hover:text-blue-300 transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-blue-600 transition-colors"
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <item.icon className="w-4 h-4" />
                   <span>{item.label}</span>
                 </motion.a>
               ))}
@@ -84,24 +77,21 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
 
             {/* Login/App Button */}
             <div className="hidden md:block">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 {isSignedIn ? (
-                  <Link 
-                    href="/resumes" 
-                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-full px-5 py-2 text-sm font-medium shadow-md"
+                  <Link
+                    href="/resumes"
+                    className="bg-stone-900 hover:bg-stone-800 text-white rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all flex items-center gap-2"
                   >
-                    <FileText className="w-4 h-4 mr-2 inline-block" />
+                    <FileText className="w-4 h-4" />
                     Meus Currículos
                   </Link>
                 ) : (
-                  <Link 
-                    href="/sign-in" 
-                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-full px-5 py-2 text-sm font-medium shadow-md"
+                  <Link
+                    href="/sign-in"
+                    className="bg-stone-900 hover:bg-stone-800 text-white rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all flex items-center gap-2"
                   >
-                    <User className="w-4 h-4 mr-2 inline-block" />
+                    <User className="w-4 h-4" />
                     Entrar
                   </Link>
                 )}
@@ -109,11 +99,7 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
             </div>
 
             {/* Mobile Menu Button */}
-            <motion.button
-              className="md:hidden text-white"
-              onClick={() => setIsOpen(!isOpen)}
-              whileTap={{ scale: 0.95 }}
-            >
+            <motion.button className="md:hidden text-stone-900" onClick={() => setIsOpen(!isOpen)} whileTap={{ scale: 0.95 }}>
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </motion.button>
           </div>
@@ -122,42 +108,31 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
           <AnimatePresence>
             {isOpen && (
               <motion.div
-                className="md:hidden mt-4 py-4 border-t border-white/10"
+                className="md:hidden mt-4 py-4 border-t border-stone-200"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="flex flex-col items-center space-y-4">
+                <div className="flex flex-col space-y-4 px-2">
                   {navItems.map((item) => (
                     <motion.a
                       key={item.label}
                       href={item.href}
-                      className="flex items-center justify-center gap-2 text-sm text-white hover:text-blue-300 transition-colors"
-                      whileHover={{ scale: 1.05 }}
+                      className="flex items-center gap-3 text-base font-medium text-stone-700 hover:text-blue-600"
                       onClick={() => setIsOpen(false)}
                     >
-                      <item.icon className="w-4 h-4" />
+                      <item.icon className="w-5 h-5 opacity-70" />
                       <span>{item.label}</span>
                     </motion.a>
                   ))}
                   {isSignedIn ? (
-                    <Link 
-                      href="/resumes" 
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-full px-5 py-2 text-sm font-medium shadow-md w-1/2 text-center mt-2"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <FileText className="w-4 h-4 mr-2 inline-block" />
-                      Meus Currículos
+                    <Link href="/resumes" className="bg-stone-900 text-white rounded-xl px-5 py-3 text-sm font-medium shadow-sm flex justify-center items-center gap-2 mt-4" onClick={() => setIsOpen(false)}>
+                      <FileText className="w-4 h-4" /> Meus Currículos
                     </Link>
                   ) : (
-                    <Link 
-                      href="/sign-in" 
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-full px-5 py-2 text-sm font-medium shadow-md w-1/2 text-center mt-2"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <User className="w-4 h-4 mr-2 inline-block" />
-                      Entrar
+                    <Link href="/sign-in" className="bg-stone-900 text-white rounded-xl px-5 py-3 text-sm font-medium shadow-sm flex justify-center items-center gap-2 mt-4" onClick={() => setIsOpen(false)}>
+                      <User className="w-4 h-4" /> Entrar
                     </Link>
                   )}
                 </div>
