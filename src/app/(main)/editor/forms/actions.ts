@@ -24,9 +24,9 @@ export async function getUserAILimits() {
   });
 
   return {
-    exp: userUsage?.aiExperienceUses || 0,
-    summary: userUsage?.aiSummaryUses || 0, // Assume these exist or default to 0
-    custom: userUsage?.aiCustomUses || 0,   // Assume these exist or default to 0
+    exp: (userUsage as any)?.aiExperienceUses || 0,
+    summary: (userUsage as any)?.aiSummaryUses || 0,
+    custom: (userUsage as any)?.aiCustomUses || 0,
   };
 }
 

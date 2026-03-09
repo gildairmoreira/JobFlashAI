@@ -135,6 +135,8 @@ model UserUsage {
   userId String @unique
 
   aiExperienceUses Int @default(0)
+  aiSummaryUses    Int @default(0)
+  aiCustomUses     Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
