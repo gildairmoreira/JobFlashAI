@@ -19,7 +19,7 @@ export async function getUserAILimits() {
   const { userId } = await auth();
   if (!userId) return { exp: 0, summary: 0, custom: 0 };
 
-  const userUsage = await prisma.userUsage.findUnique({
+  const userUsage = await (prisma as any).userUsage.findUnique({
     where: { userId },
   });
 
@@ -109,7 +109,7 @@ export async function generateWorkExperience(
 
   if (!canUseAITools(subscriptionLevel)) {
     // For free users, check if they have used their 1 free generation
-    const userUsage = await prisma.userUsage.findUnique({
+    const userUsage = await (prisma as any).userUsage.findUnique({
       where: { userId },
     });
 
@@ -118,7 +118,7 @@ export async function generateWorkExperience(
     }
 
     // Increment usage
-    await prisma.userUsage.upsert({
+    await (prisma as any).userUsage.upsert({
       where: { userId },
       update: { aiExperienceUses: { increment: 1 } },
       create: { userId, aiExperienceUses: 1 },
