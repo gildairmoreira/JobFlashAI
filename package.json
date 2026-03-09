@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@clerk/localizations": "^3.20.5",
-    "@clerk/nextjs": "^6.2.1",
+    "@clerk/nextjs": "^6.39.0",
     "@clerk/themes": "^2.1.41",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/modifiers": "^7.0.0",
