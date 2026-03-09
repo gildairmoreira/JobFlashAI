@@ -1,8 +1,9 @@
 "use server";
 
 import { canUseAITools } from "@/lib/permissions";
-
-import gemini from "@/lib/gemini";
+import openai from "@/lib/openai";
+import prisma from "@/lib/prisma";
+import { getUserSubscriptionLevel } from "@/lib/subscription";
 import {
   GenerateSummaryInput,
   generateSummarySchema,
@@ -19,7 +20,9 @@ export async function generateSummary(input: GenerateSummaryInput) {
     throw new Error("Não autorizado");
   }
 
-  if (!canUseAITools()) {
+  const subscriptionLevel = await getUserSubscriptionLevel(userId);
+
+  if (!canUseAITools(subscriptionLevel)) {
     throw new Error("Atualize sua assinatura para usar este recurso");
   }
 
@@ -62,15 +65,16 @@ export async function generateSummary(input: GenerateSummaryInput) {
       ${skills}
     `;
 
-  const model = gemini.getGenerativeModel({ model: "gemini-2.0-flash" });
-  const chat = model.startChat({
-    history: [
-      { role: "user", parts: [{ text: systemMessage }] },
-      { role: "model", parts: [{ text: "Entendido." }] },
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: systemMessage },
+      { role: "user", content: userMessage },
     ],
   });
-  const result = await chat.sendMessage(userMessage);
-  const aiResponse = result.response.text();
+
+  const aiResponse = response.choices[0].message.content;
+
   if (!aiResponse) {
     throw new Error("Falha ao gerar resposta da IA");
   }
@@ -86,8 +90,24 @@ export async function generateWorkExperience(
     throw new Error("Unauthorized");
   }
 
-  if (!canUseAITools()) {
-    throw new Error("Upgrade your subscription to use this feature");
+  const subscriptionLevel = await getUserSubscriptionLevel(userId);
+
+  if (!canUseAITools(subscriptionLevel)) {
+    // For free users, check if they have used their 1 free generation
+    const userUsage = await prisma.userUsage.findUnique({
+      where: { userId },
+    });
+
+    if (userUsage && userUsage.aiExperienceUses >= 1) {
+      throw new Error("FREE_LIMIT_REACHED");
+    }
+
+    // Increment usage
+    await prisma.userUsage.upsert({
+      where: { userId },
+      update: { aiExperienceUses: { increment: 1 } },
+      create: { userId, aiExperienceUses: 1 },
+    });
   }
 
   const { description } = generateWorkExperienceSchema.parse(input);
@@ -109,18 +129,20 @@ export async function generateWorkExperience(
   ${description}
   `;
 
-  const model = gemini.getGenerativeModel({ model: "gemini-2.0-flash" });
-  const chat = model.startChat({
-    history: [
-      { role: "user", parts: [{ text: systemMessage }] },
-      { role: "model", parts: [{ text: "Entendido." }] },
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: systemMessage },
+      { role: "user", content: userMessage },
     ],
   });
-  const result = await chat.sendMessage(userMessage);
-  const aiResponse = result.response.text();
+
+  const aiResponse = response.choices[0].message.content;
+
   if (!aiResponse) {
     throw new Error("Falha ao gerar resposta da IA");
   }
+
   return {
     position: aiResponse.match(/Cargo: (.*)/)?.[1] || "",
     company: aiResponse.match(/Empresa: (.*)/)?.[1] || "",
@@ -137,7 +159,9 @@ export async function generateCustomSection(input: { description: string }) {
     throw new Error("Não autorizado");
   }
 
-  if (!canUseAITools()) {
+  const subscriptionLevel = await getUserSubscriptionLevel(userId);
+
+  if (!canUseAITools(subscriptionLevel)) {
     throw new Error("Atualize sua assinatura para usar este recurso");
   }
 
@@ -167,15 +191,16 @@ export async function generateCustomSection(input: { description: string }) {
 
   const userMessage = `Crie uma seção personalizada para currículo baseada na seguinte descrição: ${description}`;
 
-  const model = gemini.getGenerativeModel({ model: "gemini-2.0-flash" });
-  const chat = model.startChat({
-    history: [
-      { role: "user", parts: [{ text: systemMessage }] },
-      { role: "model", parts: [{ text: "Entendido." }] },
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: systemMessage },
+      { role: "user", content: userMessage },
     ],
   });
-  const result = await chat.sendMessage(userMessage);
-  const aiResponse = result.response.text();
+
+  const aiResponse = response.choices[0].message.content;
+
   if (!aiResponse) {
     throw new Error("Falha ao gerar resposta da IA");
   }

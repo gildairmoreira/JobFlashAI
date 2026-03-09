@@ -1,10 +1,11 @@
- import { BorderStyles } from "@/app/(main)/editor/BorderStyleButton";
+import { BorderStyles } from "@/app/(main)/editor/BorderStyleButton";
 import useDimensions from "@/hooks/useDimensions";
 import { cn } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";
 import { formatDate } from "date-fns";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
+import { useSubscriptionLevel } from "@/app/(main)/SubscriptionLevelProvider";
 import { Badge } from "./ui/badge";
 
 interface ResumePreviewProps {
@@ -21,6 +22,7 @@ export default function ResumePreview({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { width } = useDimensions(containerRef);
+  const subscriptionLevel = useSubscriptionLevel();
 
   return (
     <div
@@ -44,6 +46,14 @@ export default function ResumePreview({
         <EducationSection resumeData={resumeData} />
         <CustomSectionsSection resumeData={resumeData} />
         <SkillsSection resumeData={resumeData} />
+
+        {subscriptionLevel === "free" && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 opacity-10">
+            <div className="rotate-[-45deg] bg-black text-white px-8 py-2 text-6xl font-bold tracking-widest uppercase">
+              JobFlash
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -124,9 +134,9 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
           {socialLinks?.filter(link => link.label && link.url).map((link, index) => (
             <span key={index}>
               {" • "}
-              <a 
-                href={link.url} 
-                target="_blank" 
+              <a
+                href={link.url}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="underline cursor-pointer"
                 style={{ color: colorHex }}
@@ -310,7 +320,7 @@ function CustomSectionsSection({ resumeData }: ResumeSectionProps) {
               </p>
             )}
             {section.content && (
-              <div 
+              <div
                 className="text-sm"
                 dangerouslySetInnerHTML={{
                   __html: formatContent(section.content)

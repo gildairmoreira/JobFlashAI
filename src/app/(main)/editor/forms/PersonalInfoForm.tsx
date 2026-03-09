@@ -14,6 +14,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import usePremiumModal from "@/hooks/usePremiumModal";
+import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
 
 export default function PersonalInfoForm({
   resumeData,
@@ -50,6 +52,9 @@ export default function PersonalInfoForm({
 
   const photoInputRef = useRef<HTMLInputElement>(null);
 
+  const subscriptionLevel = useSubscriptionLevel();
+  const premiumModal = usePremiumModal();
+
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div className="space-y-1.5 text-center">
@@ -70,12 +75,18 @@ export default function PersonalInfoForm({
                       {...fieldValues}
                       type="file"
                       accept="image/*"
+                      onClick={(e) => {
+                        if (subscriptionLevel === "free") {
+                          e.preventDefault();
+                          premiumModal.setOpen(true);
+                        }
+                      }}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         fieldValues.onChange(file);
                       }}
                       ref={photoInputRef}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: subscriptionLevel === "free" ? 'not-allowed' : 'pointer' }}
                     />
                   </FormControl>
                   <Button
@@ -190,7 +201,7 @@ export default function PersonalInfoForm({
               </FormItem>
             )}
           />
-          
+
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <FormLabel>Links sociais</FormLabel>
@@ -198,14 +209,20 @@ export default function PersonalInfoForm({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => append({ label: "", url: "" })}
+                onClick={() => {
+                  if (subscriptionLevel === "free") {
+                    premiumModal.setOpen(true);
+                    return;
+                  }
+                  append({ label: "", url: "" });
+                }}
                 className="flex items-center gap-2"
               >
                 <Plus className="size-4" />
-                Adicionar link
+                Adicionar link {subscriptionLevel === "free" && " (Pro)"}
               </Button>
             </div>
-            
+
             {fields.map((field, index) => (
               <div key={field.id} className="grid grid-cols-3 gap-2 items-end">
                 <FormField

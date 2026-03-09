@@ -1,19 +1,24 @@
-/*export function canCreateResume(
+import { SubscriptionLevel } from "./subscription";
+
+export function canCreateResume(
   subscriptionLevel: SubscriptionLevel,
   currentResumeCount: number,
-) {*/
-export function canCreateResume() {
-  // Temporariamente permitir criação ilimitada de currículos
-  return true;
-}
-/* export function canUseAITools(subscriptionLevel: SubscriptionLevel) { */
-export function canUseAITools() {
-  // Temporariamente permitir uso de ferramentas de IA para todos
-  return true;
+) {
+  const maxResumeMap: Record<SubscriptionLevel, number> = {
+    free: 1,
+    pro: 3,
+    pro_plus: Infinity,
+  };
+
+  const maxResumes = maxResumeMap[subscriptionLevel];
+
+  return currentResumeCount < maxResumes;
 }
 
-/* export function canUseCustomizations(subscriptionLevel: SubscriptionLevel) { */
-export function canUseCustomizations() {
-  // Temporariamente permitir customizações para todos
-  return true;
+export function canUseAITools(subscriptionLevel: SubscriptionLevel) {
+  return subscriptionLevel !== "free";
+}
+
+export function canUseCustomizations(subscriptionLevel: SubscriptionLevel) {
+  return subscriptionLevel !== "free";
 }

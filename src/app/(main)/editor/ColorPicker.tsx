@@ -11,6 +11,8 @@ import React, { useState } from "react";
 import { SketchPicker, Color, ColorChangeHandler } from "react-color";
 
 
+import { useSubscriptionLevel } from "../SubscriptionLevelProvider";
+
 interface ColorPickerProps {
   readonly color: Color | undefined;
   readonly onChange: ColorChangeHandler;
@@ -18,6 +20,7 @@ interface ColorPickerProps {
 
 export default function ColorPicker({ color, onChange }: ColorPickerProps) {
   const premiumModal = usePremiumModal();
+  const subscriptionLevel = useSubscriptionLevel();
 
   const [showPopover, setShowPopover] = useState(false);
 
@@ -29,7 +32,7 @@ export default function ColorPicker({ color, onChange }: ColorPickerProps) {
           size="icon"
           title="Change resume color"
           onClick={() => {
-            if (!canUseCustomizations()) {
+            if (!subscriptionLevel || !canUseCustomizations(subscriptionLevel)) {
               premiumModal.setOpen(true);
               return;
             }
@@ -43,8 +46,8 @@ export default function ColorPicker({ color, onChange }: ColorPickerProps) {
         className="w-auto p-0 border-none bg-transparent shadow-none"
         align="end"
       >
-        <SketchPicker 
-          color={color} 
+        <SketchPicker
+          color={color}
           onChange={onChange}
           disableAlpha
           presetColors={[

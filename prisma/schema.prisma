@@ -109,5 +109,14 @@ model UserSubscription {
   @@map("user_subscriptions")
 }
 
-// Add to Resume model:
-// customSections CustomSection[]
+model UserUsage {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  aiExperienceUses Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_usages")
+}

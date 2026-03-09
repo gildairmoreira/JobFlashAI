@@ -28,8 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { WandSparklesIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-//import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
-
+// Not checking subscription here because WorkExp has 1 free usage
 import { generateWorkExperience } from "./actions";
 
 interface GenerateWorkExperienceButtonProps {
@@ -51,16 +50,11 @@ export default function GenerateWorkExperienceButton({
         variant="outline"
         type="button"
         onClick={() => {
-          //if (!canUseAITools(subscriptionLevel || null)) {
-          if (!canUseAITools()) {
-            premiumModal.setOpen(true);
-            return;
-          }
           setShowInputDialog(true);
         }}
       >
         <WandSparklesIcon className="size-4" />
-        Preenchimento inteligente (IA)
+        Preenchimento inteligente (IA - 1x Grátis)
       </Button>
       <InputDialog
         open={showInputDialog}
@@ -68,6 +62,10 @@ export default function GenerateWorkExperienceButton({
         onWorkExperienceGenerated={(workExperience) => {
           onWorkExperienceGenerated(workExperience);
           setShowInputDialog(false);
+        }}
+        onPremiumRequired={() => {
+          setShowInputDialog(false);
+          premiumModal.setOpen(true);
         }}
       />
     </>
@@ -78,12 +76,14 @@ interface InputDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
+  onPremiumRequired: () => void;
 }
 
 function InputDialog({
   open,
   onOpenChange,
   onWorkExperienceGenerated,
+  onPremiumRequired,
 }: InputDialogProps) {
   const { toast } = useToast();
 
@@ -98,12 +98,20 @@ function InputDialog({
     try {
       const response = await generateWorkExperience(input);
       onWorkExperienceGenerated(response);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({
-        variant: "destructive",
-        description: "Something went wrong. Please try again.",
-      });
+      if (error.message.includes("FREE_LIMIT_REACHED")) {
+        toast({
+          variant: "destructive",
+          description: "Você já usou seu teste grátis 😢",
+        });
+        onPremiumRequired();
+      } else {
+        toast({
+          variant: "destructive",
+          description: "Algo deu errado. Verifique se o texto não é muito grande.",
+        });
+      }
     }
   }
 

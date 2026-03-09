@@ -1,13 +1,26 @@
-// import { env } from "@/env";
+import { env } from "@/env";
 import { cache } from "react";
-// import prisma from "./prisma";
+import prisma from "./prisma";
 
 export type SubscriptionLevel = "free" | "pro" | "pro_plus";
 
 export const getUserSubscriptionLevel = cache(
-  /* async (userId: string): Promise<SubscriptionLevel> => { */
-  async (): Promise<SubscriptionLevel> => {
-    // Temporariamente retornar 'pro_plus' para todos os usuários
-    return "pro_plus";
+  async (userId: string): Promise<SubscriptionLevel> => {
+    const subscription = await prisma.userSubscription.findUnique({
+      where: {
+        userId,
+      },
+    });
+
+    if (!subscription || subscription.currentPeriodEnd < new Date()) {
+      return "free";
+    }
+
+    if (subscription) {
+      // For now, any active subscription is treated as "pro"
+      return "pro";
+    }
+
+    throw new Error("Invalid subscription");
   },
 );
