@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import LoadingButton from "@/components/LoadingButton";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MessageSquare } from "lucide-react";
 import React, { useState } from "react";
@@ -27,6 +28,7 @@ import { canUseAITools } from "@/lib/permissions";
 export default function GenerateCustomSectionButton({ onSectionGenerated }: Readonly<Props>) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const subscriptionLevel = useSubscriptionLevel();
   const premiumModal = usePremiumModal();
@@ -36,6 +38,21 @@ export default function GenerateCustomSectionButton({ onSectionGenerated }: Read
     resolver: zodResolver(formSchema),
     defaultValues: { description: "" },
   });
+
+  const [isCooldown, setIsCooldown] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  React.useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isCooldown && cooldownRemaining > 0) {
+      timer = setTimeout(() => {
+        setCooldownRemaining(cooldownRemaining - 1);
+      }, 1000);
+    } else if (cooldownRemaining === 0) {
+      setIsCooldown(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isCooldown, cooldownRemaining]);
 
   const handleSubmit = async (values: FormValues) => {
     setLoading(true);
@@ -48,8 +65,29 @@ export default function GenerateCustomSectionButton({ onSectionGenerated }: Read
       onSectionGenerated(title, content);
       setOpen(false);
       form.reset();
-    } catch (error) {
+
+      // Start cooldown ONLY for free users to prevent spam
+      if (!isPremium) {
+         setIsCooldown(true);
+         setCooldownRemaining(30);
+      }
+    } catch (error: any) {
       console.error("Failed to generate custom section:", error);
+      if (error.message.includes("RATE_LIMIT_EXCEEDED")) {
+         toast({
+          variant: "destructive",
+          title: "Alta Demanda 🔥",
+          description: "Servidores gratuitos lotados no momento. Assine o plano PRO para servidores dedicados e geração instantânea!",
+          duration: 6000,
+        });
+        setOpen(false);
+        premiumModal.setOpen(true);
+      } else {
+        toast({
+          variant: "destructive",
+          description: "Algo deu errado. Tente novamente em instantes.",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -95,8 +133,8 @@ export default function GenerateCustomSectionButton({ onSectionGenerated }: Read
                 </FormItem>
               )}
             />
-            <LoadingButton loading={loading}>
-              Gerar
+            <LoadingButton loading={loading || isCooldown} disabled={isCooldown}>
+              {isCooldown ? `Aguarde ${cooldownRemaining}s...` : "Gerar"}
             </LoadingButton>
           </form>
         </Form>

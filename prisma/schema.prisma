@@ -143,3 +143,13 @@ model UserUsage {
 
   @@map("user_usages")
 }
+
+model AiGenerationCache {
+  id         String   @id @default(cuid())
+  promptHash String   @unique @db.VarChar(64)
+  result     String   @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([promptHash])
+  @@map("ai_generation_cache")
+}

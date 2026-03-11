@@ -1,7 +1,7 @@
 "use server";
 
 import { canUseAITools } from "@/lib/permissions";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import genAI from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import {
@@ -13,7 +13,15 @@ import {
 } from "@/lib/validation";
 import { auth } from "@clerk/nextjs/server";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+
+import { generateWithRetry } from "@/lib/gemini";
+import crypto from "crypto";
+
+// Helper to generate a consistent hash for caching
+function generateCacheKey(systemMessage: string, userMessage: string): string {
+  return crypto.createHash("sha256").update(systemMessage + userMessage).digest("hex");
+}
 
 export async function getUserAILimits() {
   const { userId } = await auth();
@@ -82,17 +90,31 @@ export async function generateSummary(input: GenerateSummaryInput) {
       ${skills}
     `;
 
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    systemInstruction: systemMessage,
+  const cacheKey = generateCacheKey(systemMessage, userMessage);
+
+  // 1. Check Cache
+  const cachedResult = await (prisma as any).aiGenerationCache.findUnique({
+    where: { promptHash: cacheKey }
   });
 
-  const response = await model.generateContent(userMessage);
-  const aiResponse = response.response.text();
-
-  if (!aiResponse) {
-    throw new Error("Falha ao gerar resposta da IA");
+  if (cachedResult) {
+     console.log("[CACHE HIT] Returning cached summary.");
+     return cachedResult.result;
   }
+
+  // 2. Generate with Retry & Tuning
+  const aiResponse = await generateWithRetry(systemMessage, userMessage);
+
+  // 3. Save to Cache
+  try {
+     await (prisma as any).aiGenerationCache.create({
+         data: {
+             promptHash: cacheKey,
+             result: aiResponse
+         }
+     });
+  } catch(e) { /* ignore duplicate key errors if concurrent */ }
+
   return aiResponse;
 }
 
@@ -106,8 +128,9 @@ export async function generateWorkExperience(
   }
 
   const subscriptionLevel = await getUserSubscriptionLevel(userId);
+  const isFreeUser = !canUseAITools(subscriptionLevel);
 
-  if (!canUseAITools(subscriptionLevel)) {
+  if (isFreeUser) {
     // For free users, check if they have used their 1 free generation
     const userUsage = await (prisma as any).userUsage.findUnique({
       where: { userId },
@@ -117,12 +140,7 @@ export async function generateWorkExperience(
       throw new Error("FREE_LIMIT_REACHED");
     }
 
-    // Increment usage
-    await (prisma as any).userUsage.upsert({
-      where: { userId },
-      update: { aiExperienceUses: { increment: 1 } },
-      create: { userId, aiExperienceUses: 1 },
-    });
+    // Increment usage -> We'll do this ONLY if generation succeeds to avoid burning the limit on errors
   }
 
   const { description } = generateWorkExperienceSchema.parse(input);
@@ -144,24 +162,48 @@ export async function generateWorkExperience(
   ${description}
   `;
 
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    systemInstruction: systemMessage,
+  const cacheKey = generateCacheKey(systemMessage, userMessage);
+
+  let aiResponse = "";
+  let isCached = false;
+
+  // 1. Check Cache
+  const cachedResult = await (prisma as any).aiGenerationCache.findUnique({
+    where: { promptHash: cacheKey }
   });
 
-  const response = await model.generateContent(userMessage);
-  const aiResponse = response.response.text();
+  if (cachedResult) {
+      console.log("[CACHE HIT] Returning cached work experience.");
+      aiResponse = cachedResult.result;
+      isCached = true;
+  } else {
+     // 2. Generate
+     aiResponse = await generateWithRetry(systemMessage, userMessage);
+     
+     // 3. Save Cache
+     try {
+         await (prisma as any).aiGenerationCache.create({
+             data: { promptHash: cacheKey, result: aiResponse }
+         });
+     } catch(e) { }
+  }
 
-  if (!aiResponse) {
-    throw new Error("Falha ao gerar resposta da IA");
+  // 4. If Free User and not cached (actually performed work), increment usages
+  // Actually, even if cached, they are "using" their perk.
+  if (isFreeUser) {
+      await (prisma as any).userUsage.upsert({
+        where: { userId },
+        update: { aiExperienceUses: { increment: 1 } },
+        create: { userId, aiExperienceUses: 1 },
+      });
   }
 
   return {
-    position: aiResponse.match(/Cargo: (.*)/)?.[1] || "",
-    company: aiResponse.match(/Empresa: (.*)/)?.[1] || "",
-    description: (aiResponse.match(/Descrição:([\s\S]*)/)?.[1] || "").trim(),
-    startDate: aiResponse.match(/Data de início: (\d{4}-\d{2}-\d{2})/)?.[1],
-    endDate: aiResponse.match(/Data de término: (\d{4}-\d{2}-\d{2})/)?.[1],
+    position: aiResponse.match(/Cargo:\s*(.*)/i)?.[1]?.trim() || "",
+    company: aiResponse.match(/Empresa:\s*(.*)/i)?.[1]?.trim() || "",
+    description: (aiResponse.match(/Descrição:([\s\S]*)/i)?.[1] || "").trim(),
+    startDate: aiResponse.match(/Data de início:\s*(\d{4}-\d{2}-\d{2})/i)?.[1],
+    endDate: aiResponse.match(/Data de término:\s*(\d{4}-\d{2}-\d{2})/i)?.[1],
   } satisfies WorkExperience;
 }
 
@@ -204,16 +246,24 @@ export async function generateCustomSection(input: { description: string }) {
 
   const userMessage = `Crie uma seção personalizada para currículo baseada na seguinte descrição: ${description}`;
 
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    systemInstruction: systemMessage,
+  const cacheKey = generateCacheKey(systemMessage, userMessage);
+  
+  const cachedResult = await (prisma as any).aiGenerationCache.findUnique({
+    where: { promptHash: cacheKey }
   });
 
-  const response = await model.generateContent(userMessage);
-  const aiResponse = response.response.text();
-
-  if (!aiResponse) {
-    throw new Error("Falha ao gerar resposta da IA");
+  if (cachedResult) {
+      console.log("[CACHE HIT] Returning cached custom section.");
+      return cachedResult.result;
   }
+
+  const aiResponse = await generateWithRetry(systemMessage, userMessage);
+
+  try {
+     await (prisma as any).aiGenerationCache.create({
+         data: { promptHash: cacheKey, result: aiResponse }
+     });
+  } catch(e) {}
+
   return aiResponse;
 }

@@ -114,6 +114,7 @@ function InputDialog({
   onPremiumRequired,
 }: InputDialogProps) {
   const { toast } = useToast();
+  const subscriptionLevel = useSubscriptionLevel();
 
   const form = useForm<GenerateWorkExperienceInput>({
     resolver: zodResolver(generateWorkExperienceSchema),
@@ -122,22 +123,53 @@ function InputDialog({
     },
   });
 
+  const [isCooldown, setIsCooldown] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isCooldown && cooldownRemaining > 0) {
+      timer = setTimeout(() => {
+        setCooldownRemaining(cooldownRemaining - 1);
+      }, 1000);
+    } else if (cooldownRemaining === 0) {
+      setIsCooldown(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isCooldown, cooldownRemaining]);
+
   async function onSubmit(input: GenerateWorkExperienceInput) {
     try {
       const response = await generateWorkExperience(input);
       onWorkExperienceGenerated(response);
+      
+      // Start cooldown ONLY for free users to prevent spam
+      if (!canUseAITools(subscriptionLevel)) {
+         setIsCooldown(true);
+         setCooldownRemaining(30); // 30 seconds cooldown for free users
+      }
+
     } catch (error: any) {
       console.error(error);
       if (error.message.includes("FREE_LIMIT_REACHED")) {
         toast({
           variant: "destructive",
-          description: "Você já usou seu teste grátis 😢",
+          title: "Limite Atingido",
+          description: "Você já usou sua geração gratuita para experiências 😢",
+        });
+        onPremiumRequired();
+      } else if (error.message.includes("RATE_LIMIT_EXCEEDED")) {
+         toast({
+          variant: "destructive",
+          title: "Alta Demanda 🔥",
+          description: "Servidores gratuitos lotados no momento. Assine o plano PRO para servidores dedicados e geração instantânea!",
+          duration: 6000,
         });
         onPremiumRequired();
       } else {
         toast({
           variant: "destructive",
-          description: "Algo deu errado. Verifique se o texto não é muito grande.",
+          description: "Algo deu errado. Tente novamente em instantes.",
         });
       }
     }
@@ -160,7 +192,7 @@ function InputDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
-                  <FormControl>
+                   <FormControl>
                     <Textarea
                       {...field}
                       placeholder={`Ex.: "de nov 2019 a dez 2020 trabalhei no Google como engenheiro de software, minhas tarefas eram: ..."`}
@@ -171,8 +203,8 @@ function InputDialog({
                 </FormItem>
               )}
             />
-            <LoadingButton loading={form.formState.isSubmitting}>
-              Gerar
+            <LoadingButton loading={form.formState.isSubmitting || isCooldown} disabled={isCooldown}>
+              {isCooldown ? `Aguarde ${cooldownRemaining}s...` : "Gerar"}
             </LoadingButton>
           </form>
         </Form>

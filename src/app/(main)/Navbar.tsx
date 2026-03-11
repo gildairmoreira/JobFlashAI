@@ -2,7 +2,7 @@
 
 import logo from "@/assets/logo.png";
 import ThemeToggle from "@/components/ThemeToggle";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useClerk } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { CreditCard, ShieldCheck, Crown } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -21,6 +21,7 @@ export default function Navbar({
 }) {
   const { theme } = useTheme();
   const premiumModal = usePremiumModal();
+  const clerk = useClerk();
 
   const isPremium = userPlan !== "FREE";
 
@@ -86,6 +87,7 @@ export default function Navbar({
                   {!isPremium && (
                     <Link
                       href="/#precos"
+                      onClick={() => clerk.closeUserProfile()}
                       className="block text-center w-full py-3 bg-stone-900 text-white font-bold rounded-lg hover:bg-stone-800 transition"
                     >
                       Fazer Upgrade Agora
