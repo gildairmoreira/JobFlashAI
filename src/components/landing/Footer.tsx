@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Github, Twitter, Linkedin, Instagram, Mail } from 'lucide-react';
+import { Twitter, Linkedin, Instagram, Mail } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -42,11 +42,10 @@ const Footer: React.FC = () => {
   ];
 
   const socialLinks = [
-    { name: 'GitHub', icon: <Github className="w-5 h-5" />, href: '#' },
     { name: 'Twitter', icon: <Twitter className="w-5 h-5" />, href: '#' },
-    { name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" />, href: '#' },
+    { name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" />, href: 'https://www.linkedin.com/in/gildair-moreira/' },
     { name: 'Instagram', icon: <Instagram className="w-5 h-5" />, href: '#' },
-    { name: 'Email', icon: <Mail className="w-5 h-5" />, href: 'mailto:contato@curriculo-ai.com' },
+    { name: 'Email', icon: <Mail className="w-5 h-5" />, href: 'mailto:contato.gildair@gmail.com' },
   ];
 
   return (
@@ -102,7 +101,7 @@ const Footer: React.FC = () => {
               © {currentYear} JobFlashAI. Todos os direitos reservados.
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Powered by <Link href="https://www.instagram.com/gildair" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 transition-colors">gildair</Link>
+              Powered by <Link href="https://www.instagram.com/gildairmoreira" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 transition-colors">Dev gil</Link>
             </p>
           </div>
 
