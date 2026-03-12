@@ -10,7 +10,7 @@ import { ptBR } from "@clerk/localizations";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://jobflash.com.br"), // Define a URL base para metadados (OG, Twitter)
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://jobflash.netlify.app"), // Define a URL base para metadados (OG, Twitter)
   title: {
     template: "%s - JobFlashAI",
     absolute: "JobFlashAI",
