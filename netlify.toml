@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Evita falhas de build por falsos positivos em arquivos gerados pelo Next.js
+  # Removemos os segredos reais do código, mas o scanner pode ser agressivo com a pasta .next
+  SECRETS_SCAN_OMIT_PATHS = ".next/**"

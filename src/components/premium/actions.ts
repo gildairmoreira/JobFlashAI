@@ -10,9 +10,13 @@ export async function createCheckoutSession(planType: string) {
   const email = user?.emailAddresses[0]?.emailAddress;
   if (!email) throw new Error('Email do usuário não encontrado');
 
-  // Use actual Cakto payment links
-  const CAKTO_PRO_CHECKOUT_URL = process.env.CAKTO_PRO_CHECKOUT_URL || "https://pay.cakto.com.br/t5u3oq5_799648";
-  const CAKTO_LIFETIME_CHECKOUT_URL = process.env.CAKTO_LIFETIME_CHECKOUT_URL || "https://pay.cakto.com.br/okwgghz_799577";
+  // Busca os links de pagamento reais do Cakto via variáveis de ambiente
+  const CAKTO_PRO_CHECKOUT_URL = process.env.CAKTO_PRO_CHECKOUT_URL;
+  const CAKTO_LIFETIME_CHECKOUT_URL = process.env.CAKTO_LIFETIME_CHECKOUT_URL;
+  
+  if (!CAKTO_PRO_CHECKOUT_URL || !CAKTO_LIFETIME_CHECKOUT_URL) {
+    throw new Error('Configuração de URLs de checkout do Cakto não encontrada');
+  }
 
   let checkoutUrl = planType === 'pro' ? CAKTO_PRO_CHECKOUT_URL : CAKTO_LIFETIME_CHECKOUT_URL;
 

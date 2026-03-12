@@ -40,8 +40,13 @@ export async function POST(req: Request) {
             return new Response("Missing clerk_user_id in metadata", { status: 400 });
         }
 
-        const CAKTO_PRO_ID = process.env.CAKTO_PRO_PRODUCT_ID || "123_PRO";
-        const CAKTO_LIFETIME_ID = process.env.CAKTO_LIFETIME_PRODUCT_ID || "123_LIFETIME";
+        const CAKTO_PRO_ID = process.env.CAKTO_PRO_PRODUCT_ID;
+        const CAKTO_LIFETIME_ID = process.env.CAKTO_LIFETIME_PRODUCT_ID;
+
+        if (!CAKTO_PRO_ID || !CAKTO_LIFETIME_ID) {
+            console.error("Cakto Webhook Error: IDs de produto do Cakto não configurados.");
+            return new Response("Configuração pendente", { status: 500 });
+        }
 
         let planType: "FREE" | "PRO" | "LIFETIME" = "FREE";
         let expirationDate: Date | null = null;
