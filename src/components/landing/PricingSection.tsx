@@ -14,50 +14,54 @@ interface PricingPlan {
   features: { name: string; included: boolean }[];
   cta: string;
   popular?: boolean;
+  originalPrice?: string;
+  badge?: string;
 }
 
 const PricingSection: React.FC = () => {
   const plans: PricingPlan[] = [
     {
       name: 'Free',
-      description: 'Para quem quer testar e criar seu primeiro rascunho.',
+      description: 'Ideal para experimentar nossa plataforma básica sem custos.',
       price: 'R$0',
-      period: 'grátis',
+      period: 'por mês',
       features: [
-        { name: 'Limite de 1 currículo ativo', included: true },
-        { name: 'Apenas 1 uso gratuito da IA (Experiência)', included: true },
+        { name: '1 Currículo ativo (sem duplicar)', included: true },
+        { name: 'Template Clássico Padrão', included: true },
         { name: 'Download PDF (Com marca d\'água)', included: true },
-        { name: 'Cores, Foto e Links Sociais', included: false },
-        { name: 'Análise detalhada de competências', included: false },
+        { name: 'Acesso ao Avaliador ATS', included: false },
+        { name: 'Gerador Job-Fit AI (Adaptador de Vagas)', included: false },
       ],
       cta: 'Começar Grátis',
     },
     {
       name: 'Acesso Pro - 7 Dias',
-      description: 'Para quem precisa dessa vaga urgente. Destrave a IA e construa até 3 versões do seu currículo.',
+      description: 'Para quem precisa dessa vaga urgente. Destrave a IA e crie versões irresistíveis.',
       price: 'R$19,90',
       period: 'por 7 dias',
       features: [
-        { name: 'Criação ilimitada com IA (por 7 dias)', included: true },
-        { name: 'Até 3 currículos simultâneos', included: true },
-        { name: 'Modelo validado por Recrutadores Tech', included: true },
-        { name: 'Exportação em PDF sem marca d\'água Otimizado ATS', included: true },
-        { name: 'Análise detalhada de competências', included: true },
+        { name: 'Módulo Job-Fit AI (Adaptador de vagas)', included: true },
+        { name: 'Avaliador ATS: Dicas Acionáveis Secretas', included: true },
+        { name: 'Currículos Ilimitados (Duplique à vontade)', included: true },
+        { name: 'Templates VIP (Harvard, Moderno, etc)', included: true },
+        { name: 'Exportação em PDF Limpo + Fontes Libertas', included: true },
       ],
-      cta: 'Criar Meu Currículo',
+      cta: 'Assinar Pro - 7 Dias',
       popular: true,
     },
     {
       name: 'Acesso Mensal',
-      description: 'Tenha seu arsenal de IA ativo mês a mês. Cancele quando quiser.',
+      description: 'Para quem quer ter o arsenal de IA pronto para todas as oportunidades do ano.',
       price: 'R$49,90',
       period: 'por mês',
+      originalPrice: 'De R$ 79,60',
+      badge: 'Economize 37%',
       features: [
-        { name: 'Acesso ilimitado a todos os recursos atuais', included: true },
+        { name: 'Acesso ilimitado a todos os recursos Pro', included: true },
+        { name: 'Módulo Job-Fit AI (Gerações Ilimitadas)', included: true },
+        { name: 'Avaliador ATS sempre atualizado', included: true },
         { name: 'Currículos ilimitados para sempre', included: true },
-        { name: 'Uso de IA Ilimitada', included: true },
-        { name: 'Design e personalização totais', included: true },
-        { name: 'Suporte VIP e Atualizações', included: true },
+        { name: 'Nenhuma fidelidade, cancele quando quiser', included: true },
       ],
       cta: 'Assinar Plano Mensal',
     }
@@ -75,13 +79,13 @@ const PricingSection: React.FC = () => {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold mb-6">
             <Shield className="w-4 h-4" />
-            Oferta de Lançamento
+            Oferta Especial
           </div>
           <h2 className="text-3xl md:text-5xl font-extrabold text-stone-900 mb-6 tracking-tight">
-            Seu próximo salário começa aqui
+            Invista no seu futuro. Pare de ser rejeitado.
           </h2>
           <p className="text-xl text-stone-600 max-w-2xl mx-auto font-light leading-relaxed">
-            Economize meses tentando descobrir como convencer recrutadores. Nós automatizamos a parte difícil.
+            Poupe meses de estresse tentando adivinhar como agradar as empresas. Libere o Avaliador ATS e o nosso Job-Fit AI para reescrever seu currículo para cada vaga.
           </p>
         </motion.div>
 
@@ -103,15 +107,29 @@ const PricingSection: React.FC = () => {
                   </span>
                 </div>
               )}
+              {plan.badge && !plan.popular && (
+                <div className="absolute -top-5 left-0 right-0 flex justify-center">
+                  <span className="bg-emerald-500 text-white text-sm font-bold px-6 py-2 rounded-full shadow-md uppercase tracking-wide">
+                    {plan.badge}
+                  </span>
+                </div>
+              )}
 
-              <div className="text-center mb-8 mt-2">
+              <div className="text-center mb-6 mt-2">
                 <h3 className="text-2xl font-bold text-stone-900 mb-3">{plan.name}</h3>
                 <p className="text-stone-600 font-light text-sm">{plan.description}</p>
               </div>
 
-              <div className="text-center mb-10">
-                <span className="text-5xl font-black text-stone-900">{plan.price}</span>
-                <span className="text-stone-500 font-medium ml-2">{plan.period}</span>
+              <div className="text-center mb-10 flex flex-col items-center">
+                {plan.originalPrice && (
+                  <span className="text-stone-400 font-medium line-through mb-1 text-sm">
+                    {plan.originalPrice}
+                  </span>
+                )}
+                <div>
+                  <span className="text-5xl font-black text-stone-900">{plan.price}</span>
+                  <span className="text-stone-500 font-medium ml-2">{plan.period}</span>
+                </div>
               </div>
 
               <ul className="space-y-4 mb-10 flex-grow">

@@ -33,18 +33,20 @@ export default function Navbar({
   return (
     <header className="shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 p-3">
-        <Link href="/resumes" className="flex items-center gap-2">
-          <Image
-            src={logo}
-            alt="Logo"
-            width={50}
-            height={50}
-            className="rounded-full"
-          />
-          <span className="text-xl font-bold tracking-tight">
-            JobFlashAI
-          </span>
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link href="/resumes" className="flex items-center gap-2">
+            <Image
+              src={logo}
+              alt="Logo"
+              width={50}
+              height={50}
+              className="rounded-full"
+            />
+            <span className="text-xl font-bold tracking-tight">
+              JobFlashAI
+            </span>
+          </Link>
+        </div>
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <UserButton

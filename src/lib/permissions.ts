@@ -24,3 +24,13 @@ export function canUseAITools(subscriptionLevel: SubscriptionLevel) {
 export function canUseCustomizations(subscriptionLevel: SubscriptionLevel) {
   return subscriptionLevel !== "free";
 }
+
+/** Duplicar currículo — disponível para PRO (semanal) e LIFETIME (mensal) */
+export function canDuplicateResume(subscriptionLevel: SubscriptionLevel) {
+  return subscriptionLevel === "pro" || subscriptionLevel === "lifetime";
+}
+
+/** Gerar currículo para vaga — exclusivo do plano LIFETIME (mensal) */
+export function canGenerateForJob(subscriptionLevel: SubscriptionLevel) {
+  return subscriptionLevel === "lifetime";
+}

@@ -7,6 +7,11 @@ import { auth } from "@clerk/nextjs/server";
 import { Metadata } from "next";
 import CreateResumeButton from "./CreateResumeButton";
 import ResumeItem from "./ResumeItem";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { BarChart2 } from "lucide-react";
+import JobFitButton from "./JobFitButton";
+import { getUserJobFitUsage } from "./job-actions";
 
 export const metadata: Metadata = {
   title: "Seus currículos",
@@ -19,7 +24,7 @@ export default async function Page() {
     return null;
   }
 
-  const [resumes, totalCount, subscriptionLevel] = await Promise.all([
+  const [resumes, totalCount, subscriptionLevel, jobFitUsage] = await Promise.all([
     prisma.resume.findMany({
       where: {
         userId,
@@ -35,20 +40,45 @@ export default async function Page() {
       },
     }),
     getUserSubscriptionLevel(userId),
+    getUserJobFitUsage(),
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-6 px-3 py-6">
-      <CreateResumeButton
-        canCreate={canCreateResume(subscriptionLevel, totalCount)}
-      />
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold">Seus currículos</h1>
-        <p>Total: {totalCount}</p>
+    <main className="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 relative">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative">
+        <div className="space-y-1 w-full md:w-1/3 text-center md:text-left order-2 md:order-1">
+          <h1 className="text-3xl font-bold">Seus currículos</h1>
+          <p className="text-muted-foreground">Total: {totalCount}</p>
+        </div>
+        
+        <div className="w-full md:w-1/3 flex justify-center order-1 md:order-2">
+          <CreateResumeButton
+            canCreate={canCreateResume(subscriptionLevel, totalCount)}
+          />
+        </div>
+
+        <div className="flex w-full md:w-1/3 items-center justify-center md:justify-end gap-3 order-3">
+          <JobFitButton 
+            resumes={resumes} 
+            subscriptionLevel={subscriptionLevel} 
+            usageCount={jobFitUsage} 
+          />
+          <Button asChild variant="secondary" className="flex gap-2 shrink-0">
+            <Link href="/ats-evaluator" prefetch={false}>
+              <BarChart2 className="size-4" />
+              <span className="hidden sm:inline">Avaliar ATS</span>
+            </Link>
+          </Button>
+        </div>
       </div>
+      
       <div className="flex w-full grid-cols-2 flex-col gap-3 sm:grid md:grid-cols-3 lg:grid-cols-4">
-        {resumes.map((resume) => (
-          <ResumeItem key={resume.id} resume={resume} />
+        {resumes.map((resume: any) => (
+          <ResumeItem
+            key={resume.id}
+            resume={resume}
+            subscriptionLevel={subscriptionLevel}
+          />
         ))}
       </div>
     </main>

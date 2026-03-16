@@ -24,6 +24,8 @@ model Resume {
   photoUrl    String?
   colorHex    String  @default("#000000")
   borderStyle String  @default("squircle")
+  templateId  String  @default("classic")
+  fontFamily  String  @default("lato")
   summary     String?
   firstName   String?
   lastName    String?
@@ -38,6 +40,9 @@ model Resume {
   educations      Education[]
   skills          String[]
   customSections   CustomSection[]
+  atsScore        ResumeAtsScore?
+  jobFitSourced   JobFitGeneration[] @relation("SourceResume")
+  jobFitOutputted JobFitGeneration?  @relation("OutputResume")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -137,6 +142,7 @@ model UserUsage {
   aiExperienceUses Int @default(0)
   aiSummaryUses    Int @default(0)
   aiCustomUses     Int @default(0)
+  jobFitUsesThisMonth Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -152,4 +158,38 @@ model AiGenerationCache {
 
   @@index([promptHash])
   @@map("ai_generation_cache")
+}
+
+model ResumeAtsScore {
+  id        String   @id @default(cuid())
+  userId    String
+  resumeId  String   @unique
+  score     Int
+  details   Json     // { strengths, weaknesses, keyword_match, suggestions }
+
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("resume_ats_scores")
+}
+
+model JobFitGeneration {
+  id              String   @id @default(cuid())
+  userId          String
+  sourceResumeId  String
+  outputResumeId  String?  @unique
+  jobDescription  String   @db.Text
+  status          String   @default("pending") // pending | processing | done | error
+  errorMessage    String?
+  sectionsCompleted Int    @default(0)
+
+  sourceResume    Resume   @relation("SourceResume", fields: [sourceResumeId], references: [id], onDelete: Cascade)
+  outputResume    Resume?  @relation("OutputResume", fields: [outputResumeId], references: [id], onDelete: SetNull)
+
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  @@map("job_fit_generations")
 }

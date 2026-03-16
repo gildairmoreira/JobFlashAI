@@ -19,8 +19,14 @@ interface ResumeEditorProps {
 export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
   const searchParams = useSearchParams();
 
+  const templateIdParam = searchParams.get("templateId") || "classic";
+  const fontFamilyParam = searchParams.get("fontFamily") || "lato";
+
   const [resumeData, setResumeData] = useState<ResumeValues>(
-    resumeToEdit ? mapToResumeValues(resumeToEdit) : {},
+    resumeToEdit ? mapToResumeValues(resumeToEdit) : {
+      templateId: templateIdParam,
+      fontFamily: fontFamilyParam,
+    },
   );
 
   const [showSmResumePreview, setShowSmResumePreview] = useState(false);

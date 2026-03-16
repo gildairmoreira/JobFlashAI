@@ -8,18 +8,18 @@ const FeaturesSection: React.FC = () => {
   const features = [
     {
       icon: CheckCircle2,
-      title: "IA Focada em Resultados",
-      description: "Nosso algoritmo não apenas escreve, mas estrutura seu currículo evidenciando conquistas reais."
+      title: "Job-Fit AI: 1 Clique",
+      description: "Cole o link da vaga e nossa IA reescreve suas experiências destacando exatamente as palavras-chave que a empresa exigiu."
     },
     {
       icon: TrendingUp,
-      title: "Otimização Aprovada por ATS",
-      description: "Cada seção é validada para passar pelos sistemas automáticos (Gupy, Workday, Compleo)."
+      title: "Avaliador ATS Antifiltros",
+      description: "Descubra sua nota antes de enviar. Receba dicas priorizadas do que alterar para bater 90+ pontos sem esforço."
     },
     {
       icon: Briefcase,
-      title: "Rumo a Entrevistas",
-      description: "Modelos simples e validados. Os Headhunters preferem foco técnico em vez de distrações visuais."
+      title: "Padrão Harvard & Moderno",
+      description: "Fuja dos currículos de Canva reprovados. Use uma estrutura 100% validada por Headhunters, com fontes tipografadas perfeitas."
     }
   ];
 
@@ -34,11 +34,11 @@ const FeaturesSection: React.FC = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl md:text-5xl font-extrabold text-stone-900 mb-6 tracking-tight">
-            Foco total em conseguir entrevistas.
+            Seu tempo vale ouro. Pare de editar PDFs.
           </h2>
 
           <p className="text-xl text-stone-600 max-w-2xl mx-auto font-light leading-relaxed">
-            Seu currículo não precisa ser uma obra de arte, precisa ser eficiente. O objetivo é fazer o recrutador entender seu valor no menor tempo possível.
+            Ter um currículo único para todas as vagas é o motivo de você não ser chamado. Com nosso gerador adaptativo, você envia dezenas de aplicações hiper-personalizadas por hora.
           </p>
         </motion.div>
 

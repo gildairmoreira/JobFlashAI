@@ -18,20 +18,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { canDuplicateResume } from "@/lib/permissions";
+import { SubscriptionLevel } from "@/lib/subscription";
 import { ResumeServerData } from "@/lib/types";
 import { mapToResumeValues } from "@/lib/utils";
 import { formatDate } from "date-fns";
-import { MoreVertical, Printer, Trash2 } from "lucide-react";
+import { Copy, MoreVertical, Printer, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState, useTransition } from "react";
 import { useReactToPrint } from "react-to-print";
-import { deleteResume } from "./actions";
+import { deleteResume, duplicateResume } from "./actions";
+import usePremiumModal from "@/hooks/usePremiumModal";
 
 interface ResumeItemProps {
   resume: ResumeServerData;
+  subscriptionLevel: SubscriptionLevel;
 }
 
-export default function ResumeItem({ resume }: Readonly<ResumeItemProps>) {
+export default function ResumeItem({ resume, subscriptionLevel }: Readonly<ResumeItemProps>) {
   const contentRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -79,7 +83,11 @@ export default function ResumeItem({ resume }: Readonly<ResumeItemProps>) {
           </div>
         </div>
       </div>
-      <MoreMenu resumeId={resume.id} onPrintClick={reactToPrintFn} />
+      <MoreMenu
+        resumeId={resume.id}
+        onPrintClick={reactToPrintFn}
+        subscriptionLevel={subscriptionLevel}
+      />
     </div>
   );
 }
@@ -87,10 +95,40 @@ export default function ResumeItem({ resume }: Readonly<ResumeItemProps>) {
 interface MoreMenuProps {
   resumeId: string;
   onPrintClick: () => void;
+  subscriptionLevel: SubscriptionLevel;
 }
 
-function MoreMenu({ resumeId, onPrintClick }: Readonly<MoreMenuProps>) {
+function MoreMenu({ resumeId, onPrintClick, subscriptionLevel }: Readonly<MoreMenuProps>) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isDuplicating, startDuplicate] = useTransition();
+  const { toast } = useToast();
+  const premiumModal = usePremiumModal();
+
+  const canDuplicate = canDuplicateResume(subscriptionLevel);
+
+  function handleDuplicate() {
+    if (!canDuplicate) {
+      premiumModal.setOpen(true);
+      return;
+    }
+
+    startDuplicate(async () => {
+      try {
+        await duplicateResume(resumeId);
+        toast({ description: "Currículo duplicado com sucesso!" });
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "";
+        if (message === "PLAN_REQUIRED") {
+          premiumModal.setOpen(true);
+        } else {
+          toast({
+            variant: "destructive",
+            description: "Erro ao duplicar currículo. Tente novamente.",
+          });
+        }
+      }
+    });
+  }
 
   return (
     <>
@@ -107,17 +145,28 @@ function MoreMenu({ resumeId, onPrintClick }: Readonly<MoreMenuProps>) {
         <DropdownMenuContent>
           <DropdownMenuItem
             className="flex items-center gap-2"
-            onClick={() => setShowDeleteConfirmation(true)}
-          >
-            <Trash2 className="size-4" />
-            Excluir
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="flex items-center gap-2"
             onClick={onPrintClick}
           >
             <Printer className="size-4" />
             Imprimir
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className={`flex items-center gap-2 ${!canDuplicate ? "opacity-50" : ""}`}
+            onClick={handleDuplicate}
+            disabled={isDuplicating}
+          >
+            <Copy className="size-4" />
+            {isDuplicating ? "Duplicando..." : "Duplicar"}
+            {!canDuplicate && (
+              <span className="ml-auto text-[10px] text-muted-foreground">PRO</span>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="flex items-center gap-2"
+            onClick={() => setShowDeleteConfirmation(true)}
+          >
+            <Trash2 className="size-4" />
+            Excluir
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
