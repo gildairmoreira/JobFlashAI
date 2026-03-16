@@ -35,6 +35,8 @@ model Resume {
   phone       String?
   email       String?
   socialLinks Json?   @default("[]")
+  language             String?
+  alternateLanguageData Json?
 
   workExperiences WorkExperience[]
   educations      Education[]

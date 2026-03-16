@@ -57,5 +57,7 @@ export function mapToResumeValues(data: ResumeServerData): ResumeValues {
     // @ts-ignore
     fontFamily: (data as any).fontFamily,
     summary: data.summary ?? undefined,
+    language: (data as any).language ?? undefined,
+    alternateLanguageData: (data as any).alternateLanguageData ?? undefined,
   };
 }

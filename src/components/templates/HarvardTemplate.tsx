@@ -3,7 +3,9 @@
 
 import { ResumeTemplateProps } from "@/lib/resume-templates/registry";
 import { formatDate } from "date-fns";
+import { ptBR, enUS } from "date-fns/locale";
 import React from "react";
+import { getTranslation } from "@/lib/resume-templates/translations";
 
 export default function HarvardTemplate({ resumeData }: ResumeTemplateProps) {
   return (
@@ -64,12 +66,13 @@ function HarvardHeader({ resumeData }: ResumeTemplateProps) {
 
 // Resumo Profissional
 function HarvardSummary({ resumeData }: ResumeTemplateProps) {
-  const { summary } = resumeData;
+  const { summary, language } = resumeData;
+  const t = getTranslation(language);
   if (!summary) return null;
 
   return (
     <>
-      <SectionTitle>PROFESSIONAL SUMMARY</SectionTitle>
+      <SectionTitle>{t.summary}</SectionTitle>
       <div className="mb-2 whitespace-pre-line text-[11.5px]">
         {summary}
       </div>
@@ -90,7 +93,8 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 // Educação: Instituição/Cidade | Grau/Data
 function HarvardEducation({ resumeData }: ResumeTemplateProps) {
-  const { educations } = resumeData;
+  const { educations, language } = resumeData;
+  const t = getTranslation(language);
   const filtered = educations?.filter(
     (edu) => Object.values(edu).filter(Boolean).length > 0,
   );
@@ -98,7 +102,7 @@ function HarvardEducation({ resumeData }: ResumeTemplateProps) {
 
   return (
     <>
-      <SectionTitle>EDUCATION</SectionTitle>
+      <SectionTitle>{t.education}</SectionTitle>
       <div className="space-y-2">
         {filtered.map((edu, i) => (
           <div key={i} className="break-inside-avoid">
@@ -106,8 +110,8 @@ function HarvardEducation({ resumeData }: ResumeTemplateProps) {
               <span className="font-bold">{edu.school}</span>
               {edu.startDate && (
                 <span className="shrink-0 text-right text-[11.5px]">
-                  {formatDate(edu.startDate, "MMM yyyy")}
-                  {edu.endDate ? ` – ${formatDate(edu.endDate, "MMM yyyy")}` : ""}
+                  {formatDate(edu.startDate, "MMM yyyy", { locale: language === 'en' ? enUS : ptBR })}
+                  {edu.endDate ? ` – ${formatDate(edu.endDate, "MMM yyyy", { locale: language === 'en' ? enUS : ptBR })}` : ""}
                 </span>
               )}
             </div>
@@ -123,7 +127,8 @@ function HarvardEducation({ resumeData }: ResumeTemplateProps) {
 
 // Experiência: Empresa/Cidade | Cargo/Data | Bullets
 function HarvardExperience({ resumeData }: ResumeTemplateProps) {
-  const { workExperiences } = resumeData;
+  const { workExperiences, language } = resumeData;
+  const t = getTranslation(language);
   const filtered = workExperiences?.filter(
     (exp) => Object.values(exp).filter(Boolean).length > 0,
   );
@@ -131,7 +136,7 @@ function HarvardExperience({ resumeData }: ResumeTemplateProps) {
 
   return (
     <>
-      <SectionTitle>EXPERIENCE</SectionTitle>
+      <SectionTitle>{t.workExperience}</SectionTitle>
       <div className="space-y-3">
         {filtered.map((exp, i) => (
           <div key={i} className="break-inside-avoid">
@@ -142,8 +147,8 @@ function HarvardExperience({ resumeData }: ResumeTemplateProps) {
               <span className="italic text-[11.5px]">{exp.position}</span>
               {exp.startDate && (
                 <span className="shrink-0 text-right text-[11.5px]">
-                  {formatDate(exp.startDate, "MMM yyyy")} –{" "}
-                  {exp.endDate ? formatDate(exp.endDate, "MMM yyyy") : "Present"}
+                  {formatDate(exp.startDate, "MMM yyyy", { locale: language === 'en' ? enUS : ptBR })} –{" "}
+                  {exp.endDate ? formatDate(exp.endDate, "MMM yyyy", { locale: language === 'en' ? enUS : ptBR }) : t.present}
                 </span>
               )}
             </div>
@@ -189,14 +194,15 @@ function HarvardCustomSections({ resumeData }: ResumeTemplateProps) {
 
 // Skills & Interests
 function HarvardSkills({ resumeData }: ResumeTemplateProps) {
-  const { skills } = resumeData;
+  const { skills, language } = resumeData;
+  const t = getTranslation(language);
   if (!skills?.length) return null;
 
   return (
     <>
-      <SectionTitle>SKILLS & INTERESTS</SectionTitle>
+      <SectionTitle>{t.skills}</SectionTitle>
       <p className="text-[11.5px]">
-        <span className="font-bold">Technical: </span>
+        <span className="font-bold">{t.skillsLabel}: </span>
         {skills.join(", ")}
       </p>
     </>

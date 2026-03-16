@@ -3,9 +3,11 @@
 
 import { ResumeTemplateProps } from "@/lib/resume-templates/registry";
 import { formatDate } from "date-fns";
+import { ptBR, enUS } from "date-fns/locale";
 import { Mail, MapPin, Phone, User } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { getTranslation } from "@/lib/resume-templates/translations";
 
 export default function ModernPhotoTemplate({ resumeData }: ResumeTemplateProps) {
   const accentColor = resumeData.colorHex || "#1e3a5f";
@@ -22,7 +24,8 @@ export default function ModernPhotoTemplate({ resumeData }: ResumeTemplateProps)
 
 // Sidebar com foto, contato e skills
 function Sidebar({ resumeData, accentColor }: ResumeTemplateProps & { accentColor: string }) {
-  const { photo, firstName, lastName, phone, email, city, country, skills, socialLinks } = resumeData;
+  const { photo, firstName, lastName, phone, email, city, country, skills, socialLinks, language } = resumeData;
+  const t = getTranslation(language);
 
   const [photoSrc, setPhotoSrc] = useState(photo instanceof File ? "" : photo);
 
@@ -65,7 +68,7 @@ function Sidebar({ resumeData, accentColor }: ResumeTemplateProps & { accentColo
       {/* Contato */}
       <div className="mb-5 w-full space-y-2">
         <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/70">
-          Contato
+          {t.contact}
         </h3>
         {email && (
           <div className="flex items-center gap-2 text-[10px]">
@@ -103,7 +106,7 @@ function Sidebar({ resumeData, accentColor }: ResumeTemplateProps & { accentColo
       {skills && skills.length > 0 && (
         <div className="w-full">
           <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-white/70">
-            Habilidades
+            {t.skills}
           </h3>
           <div className="flex flex-wrap gap-1">
             {skills.map((skill, i) => (
@@ -124,7 +127,8 @@ function Sidebar({ resumeData, accentColor }: ResumeTemplateProps & { accentColo
 
 // Conteúdo principal à direita
 function MainContent({ resumeData, accentColor }: ResumeTemplateProps & { accentColor: string }) {
-  const { firstName, lastName, jobTitle, summary, workExperiences, educations, customSections } = resumeData;
+  const { firstName, lastName, jobTitle, summary, workExperiences, educations, customSections, language } = resumeData;
+  const t = getTranslation(language);
 
   return (
     <div className="flex-1 px-5 py-5">
@@ -142,14 +146,14 @@ function MainContent({ resumeData, accentColor }: ResumeTemplateProps & { accent
 
       {/* Resumo profissional */}
       {summary && (
-        <SidebarSection title="Perfil Profissional" accentColor={accentColor}>
+        <SidebarSection title={t.summary} accentColor={accentColor}>
           <p className="whitespace-pre-line text-gray-700">{summary}</p>
         </SidebarSection>
       )}
 
       {/* Experiência */}
       {workExperiences && workExperiences.filter(e => Object.values(e).filter(Boolean).length > 0).length > 0 && (
-        <SidebarSection title="Experiência" accentColor={accentColor}>
+        <SidebarSection title={t.workExperience} accentColor={accentColor}>
           <div className="space-y-3">
             {workExperiences.filter(e => Object.values(e).filter(Boolean).length > 0).map((exp, i) => (
               <div key={i} className="break-inside-avoid">
@@ -157,8 +161,8 @@ function MainContent({ resumeData, accentColor }: ResumeTemplateProps & { accent
                   <span className="font-bold text-gray-900 text-[12px]">{exp.position}</span>
                   {exp.startDate && (
                     <span className="shrink-0 text-[10px] text-gray-500">
-                      {formatDate(exp.startDate, "MM/yyyy")} –{" "}
-                      {exp.endDate ? formatDate(exp.endDate, "MM/yyyy") : "Atual"}
+                      {formatDate(exp.startDate, "MM/yyyy", { locale: language === 'en' ? enUS : ptBR })} –{" "}
+                      {exp.endDate ? formatDate(exp.endDate, "MM/yyyy", { locale: language === 'en' ? enUS : ptBR }) : t.present}
                     </span>
                   )}
                 </div>
@@ -178,7 +182,7 @@ function MainContent({ resumeData, accentColor }: ResumeTemplateProps & { accent
 
       {/* Educação */}
       {educations && educations.filter(e => Object.values(e).filter(Boolean).length > 0).length > 0 && (
-        <SidebarSection title="Educação" accentColor={accentColor}>
+        <SidebarSection title={t.education} accentColor={accentColor}>
           <div className="space-y-2">
             {educations.filter(e => Object.values(e).filter(Boolean).length > 0).map((edu, i) => (
               <div key={i} className="break-inside-avoid">
@@ -186,8 +190,8 @@ function MainContent({ resumeData, accentColor }: ResumeTemplateProps & { accent
                   <span className="font-bold text-gray-900 text-[12px]">{edu.degree}</span>
                   {edu.startDate && (
                     <span className="shrink-0 text-[10px] text-gray-500">
-                      {formatDate(edu.startDate, "MM/yyyy")}
-                      {edu.endDate ? ` – ${formatDate(edu.endDate, "MM/yyyy")}` : ""}
+                      {formatDate(edu.startDate, "MM/yyyy", { locale: language === 'en' ? enUS : ptBR })}
+                      {edu.endDate ? ` – ${formatDate(edu.endDate, "MM/yyyy", { locale: language === 'en' ? enUS : ptBR })}` : ""}
                     </span>
                   )}
                 </div>

@@ -20,6 +20,13 @@ const FeaturesSection: React.FC = () => {
       icon: Briefcase,
       title: "Padrão Harvard & Moderno",
       description: "Fuja dos currículos de Canva reprovados. Use uma estrutura 100% validada por Headhunters, com fontes tipografadas perfeitas."
+    },
+    {
+      icon: CheckCircle2,
+      // @ts-ignore - Using Languages icon (Lucide)
+      icon: (props: any) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>,
+      title: "Tradução Global Instantânea",
+      description: "Transforme seu currículo PT-BR em um currículo internacional (EN-US) perfeito em segundos, adaptado culturalmente pela nossa IA."
     }
   ];
 
@@ -42,7 +49,7 @@ const FeaturesSection: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={index}

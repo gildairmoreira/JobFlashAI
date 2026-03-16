@@ -5,6 +5,7 @@ import BorderStyleButton from "./BorderStyleButton";
 import ColorPicker from "./ColorPicker";
 import FontSelector from "./FontSelector";
 import TemplateSelector from "./TemplateSelector";
+import TranslateResumeButton from "./TranslateResumeButton";
 import { useSubscriptionLevel } from "@/app/(main)/SubscriptionLevelProvider";
 
 interface ResumePreviewSectionProps {
@@ -53,6 +54,10 @@ export default function ResumePreviewSection({
             if (fontId) newData.fontFamily = fontId;
             setResumeData(newData);
           }}
+        />
+        <TranslateResumeButton
+          resumeData={resumeData}
+          setResumeData={setResumeData}
         />
       </div>
       <div className="flex w-full flex-1 justify-center overflow-y-auto bg-secondary p-4">

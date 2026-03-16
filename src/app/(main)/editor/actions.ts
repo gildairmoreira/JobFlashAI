@@ -77,6 +77,7 @@ export async function saveResume(values: ResumeValues) {
         ...resumeValues,
         photoUrl: newPhotoUrl,
         socialLinks: resumeValues.socialLinks || [],
+        alternateLanguageData: values.alternateLanguageData || null,
         workExperiences: {
           deleteMany: {},
           create: workExperiences?.map((exp) => ({
@@ -109,6 +110,7 @@ export async function saveResume(values: ResumeValues) {
         userId,
         photoUrl: newPhotoUrl,
         socialLinks: resumeValues.socialLinks || [],
+        alternateLanguageData: values.alternateLanguageData || null,
         workExperiences: {
           create: workExperiences?.map((exp) => ({
             ...exp,

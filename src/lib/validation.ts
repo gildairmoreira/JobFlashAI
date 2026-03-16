@@ -112,11 +112,14 @@ export const resumeSchema = z.object({
   borderStyle: optionalString,
   templateId: optionalString,
   fontFamily: optionalString,
+  language: optionalString,
+  alternateLanguageData: z.any().optional(),
 });
 
-export type ResumeValues = Omit<z.infer<typeof resumeSchema>, "photo"> & {
+export type ResumeValues = Omit<z.infer<typeof resumeSchema>, "photo" | "alternateLanguageData"> & {
   id?: string;
   photo?: File | string | null;
+  alternateLanguageData?: any | null;
 };
 
 export const generateWorkExperienceSchema = z.object({

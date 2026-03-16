@@ -138,7 +138,7 @@ export async function updateUserStatus(targetUserId: string, status: "ACTIVE" | 
         update: { status },
     });
 
-    revalidatePath("/", "layout");
+    revalidatePath("/billing");
     return { success: true };
 }
 
@@ -169,7 +169,7 @@ export async function updateUserPlan(targetUserId: string, newPlanType: "FREE" |
         },
     });
 
-    revalidatePath("/", "layout");
+    revalidatePath("/billing");
     return { success: true };
 }
 
@@ -187,6 +187,6 @@ export async function promoteToAdmin(targetUserId: string) {
         update: { role: "ADMIN" },
     });
 
-    revalidatePath("/", "layout");
+    revalidatePath("/billing");
     return { success: true };
 }

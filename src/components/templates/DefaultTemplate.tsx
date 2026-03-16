@@ -4,9 +4,11 @@
 import { BorderStyles } from "@/app/(main)/editor/BorderStyleButton";
 import { ResumeTemplateProps } from "@/lib/resume-templates/registry";
 import { formatDate } from "date-fns";
+import { ptBR, enUS } from "date-fns/locale";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { getTranslation } from "@/lib/resume-templates/translations";
 
 export default function DefaultTemplate({ resumeData }: ResumeTemplateProps) {
   return (
@@ -106,7 +108,8 @@ function PersonalInfoHeader({ resumeData }: ResumeTemplateProps) {
 }
 
 function SummarySection({ resumeData }: ResumeTemplateProps) {
-  const { summary, colorHex } = resumeData;
+  const { summary, colorHex, language } = resumeData;
+  const t = getTranslation(language);
   if (!summary) return null;
 
   return (
@@ -114,7 +117,7 @@ function SummarySection({ resumeData }: ResumeTemplateProps) {
       <hr className="border-2" style={{ borderColor: colorHex }} />
       <div className="break-inside-avoid space-y-3">
         <p className="text-lg font-semibold" style={{ color: colorHex }}>
-          Perfil profissional
+          {t.summary}
         </p>
         <div className="whitespace-pre-line text-sm">{summary}</div>
       </div>
@@ -123,7 +126,8 @@ function SummarySection({ resumeData }: ResumeTemplateProps) {
 }
 
 function WorkExperienceSection({ resumeData }: ResumeTemplateProps) {
-  const { workExperiences, colorHex } = resumeData;
+  const { workExperiences, colorHex, language } = resumeData;
+  const t = getTranslation(language);
   const workExperiencesNotEmpty = workExperiences?.filter(
     (exp) => Object.values(exp).filter(Boolean).length > 0,
   );
@@ -134,7 +138,7 @@ function WorkExperienceSection({ resumeData }: ResumeTemplateProps) {
       <hr className="border-2" style={{ borderColor: colorHex }} />
       <div className="space-y-3">
         <p className="text-lg font-semibold" style={{ color: colorHex }}>
-          Experiência profissional
+          {t.workExperience}
         </p>
         {workExperiencesNotEmpty.map((exp, index) => (
           <div key={index} className="break-inside-avoid space-y-1">
@@ -145,8 +149,8 @@ function WorkExperienceSection({ resumeData }: ResumeTemplateProps) {
               <span>{exp.position}</span>
               {exp.startDate && (
                 <span>
-                  {formatDate(exp.startDate, "MM/yyyy")} -{" "}
-                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy") : "Present"}
+                  {formatDate(exp.startDate, "MM/yyyy", { locale: language === 'en' ? enUS : ptBR })} -{" "}
+                  {exp.endDate ? formatDate(exp.endDate, "MM/yyyy", { locale: language === 'en' ? enUS : ptBR }) : t.present}
                 </span>
               )}
             </div>
@@ -160,7 +164,8 @@ function WorkExperienceSection({ resumeData }: ResumeTemplateProps) {
 }
 
 function EducationSection({ resumeData }: ResumeTemplateProps) {
-  const { educations, colorHex } = resumeData;
+  const { educations, colorHex, language } = resumeData;
+  const t = getTranslation(language);
   const educationsNotEmpty = educations?.filter(
     (edu) => Object.values(edu).filter(Boolean).length > 0,
   );
@@ -171,7 +176,7 @@ function EducationSection({ resumeData }: ResumeTemplateProps) {
       <hr className="border-2" style={{ borderColor: colorHex }} />
       <div className="space-y-3">
         <p className="text-lg font-semibold" style={{ color: colorHex }}>
-          Educação
+          {t.education}
         </p>
         {educationsNotEmpty.map((edu, index) => (
           <div key={index} className="break-inside-avoid space-y-1">
@@ -183,7 +188,7 @@ function EducationSection({ resumeData }: ResumeTemplateProps) {
               {edu.startDate && (
                 <span>
                   {edu.startDate &&
-                    `${formatDate(edu.startDate, "MM/yyyy")} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy")}` : ""}`}
+                    `${formatDate(edu.startDate, "MM/yyyy", { locale: language === 'en' ? enUS : ptBR })} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy", { locale: language === 'en' ? enUS : ptBR })}` : ""}`}
                 </span>
               )}
             </div>
@@ -235,7 +240,8 @@ function CustomSectionsSection({ resumeData }: ResumeTemplateProps) {
 }
 
 function SkillsSection({ resumeData }: ResumeTemplateProps) {
-  const { skills, colorHex, borderStyle } = resumeData;
+  const { skills, colorHex, borderStyle, language } = resumeData;
+  const t = getTranslation(language);
   if (!skills?.length) return null;
 
   return (
@@ -243,7 +249,7 @@ function SkillsSection({ resumeData }: ResumeTemplateProps) {
       <hr className="border-2" style={{ borderColor: colorHex }} />
       <div className="break-inside-avoid space-y-3">
         <p className="text-lg font-semibold" style={{ color: colorHex }}>
-          Skills
+          {t.skills}
         </p>
         <div className="flex break-inside-avoid flex-wrap gap-2">
           {skills.map((skill, index) => (
