@@ -17,27 +17,40 @@ import {
 } from "@/components/ui/popover";
 import { TEMPLATES, TemplateConfig } from "@/lib/resume-templates/registry";
 import { getDefaultFontForTemplate } from "@/lib/resume-templates/fonts";
-import { LayoutTemplate, Camera } from "lucide-react";
+import { SubscriptionLevel } from "@/lib/subscription";
+import usePremiumModal from "@/hooks/usePremiumModal";
+import { Camera, LayoutTemplate, Lock } from "lucide-react";
 import React, { useState } from "react";
 
 interface TemplateSelectorProps {
   readonly currentTemplate: string | undefined;
   readonly currentFont: string | undefined;
   readonly onChange: (templateId: string, fontId?: string) => void;
+  readonly subscriptionLevel?: SubscriptionLevel;
 }
 
 export default function TemplateSelector({
   currentTemplate,
   currentFont,
   onChange,
+  subscriptionLevel = "free",
 }: TemplateSelectorProps) {
   const [open, setOpen] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{
     template: TemplateConfig;
     defaultFont: string;
   } | null>(null);
+  const premiumModal = usePremiumModal();
+
+  const isFree = subscriptionLevel === "free" || subscriptionLevel === "frozen" || subscriptionLevel === "banned";
+  const isPremiumTemplate = (id: string) => id !== "classic";
 
   const handleSelect = (template: TemplateConfig) => {
+    if (isFree && isPremiumTemplate(template.id)) {
+      premiumModal.setOpen(true);
+      setOpen(false);
+      return;
+    }
     const defaultFont = getDefaultFontForTemplate(template.id);
 
     // Se a fonte atual é diferente da padrão do novo template, confirmar
@@ -81,6 +94,7 @@ export default function TemplateSelector({
                 key={template.id}
                 template={template}
                 isActive={currentTemplate === template.id}
+                isLocked={isFree && isPremiumTemplate(template.id)}
                 onClick={() => handleSelect(template)}
               />
             ))}
@@ -122,20 +136,27 @@ export default function TemplateSelector({
 function TemplateCard({
   template,
   isActive,
+  isLocked = false,
   onClick,
 }: {
   template: TemplateConfig;
   isActive: boolean;
+  isLocked?: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent ${
+      className={`relative flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent ${
         isActive ? "border-primary bg-accent" : "border-border"
-      }`}
+      } ${isLocked ? "opacity-70" : ""}`}
     >
+      {isLocked && (
+        <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+          <Lock className="h-2.5 w-2.5" /> PRO
+        </div>
+      )}
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted">
         <LayoutTemplate className="h-5 w-5 text-muted-foreground" />
       </div>

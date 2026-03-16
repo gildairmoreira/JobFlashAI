@@ -13,7 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import usePremiumModal from "@/hooks/usePremiumModal";
 import { SubscriptionLevel } from "@/lib/subscription";
 import { ResumeServerData } from "@/lib/types";
-import { ResumeServerData } from "@/lib/types";
 import {
   AlertTriangle,
   BarChart2,
@@ -56,7 +55,7 @@ export default function ATSDetailModal({
 
   const isStale =
     atsScore && new Date(atsScore.updatedAt) < new Date(resume.updatedAt);
-  const showBlur = subscriptionLevel !== "pro" && subscriptionLevel !== "lifetime";
+  const showBlur = subscriptionLevel !== "pro" && subscriptionLevel !== "monthly";
 
   const handleEvaluate = () => {
     if (subscriptionLevel === "free") {

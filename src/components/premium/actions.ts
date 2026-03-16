@@ -12,13 +12,13 @@ export async function createCheckoutSession(planType: string) {
 
   // Busca os links de pagamento reais do Cakto via variáveis de ambiente
   const CAKTO_PRO_CHECKOUT_URL = process.env.CAKTO_PRO_CHECKOUT_URL;
-  const CAKTO_LIFETIME_CHECKOUT_URL = process.env.CAKTO_LIFETIME_CHECKOUT_URL;
+  const CAKTO_MONTHLY_CHECKOUT_URL = process.env.CAKTO_MONTHLY_CHECKOUT_URL;
   
-  if (!CAKTO_PRO_CHECKOUT_URL || !CAKTO_LIFETIME_CHECKOUT_URL) {
+  if (!CAKTO_PRO_CHECKOUT_URL || !CAKTO_MONTHLY_CHECKOUT_URL) {
     throw new Error('Configuração de URLs de checkout do Cakto não encontrada');
   }
 
-  let checkoutUrl = planType === 'pro' ? CAKTO_PRO_CHECKOUT_URL : CAKTO_LIFETIME_CHECKOUT_URL;
+  let checkoutUrl = planType === 'pro' ? CAKTO_PRO_CHECKOUT_URL : CAKTO_MONTHLY_CHECKOUT_URL;
 
   // Append user data to the URL so that Cakto fires the webhook with clerk_user_id
   const urlParams = new URLSearchParams({

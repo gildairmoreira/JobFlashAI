@@ -20,13 +20,15 @@ export default function HarvardTemplate({ resumeData }: ResumeTemplateProps) {
 
 // Cabeçalho: Nome centralizado + contato em linha com pipes
 function HarvardHeader({ resumeData }: ResumeTemplateProps) {
-  const { firstName, lastName, city, country, email, phone } = resumeData;
+  const { firstName, lastName, city, country, email, phone, socialLinks } = resumeData;
 
   const contactParts = [
     [city, country].filter(Boolean).join(", "),
     email,
     phone,
   ].filter(Boolean);
+
+  const links = socialLinks?.filter((l) => l.label && l.url) ?? [];
 
   return (
     <div className="mb-1 text-center">
@@ -36,6 +38,23 @@ function HarvardHeader({ resumeData }: ResumeTemplateProps) {
       {contactParts.length > 0 && (
         <p className="mt-0.5 text-[11.5px] text-gray-700">
           {contactParts.join(" | ")}
+        </p>
+      )}
+      {links.length > 0 && (
+        <p className="mt-0.5 flex flex-wrap justify-center gap-x-2 text-[10.5px] text-gray-500">
+          {links.map((link, i) => (
+            <span key={i}>
+              {i > 0 && <span className="mr-1 text-gray-300">|</span>}
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-gray-800"
+              >
+                {link.label}
+              </a>
+            </span>
+          ))}
         </p>
       )}
       <hr className="mt-2 border-t border-black" />

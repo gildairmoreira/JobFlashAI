@@ -100,7 +100,7 @@ export default function JobFitModal({
   }, [step, generationId, toast]);
 
   const handleNext = () => {
-    if (subscriptionLevel !== "pro" && subscriptionLevel !== "lifetime") {
+    if (subscriptionLevel !== "pro" && subscriptionLevel !== "monthly") {
       onOpenChange(false);
       premiumModal.setOpen(true);
       return;
@@ -129,7 +129,7 @@ export default function JobFitModal({
         setGenerationId(genId);
         setStep("processing");
       } catch (error: any) {
-        if (error.message === "PRO_PLAN_REQUIRED" || error.message === "LIFETIME_PLAN_REQUIRED") {
+        if (error.message === "PRO_PLAN_REQUIRED" || error.message === "MONTHLY_PLAN_REQUIRED") {
           onOpenChange(false);
           premiumModal.setOpen(true);
         } else if (error.message === "MONTHLY_LIMIT_REACHED") {

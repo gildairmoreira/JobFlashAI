@@ -40,7 +40,7 @@ export default async function AdminDashboard() {
     async function handlePlanChange(formData: FormData) {
         "use server";
         const userId = formData.get("userId") as string;
-        const newPlan = formData.get("planType") as "FREE" | "PRO" | "LIFETIME";
+        const newPlan = formData.get("planType") as "FREE" | "PRO" | "MONTHLY";
         if (userId && newPlan) {
             await updateUserPlan(userId, newPlan);
             revalidatePath("/billing");
@@ -118,7 +118,7 @@ export default async function AdminDashboard() {
                                     </div>
                                     <div className="w-[1px] h-8 bg-stone-200 mx-1"></div>
                                     <div className="text-center">
-                                        <span className="text-3xl font-black text-purple-600 block">{stats.activeLifetimePaid}</span>
+                                        <span className="text-3xl font-black text-purple-600 block">{stats.activeMonthlyPaid}</span>
                                         <span className="text-xs font-bold text-stone-400 uppercase">MENSAL</span>
                                     </div>
                                 </div>
@@ -217,7 +217,7 @@ export default async function AdminDashboard() {
                                                     >
                                                         <option value="FREE">📦 FREE</option>
                                                         <option value="PRO">⚡ PRO</option>
-                                                        <option value="LIFETIME">💎 MENSAL</option>
+                                                        <option value="MONTHLY">💎 MENSAL</option>
                                                     </select>
                                                 </div>
                                                 <Button type="submit" size="sm" variant="ghost" className="h-8 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold shrink-0 border border-stone-200">

@@ -6,8 +6,8 @@ export function canCreateResume(
 ) {
   const maxResumeMap: Record<SubscriptionLevel, number> = {
     free: 1,
-    pro: 3,
-    lifetime: Infinity,
+    pro: Infinity,
+    monthly: Infinity,
     frozen: 0,
     banned: 0,
   };
@@ -25,12 +25,12 @@ export function canUseCustomizations(subscriptionLevel: SubscriptionLevel) {
   return subscriptionLevel !== "free";
 }
 
-/** Duplicar currículo — disponível para PRO (semanal) e LIFETIME (mensal) */
+/** Duplicar currículo — disponível para PRO (semanal) e MONTHLY (mensal) */
 export function canDuplicateResume(subscriptionLevel: SubscriptionLevel) {
-  return subscriptionLevel === "pro" || subscriptionLevel === "lifetime";
+  return subscriptionLevel === "pro" || subscriptionLevel === "monthly";
 }
 
-/** Gerar currículo para vaga — exclusivo do plano LIFETIME (mensal) */
+/** Gerar currículo para vaga — exclusivo do plano MONTHLY (mensal) */
 export function canGenerateForJob(subscriptionLevel: SubscriptionLevel) {
-  return subscriptionLevel === "lifetime";
+  return subscriptionLevel === "monthly";
 }

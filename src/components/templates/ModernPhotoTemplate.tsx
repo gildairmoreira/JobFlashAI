@@ -86,10 +86,16 @@ function Sidebar({ resumeData, accentColor }: ResumeTemplateProps & { accentColo
           </div>
         )}
         {socialLinks?.filter(l => l.label && l.url).map((link, i) => (
-          <div key={i} className="flex items-center gap-2 text-[10px]">
+          <a
+            key={i}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-[10px] text-white/90 hover:text-white underline"
+          >
             <span className="h-3.5 w-3.5 shrink-0 text-center">🔗</span>
             <span className="break-all">{link.label}</span>
-          </div>
+          </a>
         ))}
       </div>
 

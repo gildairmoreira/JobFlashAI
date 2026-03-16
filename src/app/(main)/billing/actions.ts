@@ -50,13 +50,13 @@ export async function getAdminDashboardData() {
     const activeProPaid = await (prisma.userSubscription as any).count({
         where: { planType: "PRO", status: "ACTIVE", caktoTransactionId: { not: null } }
     });
-    const activeLifetimePaid = await (prisma.userSubscription as any).count({
-        where: { planType: "LIFETIME", status: "ACTIVE", caktoTransactionId: { not: null } }
+    const activeMonthlyPaid = await (prisma.userSubscription as any).count({
+        where: { planType: "MONTHLY", status: "ACTIVE", caktoTransactionId: { not: null } }
     });
     const frozenOrBanned = await (prisma.userSubscription as any).count({ where: { status: { in: ["FROZEN", "BANNED"] } } });
 
     // "Receita Faturada" - synchronized logically and strictly with real Cakto Sales
-    const estimatedRevenue = (activeProPaid * 19.90) + (activeLifetimePaid * 49.90);
+    const estimatedRevenue = (activeProPaid * 19.90) + (activeMonthlyPaid * 49.90);
 
     // Fetch latest 50 users from Clerk as source of truth for all signups
     const client = await clerkClient();
@@ -115,7 +115,7 @@ export async function getAdminDashboardData() {
         stats: {
             totalUsers,
             activeProPaid,
-            activeLifetimePaid,
+            activeMonthlyPaid,
             frozenOrBanned,
             estimatedRevenue
         },
@@ -143,7 +143,7 @@ export async function updateUserStatus(targetUserId: string, status: "ACTIVE" | 
 }
 
 // Admin Action: Change User Plan
-export async function updateUserPlan(targetUserId: string, newPlanType: "FREE" | "PRO" | "LIFETIME") {
+export async function updateUserPlan(targetUserId: string, newPlanType: "FREE" | "PRO" | "MONTHLY") {
     const adminData = await verifyAdminAccess();
 
     // Determine current expiration based on new plan (optional, but good practice)
@@ -151,7 +151,7 @@ export async function updateUserPlan(targetUserId: string, newPlanType: "FREE" |
     if (newPlanType === "PRO") {
         expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 7);
-    } else if (newPlanType === "LIFETIME") {
+    } else if (newPlanType === "MONTHLY") {
         expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 31);
     }

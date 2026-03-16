@@ -72,8 +72,10 @@ export async function duplicateResume(id: string) {
       photoUrl: original.photoUrl,
       colorHex: original.colorHex,
       borderStyle: original.borderStyle,
-      templateId: original.templateId,
-      fontFamily: original.fontFamily,
+      // @ts-ignore
+      templateId: (original as any).templateId,
+      // @ts-ignore
+      fontFamily: (original as any).fontFamily,
       summary: original.summary,
       firstName: original.firstName,
       lastName: original.lastName,

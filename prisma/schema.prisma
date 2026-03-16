@@ -109,7 +109,7 @@ enum Role {
 enum PlanType {
   FREE
   PRO
-  LIFETIME
+  MONTHLY
 }
 
 enum SubStatus {
@@ -127,7 +127,7 @@ model UserSubscription {
   caktoTransactionId      String?  @unique // Cakto Payment or Subscription identifier
   status                  SubStatus @default(ACTIVE) // Can freeze/ban users
 
-  currentPeriodEnd        DateTime? // Expiration for PRO; Null for LIFETIME or FREE
+  currentPeriodEnd        DateTime? // Expiration for PRO; Null for MONTHLY or FREE
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

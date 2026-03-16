@@ -16,16 +16,20 @@ const borderStyles = Object.values(BorderStyles);
 interface BorderStyleButtonProps {
   borderStyle: string | undefined;
   onChange: (borderStyle: string) => void;
+  templateId?: string;
 }
 
 export default function BorderStyleButton({
   borderStyle,
   onChange,
+  templateId,
 }: BorderStyleButtonProps) {
   const premiumModal = usePremiumModal();
   const subscriptionLevel = useSubscriptionLevel();
+  const isHarvard = templateId === "harvard";
 
   function handleClick() {
+    if (isHarvard) return;
     if (!subscriptionLevel || !canUseCustomizations(subscriptionLevel)) {
       premiumModal.setOpen(true);
       return;
@@ -47,8 +51,14 @@ export default function BorderStyleButton({
     <Button
       variant="outline"
       size="icon"
-      title="Change border style"
+      title={
+        isHarvard
+          ? "Template Harvard não suporta foto de perfil"
+          : "Alterar estilo de borda"
+      }
       onClick={handleClick}
+      disabled={isHarvard}
+      className={isHarvard ? "cursor-not-allowed opacity-40" : ""}
     >
       <Icon className="size-5" />
     </Button>

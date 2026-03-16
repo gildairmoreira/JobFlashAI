@@ -1,17 +1,16 @@
 import { canCreateResume } from "@/lib/permissions";
 import prisma from "@/lib/prisma";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
-
 import { resumeDataInclude } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
 import { Metadata } from "next";
-import CreateResumeButton from "./CreateResumeButton";
-import ResumeItem from "./ResumeItem";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { BarChart2 } from "lucide-react";
-import JobFitButton from "./JobFitButton";
+import { Button } from "@/components/ui/button";
+import ResumeItem from "./ResumeItem";
+import Link from "next/link";
 import { getUserJobFitUsage } from "./job-actions";
+import JobFitButton from "./JobFitButton";
+import CreateResumeButtonWrapper from "./CreateResumeButtonWrapper";
 
 export const metadata: Metadata = {
   title: "Seus currículos",
@@ -52,8 +51,9 @@ export default async function Page() {
         </div>
         
         <div className="w-full md:w-1/3 flex justify-center order-1 md:order-2">
-          <CreateResumeButton
+          <CreateResumeButtonWrapper
             canCreate={canCreateResume(subscriptionLevel, totalCount)}
+            subscriptionLevel={subscriptionLevel}
           />
         </div>
 
@@ -73,13 +73,18 @@ export default async function Page() {
       </div>
       
       <div className="flex w-full grid-cols-2 flex-col gap-3 sm:grid md:grid-cols-3 lg:grid-cols-4">
-        {resumes.map((resume: any) => (
-          <ResumeItem
-            key={resume.id}
-            resume={resume}
-            subscriptionLevel={subscriptionLevel}
-          />
-        ))}
+        {resumes.map((resume: any, index: number) => {
+          const isLocked = index >= 1 && subscriptionLevel !== "pro" && subscriptionLevel !== "monthly";
+          
+          return (
+            <ResumeItem
+              key={resume.id}
+              resume={resume}
+              subscriptionLevel={subscriptionLevel}
+              isLocked={isLocked}
+            />
+          );
+        })}
       </div>
     </main>
   );

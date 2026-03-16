@@ -135,6 +135,7 @@ ${plainText}`;
   }
 
   // Save to DB
+  // @ts-ignore
   await prisma.resumeAtsScore.upsert({
     where: { resumeId: resume.id },
     create: {

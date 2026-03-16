@@ -23,7 +23,7 @@ import { SubscriptionLevel } from "@/lib/subscription";
 import { ResumeServerData } from "@/lib/types";
 import { mapToResumeValues } from "@/lib/utils";
 import { formatDate } from "date-fns";
-import { Copy, MoreVertical, Printer, Trash2 } from "lucide-react";
+import { Copy, MoreVertical, Printer, Trash2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState, useTransition } from "react";
 import { useReactToPrint } from "react-to-print";
@@ -33,11 +33,13 @@ import usePremiumModal from "@/hooks/usePremiumModal";
 interface ResumeItemProps {
   resume: ResumeServerData;
   subscriptionLevel: SubscriptionLevel;
+  isLocked?: boolean;
 }
 
-export default function ResumeItem({ resume, subscriptionLevel }: Readonly<ResumeItemProps>) {
+export default function ResumeItem({ resume, subscriptionLevel, isLocked = false }: Readonly<ResumeItemProps>) {
   const contentRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const premiumModal = usePremiumModal();
 
   const reactToPrintFn = useReactToPrint({
     contentRef,
@@ -47,13 +49,23 @@ export default function ResumeItem({ resume, subscriptionLevel }: Readonly<Resum
   const wasUpdated = resume.updatedAt !== resume.createdAt;
 
   return (
-    <div className="group relative rounded-lg border border-transparent bg-secondary p-3 transition-colors hover:border-border">
+    <div className="group relative rounded-lg border border-transparent bg-secondary p-3 transition-colors hover:border-border overflow-hidden">
       <div className="space-y-3">
         <div
-          onClick={() => router.push(`/editor?resumeId=${resume.id}`)}
+          onClick={(e) => {
+            if (isLocked) {
+              premiumModal.setOpen(true);
+            } else {
+              router.push(`/editor?resumeId=${resume.id}`);
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              router.push(`/editor?resumeId=${resume.id}`);
+              if (isLocked) {
+                premiumModal.setOpen(true);
+              } else {
+                router.push(`/editor?resumeId=${resume.id}`);
+              }
               e.preventDefault();
             }
           }}
@@ -77,9 +89,26 @@ export default function ResumeItem({ resume, subscriptionLevel }: Readonly<Resum
             <ResumePreview
               resumeData={mapToResumeValues(resume)}
               contentRef={contentRef}
-              className="overflow-hidden shadow-sm transition-shadow group-hover:shadow-lg"
+              className={`overflow-hidden shadow-sm transition-shadow group-hover:shadow-lg ${isLocked ? "blur-[3px] opacity-70" : ""}`}
             />
-            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+            {isLocked && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/30 backdrop-blur-[2px] rounded-lg border border-dashed border-primary/40">
+                {/* Cross Chains SVG */}
+                <svg className="absolute inset-0 h-full w-full pointer-events-none opacity-30 text-stone-700 dark:text-stone-300" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="1" strokeDasharray="4 2" />
+                  <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="1" strokeDasharray="4 2" />
+                </svg>
+                <div className="bg-card shadow-xl rounded-full p-3 text-center mb-2 z-20 border-2 border-primary/20">
+                  <Lock className="h-6 w-6 text-primary" />
+                </div>
+                <span className="text-xs font-bold text-center px-4 z-20 bg-background/80 py-1 rounded-md shadow-sm">
+                  Renove para Desbloquear
+                </span>
+              </div>
+            )}
+            {!isLocked && (
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+            )}
           </div>
         </div>
       </div>
@@ -87,6 +116,7 @@ export default function ResumeItem({ resume, subscriptionLevel }: Readonly<Resum
         resumeId={resume.id}
         onPrintClick={reactToPrintFn}
         subscriptionLevel={subscriptionLevel}
+        isLocked={isLocked}
       />
     </div>
   );
@@ -96,9 +126,10 @@ interface MoreMenuProps {
   resumeId: string;
   onPrintClick: () => void;
   subscriptionLevel: SubscriptionLevel;
+  isLocked?: boolean;
 }
 
-function MoreMenu({ resumeId, onPrintClick, subscriptionLevel }: Readonly<MoreMenuProps>) {
+function MoreMenu({ resumeId, onPrintClick, subscriptionLevel, isLocked = false }: Readonly<MoreMenuProps>) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [isDuplicating, startDuplicate] = useTransition();
   const { toast } = useToast();
@@ -137,7 +168,7 @@ function MoreMenu({ resumeId, onPrintClick, subscriptionLevel }: Readonly<MoreMe
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-0.5 top-0.5 opacity-0 transition-opacity group-hover:opacity-100"
+            className={`absolute right-0.5 top-0.5 transition-opacity ${isLocked ? "hidden pointer-events-none" : "opacity-0 group-hover:opacity-100"}`}
           >
             <MoreVertical className="size-4" />
           </Button>

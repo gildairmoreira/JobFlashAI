@@ -5,6 +5,7 @@ import BorderStyleButton from "./BorderStyleButton";
 import ColorPicker from "./ColorPicker";
 import FontSelector from "./FontSelector";
 import TemplateSelector from "./TemplateSelector";
+import { useSubscriptionLevel } from "@/app/(main)/SubscriptionLevelProvider";
 
 interface ResumePreviewSectionProps {
   resumeData: ResumeValues;
@@ -17,6 +18,7 @@ export default function ResumePreviewSection({
   setResumeData,
   className,
 }: ResumePreviewSectionProps) {
+  const subscriptionLevel = useSubscriptionLevel();
   return (
     <div
       className={cn("hidden w-full flex-col md:flex md:w-1/2", className)}
@@ -30,6 +32,7 @@ export default function ResumePreviewSection({
         />
         <BorderStyleButton
           borderStyle={resumeData.borderStyle}
+          templateId={resumeData.templateId}
           onChange={(borderStyle) =>
             setResumeData({ ...resumeData, borderStyle })
           }
@@ -44,6 +47,7 @@ export default function ResumePreviewSection({
         <TemplateSelector
           currentTemplate={resumeData.templateId}
           currentFont={resumeData.fontFamily}
+          subscriptionLevel={subscriptionLevel}
           onChange={(templateId, fontId) => {
             const newData = { ...resumeData, templateId };
             if (fontId) newData.fontFamily = fontId;

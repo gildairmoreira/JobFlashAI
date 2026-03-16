@@ -26,6 +26,14 @@ export async function createJobFitGeneration(sourceResumeId: string, jobDescript
     throw new Error("MONTHLY_LIMIT_REACHED");
   }
 
+  // Verificar propriedade do currículo original (Prevenção de IDOR)
+  const sourceResume = await prisma.resume.findFirst({
+    where: { id: sourceResumeId, userId }
+  });
+  if (!sourceResume) {
+    throw new Error("Source resume not found or unauthorized");
+  }
+
   // Criar registro de geração
   // @ts-ignore
   const generation = await prisma.jobFitGeneration.create({
@@ -64,8 +72,8 @@ export async function getJobFitStatus(generationId: string) {
   if (!userId) throw new Error("Unauthorized");
 
   // @ts-ignore
-  const generation = await prisma.jobFitGeneration.findUnique({
-    where: { id: generationId },
+  const generation = await prisma.jobFitGeneration.findFirst({
+    where: { id: generationId, userId },
     select: {
       status: true,
       sectionsCompleted: true,

@@ -59,23 +59,33 @@ export default function ResumePreview({
           <DefaultTemplate resumeData={resumeData} />
         )}
 
-        {/* Marca d'água para plano free */}
+        {/* Marca d'água para plano free — tela inteira com padrão em grade */}
         {subscriptionLevel === "free" && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 opacity-[0.1]">
-            <div className="flex flex-col items-center gap-2 rotate-[-45deg] border-[12px] border-gray-400 p-8 rounded-full">
-              <Image
-                src={logo}
-                alt="Watermark Logo"
-                width={150}
-                height={150}
-                className="grayscale opacity-50"
-              />
-              <div className="text-7xl font-black tracking-tighter uppercase mt-2 text-gray-500">
-                JobFlash
-              </div>
-              <div className="text-xl font-bold tracking-[0.3em] uppercase text-gray-400">
-                FREE TIER
-              </div>
+          <div
+            className="absolute inset-0 pointer-events-none z-50"
+            style={{ overflow: "hidden" }}
+          >
+            {/* Grade 3x4 de marcas d'água cobrindo todo o PDF */}
+            <div className="absolute inset-0 grid grid-cols-3 grid-rows-4">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-center opacity-[0.07]"
+                >
+                  <div className="flex flex-col items-center gap-1 rotate-[-35deg]">
+                    <Image
+                      src={logo}
+                      alt=""
+                      width={80}
+                      height={80}
+                      className="grayscale"
+                    />
+                    <div className="text-[28px] font-black tracking-tight uppercase text-gray-800">
+                      JobFlash
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

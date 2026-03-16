@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import prisma from "@/lib/prisma";
+import { PlanType } from "@prisma/client";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -8,16 +9,20 @@ export async function POST(req: Request) {
         const headers = req.headers;
         const signature = headers.get("x-cakto-signature");
 
-        if (process.env.CAKTO_WEBHOOK_SECRET) {
-            if (!signature) {
-                console.error("Cakto Webhook Warning: Assinatura ausente");
-                return new Response("Unauthorized", { status: 401 });
-            }
-            const expectedSignature = crypto.createHmac("sha256", process.env.CAKTO_WEBHOOK_SECRET).update(rawBody).digest("hex");
-            if (signature !== expectedSignature) {
-                console.error("Cakto Webhook Warning: Assinatura inválida (HMAC Mismatch)");
-                return new Response("Unauthorized", { status: 401 });
-            }
+        if (!process.env.CAKTO_WEBHOOK_SECRET) {
+            console.error("Cakto Webhook Error: CAKTO_WEBHOOK_SECRET is not configured. Rejecting for security.");
+            return new Response("Webhook secret not configured", { status: 500 });
+        }
+
+        if (!signature) {
+            console.error("Cakto Webhook Warning: Assinatura ausente");
+            return new Response("Unauthorized", { status: 401 });
+        }
+        
+        const expectedSignature = crypto.createHmac("sha256", process.env.CAKTO_WEBHOOK_SECRET).update(rawBody).digest("hex");
+        if (signature !== expectedSignature) {
+            console.error("Cakto Webhook Warning: Assinatura inválida (HMAC Mismatch)");
+            return new Response("Unauthorized", { status: 401 });
         }
 
         const payload = JSON.parse(rawBody);
@@ -41,22 +46,22 @@ export async function POST(req: Request) {
         }
 
         const CAKTO_PRO_ID = process.env.CAKTO_PRO_PRODUCT_ID;
-        const CAKTO_LIFETIME_ID = process.env.CAKTO_LIFETIME_PRODUCT_ID;
+        const CAKTO_MONTHLY_ID = process.env.CAKTO_MONTHLY_PRODUCT_ID;
 
-        if (!CAKTO_PRO_ID || !CAKTO_LIFETIME_ID) {
+        if (!CAKTO_PRO_ID || !CAKTO_MONTHLY_ID) {
             console.error("Cakto Webhook Error: IDs de produto do Cakto não configurados.");
             return new Response("Configuração pendente", { status: 500 });
         }
 
-        let planType: "FREE" | "PRO" | "LIFETIME" = "FREE";
+        let planType: PlanType = "FREE" as PlanType;
         let expirationDate: Date | null = null;
 
         if (productId === CAKTO_PRO_ID) {
-            planType = "PRO";
+            planType = "PRO" as PlanType;
             expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 7); // 7 days from now
-        } else if (productId === CAKTO_LIFETIME_ID) {
-            planType = "LIFETIME";
+        } else if (productId === CAKTO_MONTHLY_ID) {
+            planType = "MONTHLY" as PlanType;
             expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 31); // Monthly recurrence
         }

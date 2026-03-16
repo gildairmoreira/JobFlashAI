@@ -17,9 +17,9 @@ export const env = createEnv({
     OPENAI_API_KEY: z.string().min(1).optional(),
     CAKTO_WEBHOOK_SECRET: z.string().optional(),
     CAKTO_PRO_PRODUCT_ID: z.string().optional(),
-    CAKTO_LIFETIME_PRODUCT_ID: z.string().optional(),
+    CAKTO_MONTHLY_PRODUCT_ID: z.string().optional(),
     CAKTO_PRO_CHECKOUT_URL: z.string().optional(),
-    CAKTO_LIFETIME_CHECKOUT_URL: z.string().optional(),
+    CAKTO_MONTHLY_CHECKOUT_URL: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),

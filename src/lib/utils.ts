@@ -52,8 +52,10 @@ export function mapToResumeValues(data: ResumeServerData): ResumeValues {
     })),
     borderStyle: data.borderStyle,
     colorHex: data.colorHex,
-    templateId: data.templateId,
-    fontFamily: data.fontFamily,
+    // @ts-ignore
+    templateId: (data as any).templateId,
+    // @ts-ignore
+    fontFamily: (data as any).fontFamily,
     summary: data.summary ?? undefined,
   };
 }

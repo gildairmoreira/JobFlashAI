@@ -66,45 +66,60 @@ export default function PersonalInfoForm({
           <FormField
             control={form.control}
             name="photo"
-            render={({ field: { value, ...fieldValues } }) => (
-              <FormItem>
-                <FormLabel>Sua foto</FormLabel>
-                <div className="flex items-center gap-2">
-                  <FormControl>
-                    <Input
-                      {...fieldValues}
-                      type="file"
-                      accept="image/*"
-                      onClick={(e) => {
-                        if (subscriptionLevel === "free") {
-                          e.preventDefault();
-                          premiumModal.setOpen(true);
-                        }
-                      }}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        fieldValues.onChange(file);
-                      }}
-                      ref={photoInputRef}
-                      style={{ cursor: subscriptionLevel === "free" ? 'not-allowed' : 'pointer' }}
-                    />
-                  </FormControl>
-                  <Button
-                    variant="secondary"
-                    type="button"
-                    onClick={() => {
-                      fieldValues.onChange(null);
-                      if (photoInputRef.current) {
-                        photoInputRef.current.value = "";
-                      }
-                    }}
-                  >
-                    Remover
-                  </Button>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field: { value, ...fieldValues } }) => {
+              const isHarvard = resumeData.templateId === "harvard";
+              return (
+                <FormItem>
+                  <FormLabel>Sua foto</FormLabel>
+                  {isHarvard ? (
+                    // Bloqueia o campo de foto para o template Harvard
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2 rounded-md border border-dashed border-muted-foreground/40 bg-muted/50 px-3 py-2 text-sm text-muted-foreground opacity-70 cursor-not-allowed select-none">
+                        <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                          Não disponível
+                        </span>
+                        Template Harvard não é compatível com foto de perfil
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <FormControl>
+                        <Input
+                          {...fieldValues}
+                          type="file"
+                          accept="image/*"
+                          onClick={(e) => {
+                            if (subscriptionLevel === "free") {
+                              e.preventDefault();
+                              premiumModal.setOpen(true);
+                            }
+                          }}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            fieldValues.onChange(file);
+                          }}
+                          ref={photoInputRef}
+                          style={{ cursor: subscriptionLevel === "free" ? 'not-allowed' : 'pointer' }}
+                        />
+                      </FormControl>
+                      <Button
+                        variant="secondary"
+                        type="button"
+                        onClick={() => {
+                          fieldValues.onChange(null);
+                          if (photoInputRef.current) {
+                            photoInputRef.current.value = "";
+                          }
+                        }}
+                      >
+                        Remover
+                      </Button>
+                    </div>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
           <div className="grid grid-cols-2 gap-3">
             <FormField

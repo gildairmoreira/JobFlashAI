@@ -71,7 +71,7 @@ export default function Navbar({
                     <div>
                       <p className="text-sm font-semibold text-stone-500 uppercase tracking-widest">Plano Atual</p>
                       <p className="text-3xl font-black">
-                        {userPlan === "PRO" ? "SEMANAL" : userPlan === "LIFETIME" ? "MENSAL" : "GRÁTIS"}
+                        {userPlan === "PRO" ? "SEMANAL" : userPlan === "MONTHLY" ? "MENSAL" : "GRÁTIS"}
                       </p>
                     </div>
                   </div>

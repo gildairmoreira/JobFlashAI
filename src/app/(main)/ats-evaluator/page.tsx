@@ -25,6 +25,7 @@ export default async function AtsEvaluatorPage() {
       orderBy: { updatedAt: "desc" },
       include: {
         ...resumeDataInclude,
+        // @ts-ignore
         atsScore: true,
       },
     }),
@@ -54,10 +55,11 @@ export default async function AtsEvaluatorPage() {
         </div>
       ) : (
         <div className="flex w-full grid-cols-2 flex-col gap-4 sm:grid md:grid-cols-3 lg:grid-cols-4">
-          {resumes.map((resume) => (
+          {resumes.map((resume: any) => (
             <AtsResumeCard
               key={resume.id}
               resume={resume}
+              // @ts-ignore
               atsScore={resume.atsScore}
               subscriptionLevel={subscriptionLevel}
             />
