@@ -88,7 +88,7 @@ export async function getAdminDashboardData() {
         revenue
     }));
 
-    // 3. Funnel Data
+    // 3. Funnel Data (With Mocking)
     const funnelEvents = await (prisma as any).analyticEvent.groupBy({
         by: ['event'],
         _count: { id: true }

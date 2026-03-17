@@ -246,7 +246,7 @@ export default function SuportePage({ params }: { params: Promise<{ slug: string
       <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-4xl mx-auto px-4">
           <div className="space-y-12">
-            {pageData.content.sections.map((section, index) => (
+            {pageData.content.sections.map((section: any, index: number) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
