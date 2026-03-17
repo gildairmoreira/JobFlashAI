@@ -16,9 +16,22 @@ interface PricingPlan {
   popular?: boolean;
   originalPrice?: string;
   badge?: string;
+  href?: string;
 }
 
+import { getGlobalSettings } from '@/app/(main)/billing/actions';
+import { useTransition, useEffect, useState } from 'react';
+
 const PricingSection: React.FC = () => {
+  const [globalSettings, setGlobalSettings] = useState<any>(null);
+
+  useEffect(() => {
+    getGlobalSettings().then(setGlobalSettings);
+  }, []);
+
+  const displayProPrice = globalSettings?.proPrice ? `R$${globalSettings.proPrice.toFixed(2).replace('.', ',')}` : 'R$19,90';
+  const displayMonPrice = globalSettings?.monthlyPrice ? `R$${globalSettings.monthlyPrice.toFixed(2).replace('.', ',')}` : 'R$49,90';
+
   const plans: PricingPlan[] = [
     {
       name: 'Free',
@@ -38,7 +51,7 @@ const PricingSection: React.FC = () => {
     {
       name: 'Acesso Pro - 7 Dias',
       description: 'Para quem precisa dessa vaga urgente. Destrave a IA e crie versões irresistíveis.',
-      price: 'R$19,90',
+      price: displayProPrice,
       period: 'por 7 dias',
       features: [
         { name: 'Módulo Job-Fit AI (Adaptador de vagas)', included: true },
@@ -50,11 +63,12 @@ const PricingSection: React.FC = () => {
       ],
       cta: 'Assinar Pro - 7 Dias',
       popular: true,
+      href: '/resumes?plan=pro'
     },
     {
       name: 'Acesso Mensal',
       description: 'Para quem quer ter o arsenal de IA pronto para todas as oportunidades do ano.',
-      price: 'R$49,90',
+      price: displayMonPrice,
       period: 'por mês',
       originalPrice: 'De R$ 79,60',
       badge: 'Economize 37%',
@@ -67,6 +81,7 @@ const PricingSection: React.FC = () => {
         { name: 'Nenhuma fidelidade, cancele quando quiser', included: true },
       ],
       cta: 'Assinar Plano Mensal',
+      href: '/resumes?plan=pro-plus'
     }
   ];
 
@@ -155,7 +170,7 @@ const PricingSection: React.FC = () => {
                   }`}
                 asChild
               >
-                <Link href="/resumes">
+                <Link href={(plan as any).href || "/resumes"}>
                   {plan.cta}
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>

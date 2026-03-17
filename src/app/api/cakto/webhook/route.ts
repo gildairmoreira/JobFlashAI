@@ -27,65 +27,120 @@ export async function POST(req: Request) {
 
         const payload = JSON.parse(rawBody);
         const eventType = payload.event;
+        const data = payload.data;
 
-        // We only care about approved payments for now
-        if (eventType !== "payment.approved" && eventType !== "payment.completed") {
-            return new Response("Event ignored", { status: 200 });
+        // Extract identifiers
+        const transactionId = data?.transaction?.id?.toString();
+        const customerEmail = data?.customer?.email;
+        const customerName = data?.customer?.name;
+        const clerkUserId = data?.metadata?.clerk_user_id || data?.custom_fields?.clerk_user_id;
+
+        // Logging event for funnel analytics
+        await (prisma as any).analyticEvent.create({
+            data: {
+                userId: clerkUserId || null,
+                event: eventType,
+                metadata: {
+                    transactionId,
+                    email: customerEmail,
+                    product: data?.product?.name
+                }
+            }
+        });
+
+        // 1. Handle Checkout Initiation (Funnel Top)
+        if (eventType === "initiate_checkout") {
+            return new Response("Event logged", { status: 200 });
         }
 
-        const transactionId = payload.data?.transaction?.id;
-        const customerEmail = payload.data?.customer?.email; // Usually the user's primary identifier before Clerk ID is linked via metadata, or they pass a custom parameter.
-        const productId = payload.data?.product?.id?.toString();
-
-        // The user might pass the Clerk userId in the checkout metadata/custom fields
-        const clerkUserId = payload.data?.metadata?.clerk_user_id || payload.data?.custom_fields?.clerk_user_id;
-
-        if (!clerkUserId) {
-            console.error("Cakto Webhook Error: clerk_user_id missing from metadata.");
-            return new Response("Missing clerk_user_id in metadata", { status: 400 });
+        // 2. Handle Payment Generated (PIX, Boleto, etc. - Funnel Middle)
+        if (eventType === "pix_gerado" || eventType === "boleto_gerado" || eventType === "picpay_gerado") {
+            if (clerkUserId && transactionId) {
+                await (prisma as any).transaction.upsert({
+                    where: { caktoTransactionId: transactionId },
+                    create: {
+                        userId: clerkUserId,
+                        caktoTransactionId: transactionId,
+                        amount: parseFloat(data?.transaction?.amount || "0"),
+                        status: "PENDING",
+                        paymentMethod: eventType.replace("_gerado", ""),
+                        customerEmail,
+                        customerName,
+                    },
+                    update: {
+                        status: "PENDING",
+                    }
+                });
+            }
+            return new Response("Pending transaction created", { status: 200 });
         }
 
-        const CAKTO_PRO_ID = process.env.CAKTO_PRO_PRODUCT_ID;
-        const CAKTO_MONTHLY_ID = process.env.CAKTO_MONTHLY_PRODUCT_ID;
+        // 3. Handle Approved Payments (Funnel Conversion)
+        if (eventType === "purchase_approved" || eventType === "payment.approved" || eventType === "payment.completed") {
+            const productId = data?.product?.id?.toString();
+            if (!clerkUserId) {
+                console.error("Cakto Webhook Error: clerk_user_id missing from metadata.");
+                return new Response("Missing clerk_user_id", { status: 400 });
+            }
 
-        if (!CAKTO_PRO_ID || !CAKTO_MONTHLY_ID) {
-            console.error("Cakto Webhook Error: IDs de produto do Cakto não configurados.");
-            return new Response("Configuração pendente", { status: 500 });
+            const CAKTO_PRO_ID = process.env.CAKTO_PRO_PRODUCT_ID;
+            const CAKTO_MONTHLY_ID = process.env.CAKTO_MONTHLY_PRODUCT_ID;
+
+            let planType: PlanType = "FREE" as PlanType;
+            let expirationDate: Date | null = null;
+
+            if (productId === CAKTO_PRO_ID) {
+                planType = "PRO" as PlanType;
+                expirationDate = new Date();
+                expirationDate.setDate(expirationDate.getDate() + 7);
+            } else if (productId === CAKTO_MONTHLY_ID) {
+                planType = "MONTHLY" as PlanType;
+                expirationDate = new Date();
+                expirationDate.setDate(expirationDate.getDate() + 31);
+            }
+
+            if (planType !== "FREE") {
+                // Update Subscription
+                await prisma.userSubscription.upsert({
+                    where: { userId: clerkUserId },
+                    create: {
+                        userId: clerkUserId,
+                        planType,
+                        caktoTransactionId: transactionId,
+                        status: "ACTIVE",
+                        currentPeriodEnd: expirationDate,
+                    },
+                    update: {
+                        planType,
+                        caktoTransactionId: transactionId,
+                        status: "ACTIVE",
+                        currentPeriodEnd: expirationDate,
+                    },
+                });
+
+                // Update or Create Transaction as PAID
+                if (transactionId) {
+                    await (prisma as any).transaction.upsert({
+                        where: { caktoTransactionId: transactionId },
+                        create: {
+                            userId: clerkUserId,
+                            caktoTransactionId: transactionId,
+                            amount: parseFloat(data?.transaction?.amount || "0"),
+                            status: "PAID",
+                            paymentMethod: data?.transaction?.payment_method || "unknown",
+                            customerEmail,
+                            customerName,
+                        },
+                        update: {
+                            status: "PAID",
+                        }
+                    });
+                }
+            }
+            return new Response("Purchase approved and subscription updated", { status: 200 });
         }
 
-        let planType: PlanType = "FREE" as PlanType;
-        let expirationDate: Date | null = null;
-
-        if (productId === CAKTO_PRO_ID) {
-            planType = "PRO" as PlanType;
-            expirationDate = new Date();
-            expirationDate.setDate(expirationDate.getDate() + 7); // 7 days from now
-        } else if (productId === CAKTO_MONTHLY_ID) {
-            planType = "MONTHLY" as PlanType;
-            expirationDate = new Date();
-            expirationDate.setDate(expirationDate.getDate() + 31); // Monthly recurrence
-        }
-
-        if (planType !== "FREE") {
-            await prisma.userSubscription.upsert({
-                where: { userId: clerkUserId },
-                create: {
-                    userId: clerkUserId,
-                    planType,
-                    caktoTransactionId: transactionId,
-                    status: "ACTIVE",
-                    currentPeriodEnd: expirationDate,
-                },
-                update: {
-                    planType,
-                    caktoTransactionId: transactionId,
-                    status: "ACTIVE",
-                    currentPeriodEnd: expirationDate,
-                },
-            });
-        }
-
-        return new Response("Webhook processed", { status: 200 });
+        return new Response("Event ignored", { status: 200 });
     } catch (error) {
         console.error("Cakto Webhook Error:", error);
         return new Response("Webhook handler failed", { status: 500 });

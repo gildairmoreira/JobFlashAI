@@ -118,15 +118,6 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
               <p className="font-bold text-stone-900">
                 {user.firstName} {user.lastName}
               </p>
-              {user.isOnline && (
-                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-green-100 border border-green-200 text-green-700 text-[9px] font-black uppercase tracking-wider relative overflow-hidden">
-                  <span className="flex h-1.5 w-1.5 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500 line-clamp-1"></span>
-                  </span>
-                  ACTIVE
-                </span>
-              )}
             </div>
             <p className="text-stone-500 text-xs">{user.email}</p>
             <div className="flex items-center gap-2 mt-0.5">
@@ -136,16 +127,22 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
               >
                 ID: {user.userId.slice(0, 8)}...
               </p>
-              {!user.isOnline && (
-                <>
-                  <span className="text-stone-300 text-[10px]">|</span>
-                  <p className="text-stone-400 text-[10px]">
-                    {user.lastActiveAt
-                      ? `Visto há ${Math.floor((Date.now() - user.lastActiveAt) / 60000)} min`
-                      : "Nunca acessou"}
-                  </p>
-                </>
-              )}
+              <span className="text-stone-300 text-[10px]">|</span>
+              <p className="text-stone-400 text-[10px]">
+                {user.isOnline ? (
+                    <span className="flex items-center gap-1.5 text-emerald-500 font-bold">
+                         <span className="flex h-1.5 w-1.5 relative">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                        </span>
+                        Online Agora
+                    </span>
+                ) : user.lastActiveAt ? (
+                    <span className="text-stone-400">Visto há {formatTimeAgo(user.lastActiveAt)}</span>
+                ) : (
+                    <span className="text-stone-400 italic">Nunca acessou</span>
+                )}
+              </p>
             </div>
           </div>
         </div>
@@ -165,23 +162,19 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
           >
             {user.role}
           </span>
-          <span
-            className={`px-2.5 py-1 text-[11px] font-bold rounded-full uppercase tracking-wide flex items-center gap-1
-                ${
-                  currentStatus === "ACTIVE"
-                    ? "bg-green-100 text-green-700"
-                    : currentStatus === "FROZEN"
-                      ? "bg-orange-100 text-orange-700"
-                      : "bg-red-100 text-red-700"
-                }`}
-          >
-            {currentStatus === "ACTIVE"
-              ? "🟢"
-              : currentStatus === "FROZEN"
-                ? "❄️"
-                : "⛔"}{" "}
-            {currentStatus}
-          </span>
+          {currentStatus !== "ACTIVE" && (
+            <span
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-full uppercase tracking-wide flex items-center gap-1
+                    ${
+                      currentStatus === "FROZEN"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+            >
+                {currentStatus === "FROZEN" ? "❄️" : "⛔"}{" "}
+                {currentStatus}
+            </span>
+          )}
         </div>
       </td>
 
@@ -281,4 +274,14 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
       </td>
     </tr>
   );
+}
+function formatTimeAgo(timestamp: number) {
+    const diff = Date.now() - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (minutes < 60) return `${minutes} min`;
+    if (hours < 24) return `${hours}h ${minutes % 60}min`;
+    return `${days}d ${hours % 24}h`;
 }

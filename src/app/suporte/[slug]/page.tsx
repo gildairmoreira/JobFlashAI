@@ -7,6 +7,8 @@ import { ArrowLeft, HelpCircle, Mail, MessageCircle, BookOpen, Activity, Phone, 
 import Footer from '@/components/landing/Footer';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
+import { getGlobalSettings } from '@/app/(main)/billing/actions';
+import { useEffect, useState } from 'react';
 
 const suporteContents = {
   ajuda: {
@@ -166,7 +168,22 @@ const suporteContents = {
 
 export default function SuportePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const pageData = suporteContents[slug as keyof typeof suporteContents] || {
+  const [globalSettings, setGlobalSettings] = useState<any>(null);
+
+  useEffect(() => {
+    getGlobalSettings().then(setGlobalSettings);
+  }, []);
+
+  const displayProPrice = globalSettings?.proPrice ? `R$ ${globalSettings.proPrice.toFixed(2).replace('.', ',')}` : 'R$ 19,90';
+
+  // Clonar e atualizar o FAQ dinamicamente
+  const updatedSuporteContents = JSON.parse(JSON.stringify(suporteContents));
+  if (updatedSuporteContents.faq) {
+    updatedSuporteContents.faq.content.sections[0].content = 
+      `Sim! Oferecemos um plano gratuito que permite criar até 3 currículos com templates básicos. Para recursos avançados, templates premium e criação ilimitada, temos planos pagos a partir de ${displayProPrice}/mês.`;
+  }
+
+  const pageData = updatedSuporteContents[slug as keyof typeof updatedSuporteContents] || {
     title: 'Página Não Encontrada',
     icon: <HelpCircle className="w-8 h-8" />,
     content: {

@@ -9,6 +9,8 @@ import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 
 import RenewButton from "@/components/premium/RenewButton";
+import { getGlobalSettings } from "./billing/actions";
+import { Hammer } from "lucide-react";
 
 export default async function Layout({
   children,
@@ -26,6 +28,27 @@ export default async function Layout({
   const isMaster = clerkUser?.emailAddresses[0]?.emailAddress === "gildair457@gmail.com";
   const userSub = await prisma.userSubscription.findUnique({ where: { userId } });
   const isAdmin = isMaster || userSub?.role === "ADMIN" || userSub?.role === "MASTER_ADMIN";
+  
+  // Real Maintenance Mode Implementation
+  const globalSettings = await getGlobalSettings();
+  if (globalSettings.maintenanceMode && !isAdmin) {
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4 text-center">
+            <div className="max-w-md space-y-6 p-8 bg-white rounded-3xl shadow-xl border border-stone-100">
+                <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Hammer className="w-8 h-8" />
+                </div>
+                <h1 className="text-3xl font-black text-stone-900 tracking-tight">Em Manutenção</h1>
+                <p className="text-stone-600 leading-relaxed">
+                    {globalSettings.maintenanceMessage || "Estamos trabalhando para melhorar sua experiência. Voltaremos em alguns instantes!"}
+                </p>
+                <div className="pt-4">
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400">JobFlashAI System Status: Maintenance</div>
+                </div>
+            </div>
+        </div>
+    );
+  }
 
   if (userSubscriptionLevel === "banned") {
     return (

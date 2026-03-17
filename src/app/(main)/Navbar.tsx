@@ -31,7 +31,7 @@ export default function Navbar({
   }
 
   return (
-    <header className="shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-stone-100 dark:border-stone-800 shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 p-3">
         <div className="flex items-center gap-6">
           <Link href="/resumes" className="flex items-center gap-2">

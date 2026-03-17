@@ -20,6 +20,8 @@ export const env = createEnv({
     CAKTO_MONTHLY_PRODUCT_ID: z.string().optional(),
     CAKTO_PRO_CHECKOUT_URL: z.string().optional(),
     CAKTO_MONTHLY_CHECKOUT_URL: z.string().optional(),
+    CAKTO_CLIENT_ID: z.string().optional(),
+    CAKTO_CLIENT_SECRET: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),

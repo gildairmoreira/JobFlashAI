@@ -131,6 +131,8 @@ model UserSubscription {
 
   currentPeriodEnd        DateTime? // Expiration for PRO; Null for MONTHLY or FREE
 
+  transactions            Transaction[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -194,4 +196,44 @@ model JobFitGeneration {
   completedAt     DateTime?
 
   @@map("job_fit_generations")
+}
+
+model Transaction {
+  id                 String   @id @default(cuid())
+  userId             String
+  caktoTransactionId String   @unique
+  amount             Float
+  currency           String   @default("BRL")
+  status             String   // PENDING, PAID, REFUSED, REFUNDED
+  paymentMethod      String?  // pix, card, boleto
+  customerEmail      String?
+  customerName       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  userSubscription   UserSubscription @relation(fields: [caktoTransactionId], references: [caktoTransactionId], map: "transaction_subscription_fkey")
+
+  @@map("transactions")
+}
+
+model AnalyticEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  event     String   // initiate_checkout, pix_gerado, purchase_approved, etc.
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@map("analytic_events")
+}
+
+model GlobalSetting {
+  id                 String   @id @default("global")
+  maintenanceMode    Boolean  @default(false)
+  maintenanceMessage String?  @default("Estamos em manutenção programada. Voltaremos em breve!")
+  proPrice           Float    @default(19.90)
+  monthlyPrice       Float    @default(49.90)
+
+  updatedAt          DateTime @updatedAt
+
+  @@map("global_settings")
 }

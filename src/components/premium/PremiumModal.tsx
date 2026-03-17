@@ -7,16 +7,25 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { createCheckoutSession } from "./actions";
+import { getGlobalSettings } from "@/app/(main)/billing/actions";
 
 const premiumFeatures = ["Ferramentas de IA", "Até 3 currículos"];
 const premiumPlusFeatures = ["Currículos ilimitados", "Personalizações de design"];
 
 export default function PremiumModal() {
   const { open, setOpen } = usePremiumModal();
-
   const { toast } = useToast();
-
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    if (open) {
+      getGlobalSettings().then(setSettings);
+    }
+  }, [open]);
+
+  const proPrice = settings?.proPrice ? `R$ ${settings.proPrice.toFixed(2).replace('.', ',')}` : "R$ 19,90";
+  const monthlyPrice = settings?.monthlyPrice ? `R$ ${settings.monthlyPrice.toFixed(2).replace('.', ',')}` : "R$ 49,90";
 
   async function handlePremiumClick(priceId: string) {
     try {
@@ -55,7 +64,7 @@ export default function PremiumModal() {
           <p>Obtenha uma assinatura premium para desbloquear mais recursos.</p>
           <div className="flex">
             <div className="flex w-1/2 flex-col space-y-5">
-              <h3 className="text-center text-lg font-bold">Semanal (R$ 19,90)</h3>
+              <h3 className="text-center text-lg font-bold">Semanal ({proPrice})</h3>
               <ul className="list-inside space-y-2">
                 {premiumFeatures.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
@@ -78,7 +87,7 @@ export default function PremiumModal() {
             <div className="mx-6 border-l" />
             <div className="flex w-1/2 flex-col space-y-5">
               <h3 className="bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-center text-lg font-bold text-transparent">
-                Mensal (R$ 49,90)
+                Mensal ({monthlyPrice})
               </h3>
               <ul className="list-inside space-y-2">
                 {premiumPlusFeatures.map((feature) => (

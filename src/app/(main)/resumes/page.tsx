@@ -11,6 +11,7 @@ import Link from "next/link";
 import { getUserJobFitUsage } from "./job-actions";
 import JobFitButton from "./JobFitButton";
 import CreateResumeButtonWrapper from "./CreateResumeButtonWrapper";
+import CheckoutTrigger from "./CheckoutTrigger";
 
 export const metadata: Metadata = {
   title: "Seus currículos",
@@ -44,6 +45,7 @@ export default async function Page() {
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 relative">
+      <CheckoutTrigger subscriptionLevel={subscriptionLevel} />
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative">
         <div className="space-y-1 w-full md:w-1/3 text-center md:text-left order-2 md:order-1">
           <h1 className="text-3xl font-bold">Seus currículos</h1>
