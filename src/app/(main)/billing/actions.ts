@@ -190,3 +190,21 @@ export async function promoteToAdmin(targetUserId: string) {
     revalidatePath("/billing");
     return { success: true };
 }
+
+// Demote user from ADMIN
+export async function demoteFromAdmin(targetUserId: string) {
+    const adminData = await verifyAdminAccess();
+
+    if (adminData.role !== "MASTER_ADMIN") {
+        throw new Error("Only MASTER_ADMIN can demote other users from ADMIN");
+    }
+
+    await (prisma.userSubscription as any).upsert({
+        where: { userId: targetUserId },
+        create: { userId: targetUserId, role: "USER" },
+        update: { role: "USER" },
+    });
+
+    revalidatePath("/billing");
+    return { success: true };
+}

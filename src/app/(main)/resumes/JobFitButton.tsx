@@ -38,7 +38,7 @@ export default function JobFitButton({
       <Button
         onClick={handleClick}
         variant="secondary"
-        className="flex w-fit gap-2 border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary dark:text-primary-foreground dark:bg-primary/20 dark:hover:bg-primary/30"
+        className="flex w-fit gap-2 border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary dark:bg-primary/10 dark:hover:bg-primary/20"
       >
         <Sparkles className="size-5" />
         Gerar para Vaga

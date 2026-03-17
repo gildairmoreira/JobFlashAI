@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { updateUserPlan, updateUserStatus, promoteToAdmin } from "./actions";
+import { updateUserPlan, updateUserStatus, promoteToAdmin, demoteFromAdmin } from "./actions";
 
 interface UserTableRowProps {
   user: any;
@@ -73,6 +73,24 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
           variant: "destructive",
           title: "Erro ao promover",
           description: "Apenas MASTER_ADMIN pode promover outros administradores.",
+        });
+      }
+    });
+  }
+
+  async function handleDemote() {
+    startTransition(async () => {
+      try {
+        await demoteFromAdmin(user.userId);
+        toast({
+          title: "Admin removido",
+          description: `O cargo de administrador foi retirado de ${user.firstName}.`,
+        });
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao remover admin",
+          description: "Apenas MASTER_ADMIN pode remover outros administradores.",
         });
       }
     });
@@ -247,6 +265,16 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
               className="text-[10px] text-stone-400 hover:text-stone-800 underline uppercase tracking-widest font-bold px-1 transition-colors"
             >
               Promover Admin
+            </button>
+          )}
+
+          {adminRole === "MASTER_ADMIN" && user.role === "ADMIN" && (
+            <button
+              onClick={handleDemote}
+              disabled={isPending}
+              className="text-[10px] text-red-400 hover:text-red-600 underline uppercase tracking-widest font-bold px-1 transition-colors"
+            >
+              Remover Admin
             </button>
           )}
         </div>
