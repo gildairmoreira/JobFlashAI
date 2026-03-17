@@ -27,6 +27,7 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useTransition } from "react";
 import { AtsEvaluationDetails, evaluateResumeAts } from "./actions";
+import { AtsThermometer } from "./AtsThermometer";
 
 interface ATSDetailModalProps {
   open: boolean;
@@ -99,7 +100,7 @@ export default function ATSDetailModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
         <DialogHeader className="px-6 py-4 border-b bg-muted/30">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pr-8">
             <DialogTitle className="text-xl">
               Análise ATS: {resume.title || "Sem título"}
             </DialogTitle>
@@ -187,9 +188,12 @@ export default function ATSDetailModal({
                   </div>
                 </div>
 
-                <div className="flex-1 space-y-4 text-center md:text-left">
+                <div className="flex-1 space-y-6 text-center md:text-left">
+                  <div className="w-full max-w-sm mx-auto md:mx-0">
+                    <AtsThermometer score={score} />
+                  </div>
                   <div>
-                    <h2 className="text-2xl font-bold mb-2">Visão Geral</h2>
+                    <h2 className="text-xl font-bold mb-2">Visão Geral</h2>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {details.resumo_executivo}
                     </p>

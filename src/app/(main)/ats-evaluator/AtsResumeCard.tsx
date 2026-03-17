@@ -7,6 +7,7 @@ import React, { useState } from "react";
 // @ts-ignore
 import ATSDetailModal from "./ATSDetailModal";
 import { SubscriptionLevel } from "@/lib/subscription";
+import { AtsThermometer } from "./AtsThermometer";
 
 interface AtsResumeCardProps {
   resume: ResumeServerData;
@@ -118,6 +119,11 @@ export default function AtsResumeCard({
         </div>
 
         <div className="flex flex-1 flex-col p-4">
+          {atsScore && (
+            <div className="mb-4">
+              <AtsThermometer score={score} />
+            </div>
+          )}
           <h3 className="line-clamp-1 font-semibold" title={resume.title || "Sem título"}>
             {resume.title || "Sem título"}
           </h3>
