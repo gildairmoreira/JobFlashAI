@@ -2,6 +2,7 @@
 // Sem foto, EB Garamond, seções em MAIÚSCULAS com border-bottom, datas alinhadas à direita
 
 import { ResumeTemplateProps } from "@/lib/resume-templates/registry";
+import { renderMarkdownToJSX } from "@/lib/resume-templates/renderMarkdown";
 import { formatDate } from "date-fns";
 import { ptBR, enUS } from "date-fns/locale";
 import React from "react";
@@ -64,7 +65,7 @@ function HarvardHeader({ resumeData }: ResumeTemplateProps) {
   );
 }
 
-// Resumo Profissional
+// Resumo Profissional — renderiza markdown, aumenta fonte do conteúdo
 function HarvardSummary({ resumeData }: ResumeTemplateProps) {
   const { summary, language } = resumeData;
   const t = getTranslation(language);
@@ -73,8 +74,8 @@ function HarvardSummary({ resumeData }: ResumeTemplateProps) {
   return (
     <>
       <SectionTitle>{t.summary}</SectionTitle>
-      <div className="mb-2 whitespace-pre-line text-[11.5px]">
-        {summary}
+      <div className="mb-2 text-[12px]">
+        {renderMarkdownToJSX(summary)}
       </div>
     </>
   );
@@ -109,14 +110,14 @@ function HarvardEducation({ resumeData }: ResumeTemplateProps) {
             <div className="flex items-start justify-between">
               <span className="font-bold">{edu.school}</span>
               {edu.startDate && (
-                <span className="shrink-0 text-right text-[11.5px]">
+                <span className="shrink-0 text-right text-[12px]">
                   {formatDate(edu.startDate, "MMM yyyy", { locale: language === 'en' ? enUS : ptBR })}
                   {edu.endDate ? ` – ${formatDate(edu.endDate, "MMM yyyy", { locale: language === 'en' ? enUS : ptBR })}` : ""}
                 </span>
               )}
             </div>
             {edu.degree && (
-              <p className="italic text-[11.5px]">{edu.degree}</p>
+              <p className="italic text-[12px]">{edu.degree}</p>
             )}
           </div>
         ))}
@@ -125,7 +126,7 @@ function HarvardEducation({ resumeData }: ResumeTemplateProps) {
   );
 }
 
-// Experiência: Empresa/Cidade | Cargo/Data | Bullets
+// Experiência: Empresa/Cidade | Cargo/Data | Bullets com markdown real
 function HarvardExperience({ resumeData }: ResumeTemplateProps) {
   const { workExperiences, language } = resumeData;
   const t = getTranslation(language);
@@ -144,20 +145,19 @@ function HarvardExperience({ resumeData }: ResumeTemplateProps) {
               <span className="font-bold">{exp.company}</span>
             </div>
             <div className="flex items-start justify-between">
-              <span className="italic text-[11.5px]">{exp.position}</span>
+              <span className="italic text-[12px]">{exp.position}</span>
               {exp.startDate && (
-                <span className="shrink-0 text-right text-[11.5px]">
+                <span className="shrink-0 text-right text-[12px]">
                   {formatDate(exp.startDate, "MMM yyyy", { locale: language === 'en' ? enUS : ptBR })} –{" "}
                   {exp.endDate ? formatDate(exp.endDate, "MMM yyyy", { locale: language === 'en' ? enUS : ptBR }) : t.present}
                 </span>
               )}
             </div>
             {exp.description && (
-              <ul className="ml-3 mt-1 list-disc space-y-0.5 text-[11.5px]">
-                {exp.description.split("\n").filter(Boolean).map((line, j) => (
-                  <li key={j}>{line.replace(/^[-•]\s*/, "")}</li>
-                ))}
-              </ul>
+              // Usa renderMarkdown: só cria bullet se a linha começa explicitamente com - ou *
+              <div className="mt-1 text-[12px]">
+                {renderMarkdownToJSX(exp.description)}
+              </div>
             )}
           </div>
         ))}
@@ -166,7 +166,7 @@ function HarvardExperience({ resumeData }: ResumeTemplateProps) {
   );
 }
 
-// Seções customizadas como Leadership & Activities
+// Seções customizadas como Leadership & Activities — renderiza markdown real
 function HarvardCustomSections({ resumeData }: ResumeTemplateProps) {
   const { customSections } = resumeData;
   const filtered = customSections?.filter(
@@ -180,11 +180,9 @@ function HarvardCustomSections({ resumeData }: ResumeTemplateProps) {
         <div key={i} className="break-inside-avoid">
           {section.title && <SectionTitle>{section.title}</SectionTitle>}
           {section.content && (
-            <ul className="ml-3 list-disc space-y-0.5 text-[11.5px]">
-              {section.content.split("\n").filter(Boolean).map((line, j) => (
-                <li key={j}>{line.replace(/^[-•*]\s*/, "")}</li>
-              ))}
-            </ul>
+            <div className="text-[12px]">
+              {renderMarkdownToJSX(section.content)}
+            </div>
           )}
         </div>
       ))}
@@ -201,7 +199,7 @@ function HarvardSkills({ resumeData }: ResumeTemplateProps) {
   return (
     <>
       <SectionTitle>{t.skills}</SectionTitle>
-      <p className="text-[11.5px]">
+      <p className="text-[12px]">
         <span className="font-bold">{t.skillsLabel}: </span>
         {skills.join(", ")}
       </p>

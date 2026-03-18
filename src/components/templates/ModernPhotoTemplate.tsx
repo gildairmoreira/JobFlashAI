@@ -2,6 +2,7 @@
 // Suporta foto circular opcional, DM Sans, ícones Lucide para contato
 
 import { ResumeTemplateProps } from "@/lib/resume-templates/registry";
+import { renderMarkdownToJSX } from "@/lib/resume-templates/renderMarkdown";
 import { formatDate } from "date-fns";
 import { ptBR, enUS } from "date-fns/locale";
 import { Mail, MapPin, Phone, User } from "lucide-react";
@@ -144,10 +145,12 @@ function MainContent({ resumeData, accentColor }: ResumeTemplateProps & { accent
         )}
       </div>
 
-      {/* Resumo profissional */}
+      {/* Resumo profissional — renderiza markdown */}
       {summary && (
         <SidebarSection title={t.summary} accentColor={accentColor}>
-          <p className="whitespace-pre-line text-gray-700">{summary}</p>
+          <div className="text-gray-700">
+            {renderMarkdownToJSX(summary, "text-gray-700")}
+          </div>
         </SidebarSection>
       )}
 
@@ -170,8 +173,8 @@ function MainContent({ resumeData, accentColor }: ResumeTemplateProps & { accent
                   {exp.company}
                 </p>
                 {exp.description && (
-                  <div className="mt-0.5 whitespace-pre-line text-[11px] text-gray-600">
-                    {exp.description}
+                  <div className="mt-0.5 text-[11px] text-gray-600">
+                    {renderMarkdownToJSX(exp.description, "text-gray-600")}
                   </div>
                 )}
               </div>
@@ -208,8 +211,8 @@ function MainContent({ resumeData, accentColor }: ResumeTemplateProps & { accent
           {customSections.filter(s => Object.values(s).filter(Boolean).length > 0).map((section, i) => (
             <SidebarSection key={i} title={section.title || "Outro"} accentColor={accentColor}>
               {section.content && (
-                <div className="whitespace-pre-line text-[11px] text-gray-600">
-                  {section.content}
+                <div className="text-[11px] text-gray-600">
+                  {renderMarkdownToJSX(section.content, "text-gray-600")}
                 </div>
               )}
             </SidebarSection>

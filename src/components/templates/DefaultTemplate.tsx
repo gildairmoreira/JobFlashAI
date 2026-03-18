@@ -3,6 +3,7 @@
 
 import { BorderStyles } from "@/app/(main)/editor/BorderStyleButton";
 import { ResumeTemplateProps } from "@/lib/resume-templates/registry";
+import { renderMarkdownToHTML } from "@/lib/resume-templates/renderMarkdown";
 import { formatDate } from "date-fns";
 import { ptBR, enUS } from "date-fns/locale";
 import Image from "next/image";
@@ -12,7 +13,8 @@ import { getTranslation } from "@/lib/resume-templates/translations";
 
 export default function DefaultTemplate({ resumeData }: ResumeTemplateProps) {
   return (
-    <div className="space-y-6">
+    // Reduz espaçamento entre seções — o header mantém margem própria via space-y-2.5
+    <div className="space-y-3">
       <PersonalInfoHeader resumeData={resumeData} />
       <SummarySection resumeData={resumeData} />
       <WorkExperienceSection resumeData={resumeData} />
@@ -115,11 +117,15 @@ function SummarySection({ resumeData }: ResumeTemplateProps) {
   return (
     <>
       <hr className="border-2" style={{ borderColor: colorHex }} />
-      <div className="break-inside-avoid space-y-3">
+      <div className="break-inside-avoid space-y-2">
         <p className="text-lg font-semibold" style={{ color: colorHex }}>
           {t.summary}
         </p>
-        <div className="whitespace-pre-line text-sm">{summary}</div>
+        {/* Usa dangerouslySetInnerHTML para manter estilo idêntico às demais seções */}
+        <div
+          className="text-sm"
+          dangerouslySetInnerHTML={{ __html: renderMarkdownToHTML(summary) }}
+        />
       </div>
     </>
   );
@@ -155,7 +161,13 @@ function WorkExperienceSection({ resumeData }: ResumeTemplateProps) {
               )}
             </div>
             <p className="text-xs font-semibold">{exp.company}</p>
-            <div className="whitespace-pre-line text-xs">{exp.description}</div>
+            {/* Usa dangerouslySetInnerHTML para bullets idênticos às seções customizadas */}
+            {exp.description && (
+              <div
+                className="text-xs"
+                dangerouslySetInnerHTML={{ __html: renderMarkdownToHTML(exp.description) }}
+              />
+            )}
           </div>
         ))}
       </div>
@@ -207,14 +219,6 @@ function CustomSectionsSection({ resumeData }: ResumeTemplateProps) {
   );
   if (!customSectionsNotEmpty?.length) return null;
 
-  const formatContent = (content: string) => {
-    return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^\*\s+(.*)$/gm, '• $1')
-      .replace(/\n/g, '<br>');
-  };
-
   return (
     <>
       <hr className="border-2" style={{ borderColor: colorHex }} />
@@ -227,9 +231,10 @@ function CustomSectionsSection({ resumeData }: ResumeTemplateProps) {
               </p>
             )}
             {section.content && (
+              // Usa helper unificado: bullets só para linhas com - ou *, markdown inline
               <div
                 className="text-sm"
-                dangerouslySetInnerHTML={{ __html: formatContent(section.content) }}
+                dangerouslySetInnerHTML={{ __html: renderMarkdownToHTML(section.content) }}
               />
             )}
           </div>
