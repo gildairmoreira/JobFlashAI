@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { FileUserIcon, PenLineIcon, Printer } from "lucide-react";
+import { FileUserIcon, PenLineIcon, Printer, Download, Loader2 } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import PrintModal from "@/components/PrintModal";
@@ -15,6 +15,7 @@ interface FooterProps {
   readonly isSaving: boolean;
   readonly resumeData?: ResumeValues;
   readonly resumeTitle?: string;
+  readonly resumeId?: string;
 }
 
 export default function Footer({
@@ -25,8 +26,10 @@ export default function Footer({
   isSaving,
   resumeData,
   resumeTitle = "Currículo",
+  resumeId,
 }: FooterProps) {
   const [showPrintModal, setShowPrintModal] = useState(false);
+
   const previousStep = steps.find(
     (_, index) => steps[index + 1]?.key === currentStep,
   )?.key;
@@ -50,14 +53,17 @@ export default function Footer({
               Passo anterior
             </Button>
             {isLastStep ? (
-              <Button
-                onClick={() => setShowPrintModal(true)}
-                className="flex items-center gap-2"
-                disabled={!resumeData}
-              >
-                <Printer className="size-4" />
-                Imprimir
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setShowPrintModal(true)}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={!resumeData}
+                  title="Abrir pré-visualização e baixar o currículo."
+                >
+                  <Download className="size-4" />
+                  Finalizar & Baixar
+                </Button>
+              </div>
             ) : (
               <Button
                 onClick={nextStep ? () => setCurrentStep(nextStep) : undefined}
@@ -99,6 +105,7 @@ export default function Footer({
         onOpenChange={setShowPrintModal}
         resumeData={resumeData}
         resumeTitle={resumeTitle}
+        resumeId={resumeId}
       />
     )}
   </>

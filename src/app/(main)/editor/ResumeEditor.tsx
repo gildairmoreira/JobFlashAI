@@ -80,7 +80,7 @@ export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
           />
         </div>
       </main>
-      <Footer
+        <Footer
           currentStep={currentStep}
           setCurrentStep={setStep}
           showSmResumePreview={showSmResumePreview}
@@ -88,6 +88,7 @@ export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
           isSaving={isSaving}
           resumeData={resumeData}
           resumeTitle={resumeData.title || "Currículo"}
+          resumeId={resumeToEdit?.id || searchParams.get("resumeId") || undefined}
         />
     </div>
   );

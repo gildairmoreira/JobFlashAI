@@ -147,7 +147,7 @@ export default function JobFitModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(val) => {
+    <Dialog open={open} onOpenChange={(val: boolean) => {
       if (step === "processing") return; // Prevent closing while generating
       onOpenChange(val);
     }}>

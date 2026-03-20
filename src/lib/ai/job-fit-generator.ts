@@ -168,7 +168,7 @@ RETORNE JSON:`;
           })),
         },
         educations: {
-          create: originalResume.educations.map((edu) => ({
+          create: originalResume.educations.map((edu: any) => ({
             degree: edu.degree,
             school: edu.school,
             startDate: edu.startDate,
@@ -176,7 +176,7 @@ RETORNE JSON:`;
           })),
         },
         customSections: {
-          create: originalResume.customSections.map((sec) => ({
+          create: originalResume.customSections.map((sec: any) => ({
             title: sec.title,
             content: sec.content,
           })),

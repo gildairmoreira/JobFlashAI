@@ -23,7 +23,7 @@ import { SubscriptionLevel } from "@/lib/subscription";
 import { ResumeServerData } from "@/lib/types";
 import { mapToResumeValues } from "@/lib/utils";
 import { formatDate } from "date-fns";
-import { Copy, MoreVertical, Printer, Trash2, Lock } from "lucide-react";
+import { Copy, MoreVertical, Printer, Trash2, Lock, Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState, useTransition } from "react";
 import { useReactToPrint } from "react-to-print";
@@ -114,6 +114,7 @@ export default function ResumeItem({ resume, subscriptionLevel, isLocked = false
       </div>
       <MoreMenu
         resumeId={resume.id}
+        resumeTitle={resume.title ?? "Currículo"}
         onPrintClick={reactToPrintFn}
         subscriptionLevel={subscriptionLevel}
         isLocked={isLocked}
@@ -124,14 +125,16 @@ export default function ResumeItem({ resume, subscriptionLevel, isLocked = false
 
 interface MoreMenuProps {
   resumeId: string;
+  resumeTitle: string;
   onPrintClick: () => void;
   subscriptionLevel: SubscriptionLevel;
   isLocked?: boolean;
 }
 
-function MoreMenu({ resumeId, onPrintClick, subscriptionLevel, isLocked = false }: Readonly<MoreMenuProps>) {
+function MoreMenu({ resumeId, resumeTitle, onPrintClick, subscriptionLevel, isLocked = false }: Readonly<MoreMenuProps>) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [isDuplicating, startDuplicate] = useTransition();
+  const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
   const premiumModal = usePremiumModal();
 
@@ -161,6 +164,31 @@ function MoreMenu({ resumeId, onPrintClick, subscriptionLevel, isLocked = false 
     });
   }
 
+  const handleDownloadPDF = async () => {
+    try {
+      setIsDownloading(true);
+      const response = await fetch(`/api/export-pdf?resumeId=${resumeId}`);
+      if (!response.ok) throw new Error("Erro na geração do PDF");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${resumeTitle.replace(/\s+/g, "_")}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        description: "Houve um erro ao gerar o PDF. Tente novamente.",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <>
       <DropdownMenu>
@@ -174,6 +202,17 @@ function MoreMenu({ resumeId, onPrintClick, subscriptionLevel, isLocked = false 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuItem
+            className="flex items-center gap-2"
+            onClick={(e) => {
+              e.preventDefault();
+              handleDownloadPDF();
+            }}
+            disabled={isDownloading}
+          >
+            {isDownloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+            {isDownloading ? "Baixando..." : "Baixar PDF"}
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="flex items-center gap-2"
             onClick={onPrintClick}
