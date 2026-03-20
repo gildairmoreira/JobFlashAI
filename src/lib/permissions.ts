@@ -30,7 +30,20 @@ export function canDuplicateResume(subscriptionLevel: SubscriptionLevel) {
   return subscriptionLevel === "pro" || subscriptionLevel === "monthly";
 }
 
-/** Gerar currículo para vaga — exclusivo do plano MONTHLY (mensal) */
+/** Gerar currículo para vaga (Vaga-Fit AI) — todos têm acesso, mas os limites mudam */
 export function canGenerateForJob(subscriptionLevel: SubscriptionLevel) {
-  return subscriptionLevel === "monthly";
+  return subscriptionLevel !== "frozen" && subscriptionLevel !== "banned";
+}
+
+export function getJobFitLimit(subscriptionLevel: SubscriptionLevel): number {
+  switch (subscriptionLevel) {
+    case "monthly":
+      return 25;
+    case "pro":
+      return 5;
+    case "free":
+      return 1;
+    default:
+      return 0;
+  }
 }

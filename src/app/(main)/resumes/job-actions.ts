@@ -4,26 +4,25 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { runJobFitGeneration } from "@/lib/ai/job-fit-generator";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
-import { canGenerateForJob } from "@/lib/permissions";
-
-const MAX_JOB_FIT_USES_PER_MONTH = 10;
+import { canGenerateForJob, getJobFitLimit } from "@/lib/permissions";
 
 export async function createJobFitGeneration(sourceResumeId: string, jobDescription: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  // Verificar plano PRO
   const subscriptionLevel = await getUserSubscriptionLevel(userId);
   if (!canGenerateForJob(subscriptionLevel)) {
-    throw new Error("PRO_PLAN_REQUIRED");
+    throw new Error("UNAUTHORIZED_PLAN");
   }
 
-  // Verificar limite mensal
+  // Verificar limite dinâmico
+  const limit = getJobFitLimit(subscriptionLevel);
+
   // @ts-ignore
   const usage = await prisma.userUsage.findUnique({ where: { userId } });
   // @ts-ignore
-  if (usage && usage.jobFitUsesThisMonth >= MAX_JOB_FIT_USES_PER_MONTH) {
-    throw new Error("MONTHLY_LIMIT_REACHED");
+  if (usage && usage.jobFitUsesThisMonth >= limit) {
+    throw new Error("LIMIT_REACHED");
   }
 
   // Verificar propriedade do currículo original (Prevenção de IDOR)

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { updateUserPlan, updateUserStatus, promoteToAdmin, demoteFromAdmin } from "./actions";
+import { updateUserPlan, updateUserStatus, promoteToAdmin, demoteFromAdmin, addJobFitCredits } from "./actions";
 
 interface UserTableRowProps {
   user: any;
@@ -91,6 +91,24 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
           variant: "destructive",
           title: "Erro ao remover admin",
           description: "Apenas MASTER_ADMIN pode remover outros administradores.",
+        });
+      }
+    });
+  }
+
+  async function handleAddCredits() {
+    startTransition(async () => {
+      try {
+        await addJobFitCredits(user.userId, 5);
+        toast({
+          title: "Créditos adicionados",
+          description: `Foram adicionados +5 usos de Vaga-Fit para ${user.firstName}.`,
+        });
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao adicionar créditos",
+          description: "Não foi possível adicionar créditos.",
         });
       }
     });
@@ -250,6 +268,17 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
               </button>
             </div>
           )}
+
+          <div className="flex bg-indigo-50/80 rounded-lg p-1 border border-indigo-200 shadow-sm max-w-max">
+            <button
+              onClick={handleAddCredits}
+              disabled={isPending}
+              className="px-3 py-1 text-xs font-bold rounded-md transition-all text-indigo-700 hover:bg-white hover:shadow-sm"
+              title="Dar +5 créditos de Vaga-Fit"
+            >
+              +5 Créditos Vaga-Fit
+            </button>
+          </div>
 
           {adminRole === "MASTER_ADMIN" && user.role === "USER" && (
             <button

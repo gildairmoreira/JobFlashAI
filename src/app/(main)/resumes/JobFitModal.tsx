@@ -60,11 +60,11 @@ export default function JobFitModal({
       setProgress(0);
       setGenerationId(null);
       setFinishedResumeId(null);
-      if (resumes.length > 0 && !selectedResumeId) {
+      if (resumes.length > 0) {
         setSelectedResumeId(resumes[0].id);
       }
     }
-  }, [open, resumes, selectedResumeId]);
+  }, [open]);
 
   // Polling logic when in 'processing' step
   useEffect(() => {
@@ -100,11 +100,8 @@ export default function JobFitModal({
   }, [step, generationId, toast]);
 
   const handleNext = () => {
-    if (subscriptionLevel !== "pro" && subscriptionLevel !== "monthly") {
-      onOpenChange(false);
-      premiumModal.setOpen(true);
-      return;
-    }
+    // Everyone has access to Vaga-Fit now, we only stop them if they hit the limit,
+    // which is checked in the backend createJobFitGeneration call.
 
     if (step === "job-description") {
       if (jobDescription.length < 50) {
@@ -129,15 +126,15 @@ export default function JobFitModal({
         setGenerationId(genId);
         setStep("processing");
       } catch (error: any) {
-        if (error.message === "PRO_PLAN_REQUIRED" || error.message === "MONTHLY_PLAN_REQUIRED") {
-          onOpenChange(false);
-          premiumModal.setOpen(true);
-        } else if (error.message === "MONTHLY_LIMIT_REACHED") {
+        if (error.message === "LIMIT_REACHED") {
           toast({
             variant: "destructive",
-            title: "Limite Mensal Atingido",
-            description: "Você já atingiu seu limite de 10 gerações Job-Fit deste mês.",
+            title: "Limite Atingido",
+            description: "Você já atingiu seu limite de gerações Vaga-Fit para o seu plano atual. Acesse a área de faturamento para renovar ou melhorar seu plano.",
           });
+        } else if (error.message === "UNAUTHORIZED_PLAN") {
+          onOpenChange(false);
+          premiumModal.setOpen(true);
         } else {
           toast({
             variant: "destructive",

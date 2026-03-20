@@ -227,6 +227,27 @@ export async function updateUserPlan(targetUserId: string, newPlanType: "FREE" |
     return { success: true };
 }
 
+// Admin Action: Add Vaga-Fit Credits (by decrementing usage)
+export async function addJobFitCredits(targetUserId: string, amountToAdd: number) {
+    const adminData = await verifyAdminAccess();
+
+    await (prisma as any).userUsage.upsert({
+        where: { userId: targetUserId },
+        create: {
+            userId: targetUserId,
+            jobFitUsesThisMonth: -amountToAdd,
+        },
+        update: {
+            jobFitUsesThisMonth: {
+                decrement: amountToAdd
+            }
+        }
+    });
+
+    revalidatePath("/billing");
+    return { success: true };
+}
+
 // Promote user to ADMIN
 export async function promoteToAdmin(targetUserId: string) {
     const adminData = await verifyAdminAccess();

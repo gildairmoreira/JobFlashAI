@@ -34,7 +34,7 @@ export async function saveResume(values: ResumeValues) {
   }
 
   const existingResume = id
-    ? await prisma.resume.findUnique({ where: { id, userId } })
+    ? await prisma.resume.findFirst({ where: { id, userId } })
     : null;
 
   if (id && !existingResume) {
@@ -55,7 +55,11 @@ export async function saveResume(values: ResumeValues) {
 
   if (photo instanceof File) {
     if (existingResume?.photoUrl) {
-      await del(existingResume.photoUrl);
+      try {
+        await del(existingResume.photoUrl);
+      } catch (error) {
+        console.error("Failed to delete photo from blob storage:", error);
+      }
     }
 
     const blob = await put(`resume_photos/${path.extname(photo.name)}`, photo, {
@@ -65,7 +69,11 @@ export async function saveResume(values: ResumeValues) {
     newPhotoUrl = blob.url;
   } else if (photo === null) {
     if (existingResume?.photoUrl) {
-      await del(existingResume.photoUrl);
+      try {
+        await del(existingResume.photoUrl);
+      } catch (error) {
+        console.error("Failed to delete photo from blob storage:", error);
+      }
     }
     newPhotoUrl = null;
   }

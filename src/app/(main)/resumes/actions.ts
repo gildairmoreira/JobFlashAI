@@ -15,7 +15,7 @@ export async function deleteResume(id: string) {
     throw new Error("User not authenticated");
   }
 
-  const resume = await prisma.resume.findUnique({
+  const resume = await prisma.resume.findFirst({
     where: {
       id,
       userId,
@@ -27,7 +27,11 @@ export async function deleteResume(id: string) {
   }
 
   if (resume.photoUrl) {
-    await del(resume.photoUrl);
+    try {
+      await del(resume.photoUrl);
+    } catch (error) {
+      console.error("Failed to delete photo from blob storage:", error);
+    }
   }
 
   await prisma.resume.delete({
@@ -54,7 +58,7 @@ export async function duplicateResume(id: string) {
   }
 
   // Buscar currículo original com todas as relações
-  const original = await prisma.resume.findUnique({
+  const original = await prisma.resume.findFirst({
     where: { id, userId },
     include: resumeDataInclude,
   });

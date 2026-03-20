@@ -47,25 +47,29 @@ export async function runJobFitGeneration(generationId: string, userId: string) 
       });
     };
 
-    // 2. Summary Generation
-    if (originalResume.summary && originalResume.summary.trim().length > 10) {
-      try {
-        const sysPrompt = `Você é um especialista em recrutamento. Sua tarefa é reescrever o Resumo Profissional do candidato focado estritamente na descrição da vaga fornecida.
-Retorne APENAS o resumo reescrito (3 a 5 linhas).
-INSTRUÇÃO ESPECIAL: Você DEVE "mentir" um pouco no resumo, afirmando explicitamente e de forma natural que o candidato possui sólido conhecimento e experiência prática exata nas tecnologias, ferramentas ou habilidades que a vaga exige. Garanta o fit perfeito incorporando as palavras-chave da vaga no texto em primeira pessoa.`;
-        
-        const userPrompt = `VAGA:
+    // 2. Summary Generation - ALWAYS GENERATE OR ADAPT
+    try {
+      const hasSummary = originalResume.summary && originalResume.summary.trim().length > 10;
+      
+      const sysPrompt = `Você é um expert em recrutamento e redação corporativa.
+Sua tarefa é ${hasSummary ? 'reescrever o Resumo Profissional do candidato' : 'criar um Resumo Profissional novo para o candidato'} focado estritamente nas necessidades da vaga fornecida.
+Retorne APENAS o texto do resumo ${hasSummary ? 'reescrito' : 'criado'} (3 a 5 linhas compactas). Nunca inclua saudações, aspas ou textos extras informais.
+
+REGRAS CRÍTICAS:
+1. TONE CORPORATIVO: NUNCA escreva em primeira pessoa (nunca use "Eu", "Meu", "Minhas", "Estou", "Sou"). Escreva de forma impessoal e objetiva.
+2. ESTRUTURA IDEAL: Inicie com o título profissional ou nível de atuação. Exemplo de bom resumo: "Desenvolvedor Full Stack com sólida vivência em X e Y. Profissional focado na otimização de interfaces e segurança de dados. Especialista em entregar aplicações confiáveis..."
+3. PALAVRAS-CHAVE ATS: Você DEVE afirmar explicitamente que o candidato possui as habilidades técnicas e comportamentais cruciais que a vaga exige, inserindo as exatas palavras-chave da vaga de forma natural.`;
+      
+      const userPrompt = `VAGA:
 ${generation.jobDescription}
 
-RESUMO ATUAL:
-${originalResume.summary}
+${hasSummary ? 'RESUMO ATUAL:\n' + originalResume.summary : 'O candidato não inseriu um resumo ainda. Crie um resumo impactante do zero focado na vaga.'}
 
-REESCREVA EM PRIMEIRA PESSOA:`;
-        
-        finalSummary = await generateWithRetry(sysPrompt, userPrompt);
-      } catch (error) {
-        console.error("Summary generation failed:", error);
-      }
+${hasSummary ? 'REESCREVA' : 'CRIE'} O RESUMO APLICANDO AS REGRAS (SEM PRIMEIRA PESSOA):`;
+      
+      finalSummary = await generateWithRetry(sysPrompt, userPrompt);
+    } catch (error) {
+      console.error("Summary generation failed:", error);
     }
     await updateProgress();
 
@@ -75,8 +79,14 @@ REESCREVA EM PRIMEIRA PESSOA:`;
       let finalDescription = exp.description;
       if (exp.description && exp.description.trim().length > 10) {
         try {
-          const sysPrompt = `Você é um especialista em recrutamento. Reescreva os tópicos da descrição de experiência profissional do candidato focando APENAS em destacar as métricas e responsabilidades que mais se alinham à vaga alvo.
-NÃO INVENTE FATOS. Use verbos de ação. Mantenha formato de bullet points. Retorne APENAS a descrição reescrita.`;
+          const sysPrompt = `Você é um especialista em recrutamento e redação de currículos de alto impacto focado em testes ATS.
+Sua tarefa é reescrever a descrição da experiência profissional do candidato destacando APENAS as conquistas, métricas e responsabilidades que mais se alinham à vaga alvo.
+
+REGRAS CRÍTICAS:
+1. Retorne APENAS bullet points (um tópico por linha, usando o modelo: - Texto).
+2. NUNCA use primeira pessoa (proibido usar "eu desenvolvi", "ajudei", "minha equipe").
+3. COMECE COM VERBOS DE AÇÃO IMPESSOAIS ou substantivos de impacto (ex: "Desenvolvimento de aplicações...", "Liderança técnica em projetos...", "Arquitetura e modelagem de...", "Redução de custos operacionais...").
+4. NÃO INVENTE tecnologias ou fatos que o candidato não citou. Apenas destaque e melhore as palavras do texto atual que fazem sentido para a vaga.`;
           
           const userPrompt = `VAGA ALVO:
 ${generation.jobDescription}
@@ -85,7 +95,7 @@ CARGO DO CANDIDATO: ${exp.position} em ${exp.company}
 DESCRIÇÃO ATUAL:
 ${exp.description}
 
-REESCREVA NO FORMATO DE BULLET POINTS COM MAIOR FIT PARA A VAGA:`;
+REESCREVA EM BULLET POINTS COM MAIOR FIT PARA A VAGA (SIGA A REGRA DE TONALIDADE IMPESSOAL):`;
           
           finalDescription = await generateWithRetry(sysPrompt, userPrompt);
         } catch (error) {
@@ -98,14 +108,15 @@ REESCREVA NO FORMATO DE BULLET POINTS COM MAIOR FIT PARA A VAGA:`;
 
     // 4. Skills Suggestion
     try {
-      const sysPrompt = `Com base na VAGA e nas SKILLS ATUAIS do candidato, sugira até 5 novas HARD SKILLS que o candidato DEVE adicionar ao currículo para melhorar seu ATS, desde que sejam inferíveis de seu histórico.
+      const hasSkills = finalSkills.length > 0;
+      
+      const sysPrompt = `Com base na VAGA fornecida${hasSkills ? ' e nas SKILLS ATUAIS do candidato' : ''}, sugira ${hasSkills ? 'até 5 novas HARD SKILLS que o candidato DEVE adicionar ao currículo' : 'até 8 HARD SKILLS e COMPETÊNCIAS essenciais'} para melhorar seu ATS.
 Responda APENAS com um JSON simples, um array de strings. Exemplo: ["Python", "Docker"]. Nenhum texto adicional.`;
 
       const userPrompt = `VAGA:
 ${generation.jobDescription}
 
-SKILLS ATUAIS DO CANDIDATO:
-${finalSkills.join(", ")}
+${hasSkills ? 'SKILLS ATUAIS DO CANDIDATO:\n' + finalSkills.join(", ") : 'O candidato ainda não tem skills na sessão. Iremos sugerir do zero baseadas puramente na vaga e área de atuação!'}
 
 RETORNE JSON:`;
 

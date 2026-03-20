@@ -42,8 +42,8 @@ const PricingSection: React.FC = () => {
         { name: '1 Currículo ativo (sem duplicar)', included: true },
         { name: 'Template Clássico Padrão', included: true },
         { name: 'Download PDF (Com marca d\'água)', included: true },
-        { name: 'Acesso ao Avaliador ATS', included: false },
-        { name: 'Gerador Job-Fit AI (Adaptador de Vagas)', included: false },
+        { name: 'Gerador Vaga-Fit IA (1 Teste Grátis)', included: true },
+        { name: 'Acesso ao Avaliador ATS Completo', included: false },
         { name: 'Tradução 1-clique (PT <-> EN)', included: false },
       ],
       cta: 'Começar Grátis',
@@ -54,7 +54,7 @@ const PricingSection: React.FC = () => {
       price: displayProPrice,
       period: 'por 7 dias',
       features: [
-        { name: 'Módulo Job-Fit AI (Adaptador de vagas)', included: true },
+        { name: 'Módulo Vaga-Fit IA (5 Créditos)', included: true },
         { name: 'Avaliador ATS: Dicas Acionáveis Secretas', included: true },
         { name: 'Currículos Ilimitados (Duplique à vontade)', included: true },
         { name: 'Templates VIP (Harvard, Moderno, etc)', included: true },
@@ -74,7 +74,7 @@ const PricingSection: React.FC = () => {
       badge: 'Economize 37%',
       features: [
         { name: 'Acesso ilimitado a todos os recursos Pro', included: true },
-        { name: 'Módulo Job-Fit AI (Gerações Ilimitadas)', included: true },
+        { name: 'Módulo Vaga-Fit IA (25 Créditos Mensais)', included: true },
         { name: 'Avaliador ATS sempre atualizado', included: true },
         { name: 'Currículos ilimitados para sempre', included: true },
         { name: 'Tradução 1-clique (PT <-> EN)', included: true },
