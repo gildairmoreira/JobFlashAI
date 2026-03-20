@@ -4,6 +4,14 @@ import { generateWithRetry } from "@/lib/gemini";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import { ResumeValues } from "@/lib/validation";
 import { auth } from "@clerk/nextjs/server";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "1 m"),
+  analytics: true,
+});
 
 // Tipos dos campos que serão traduzidos
 interface TranslateResumeInput {
@@ -63,6 +71,11 @@ export async function translateResume(
 
   if (!userId) {
     throw new Error("Não autorizado");
+  }
+
+  const { success } = await ratelimit.limit(userId);
+  if (!success) {
+    throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
   }
 
   // Verifica se o nível de assinatura é mensal

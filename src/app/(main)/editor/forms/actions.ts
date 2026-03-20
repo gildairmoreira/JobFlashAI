@@ -17,6 +17,14 @@ import { auth } from "@clerk/nextjs/server";
 
 import { generateWithRetry } from "@/lib/gemini";
 import crypto from "crypto";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "1 m"),
+  analytics: true,
+});
 
 // Helper to generate a consistent hash for caching
 function generateCacheKey(systemMessage: string, userMessage: string): string {
@@ -43,6 +51,11 @@ export async function generateSummary(input: GenerateSummaryInput) {
 
   if (!userId) {
     throw new Error("Não autorizado");
+  }
+
+  const { success } = await ratelimit.limit(userId);
+  if (!success) {
+    throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
   }
 
   const subscriptionLevel = await getUserSubscriptionLevel(userId);
@@ -125,6 +138,11 @@ export async function generateWorkExperience(
 
   if (!userId) {
     throw new Error("Unauthorized");
+  }
+
+  const { success } = await ratelimit.limit(userId);
+  if (!success) {
+    throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
   }
 
   const subscriptionLevel = await getUserSubscriptionLevel(userId);
@@ -212,6 +230,11 @@ export async function generateCustomSection(input: { description: string }) {
 
   if (!userId) {
     throw new Error("Não autorizado");
+  }
+
+  const { success } = await ratelimit.limit(userId);
+  if (!success) {
+    throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
   }
 
   const subscriptionLevel = await getUserSubscriptionLevel(userId);

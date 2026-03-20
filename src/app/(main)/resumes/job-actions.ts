@@ -5,10 +5,23 @@ import { auth } from "@clerk/nextjs/server";
 import { runJobFitGeneration } from "@/lib/ai/job-fit-generator";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import { canGenerateForJob, getJobFitLimit } from "@/lib/permissions";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(3, "1 m"), // Limite mais restrito para processos pesados
+  analytics: true,
+});
 
 export async function createJobFitGeneration(sourceResumeId: string, jobDescription: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+
+  const { success } = await ratelimit.limit(userId);
+  if (!success) {
+    throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
+  }
 
   const subscriptionLevel = await getUserSubscriptionLevel(userId);
   if (!canGenerateForJob(subscriptionLevel)) {

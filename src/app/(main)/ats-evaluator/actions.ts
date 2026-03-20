@@ -5,6 +5,14 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { generateWithRetry } from "@/lib/gemini";
 import { Resume, WorkExperience, Education, CustomSection } from "@prisma/client";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "1 m"),
+  analytics: true,
+});
 
 // Tipos para parse do JSON
 export interface AtsEvaluationCategory {
@@ -73,6 +81,11 @@ function serializeResumeToPlainText(
 export async function evaluateResumeAts(resumeId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+
+  const { success } = await ratelimit.limit(userId);
+  if (!success) {
+    throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
+  }
 
   const resume = await prisma.resume.findUnique({
     where: { id: resumeId, userId },
