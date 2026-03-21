@@ -62,12 +62,15 @@ export default function CheckoutClient({ proPrice, monthlyPrice, initialPeriodEn
   // Isso evita o bug de auto-aprovação quando o user já tinha um plano ativo
   const startPolling = useCallback((paymentId: string | null = null) => {
     if (pollingRef.current) return;
+    console.log(`[Checkout Polling] Iniciado. paymentId=${paymentId} | initialPeriodEnd=${initialPeriodEnd}`);
     pollingRef.current = setInterval(async () => {
       try {
         const url = paymentId ? `/api/payment-status?paymentId=${paymentId}` : "/api/payment-status";
         const res = await fetch(url);
         const data = await res.json();
         
+        console.log(`[Checkout Polling] Resposta:`, data);
+
         const newPeriodEnd = data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null;
         const oldPeriodEnd = initialPeriodEnd ? new Date(initialPeriodEnd) : null;
 
@@ -76,7 +79,10 @@ export default function CheckoutClient({ proPrice, monthlyPrice, initialPeriodEn
           oldPeriodEnd === null || newPeriodEnd > oldPeriodEnd
         );
 
+        console.log(`[Checkout Polling] isNewPayment=${isNewPayment} | newPeriodEnd=${newPeriodEnd?.toISOString()} | oldPeriodEnd=${oldPeriodEnd?.toISOString()} | status=${data.status}`);
+
         if (isNewPayment && data.status === "ACTIVE") {
+          console.log(`[Checkout Polling] ✅ PAGAMENTO DETECTADO! Exibindo tela de sucesso.`);
           setPaymentApproved(true);
           setApprovedPlanType(data.planType);
           if (pollingRef.current) clearInterval(pollingRef.current);

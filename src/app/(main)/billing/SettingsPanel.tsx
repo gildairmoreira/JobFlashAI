@@ -38,6 +38,8 @@ export default function SettingsPanel({ settings, adminRole }: SettingsPanelProp
   const [proPrice, setProPrice] = React.useState(settings.proPrice.toString());
   const [monPrice, setMonPrice] = React.useState(settings.monthlyPrice.toString());
 
+  const [isSyncing, setIsSyncing] = React.useState(false);
+
   async function handleSave() {
     startTransition(async () => {
       try {
@@ -60,6 +62,34 @@ export default function SettingsPanel({ settings, adminRole }: SettingsPanelProp
       }
     });
   }
+
+  async function handleSyncRefunds() {
+    try {
+      setIsSyncing(true);
+      const res = await fetch("/api/admin/sync-refunds", { method: "POST" });
+      if (!res.ok) throw new Error("Erro na requisição");
+      const data = await res.json();
+      
+      toast({
+        title: "Sincronização concluída",
+        description: `${data.synced} verificados. ${data.refunded} estornados, ${data.cancelled} cancelados.`,
+      });
+      
+      // Se houveram mudanças, recarregar a página para atualizar os gráficos
+      if (data.refunded > 0 || data.cancelled > 0) {
+        setTimeout(() => window.location.reload(), 2000);
+      }
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Erro de sincronização",
+        description: "Não foi possível sincronizar com o Mercado Pago.",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-1">
@@ -173,9 +203,17 @@ export default function SettingsPanel({ settings, adminRole }: SettingsPanelProp
                     {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Salvar Alterações
                 </Button>
-                <Button variant="outline" className="w-full border-stone-200 dark:border-stone-800 rounded-2xl h-12">
-                    Descartar
+                
+                <Button 
+                    variant="outline" 
+                    onClick={handleSyncRefunds}
+                    disabled={isSyncing}
+                    className="w-full border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-2xl h-12 flex items-center gap-2 mb-2"
+                >
+                    {isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
+                    Sincronizar Estornos (MP)
                 </Button>
+
                 <div className="pt-4 border-t border-stone-100 dark:border-stone-800 mt-4 space-y-4">
                     <div className="flex items-center gap-2 text-stone-400 dark:text-stone-500">
                         <Globe className="w-4 h-4" />

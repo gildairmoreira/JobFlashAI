@@ -151,7 +151,7 @@ export async function getAdminDashboardData() {
 
     // 4. Last 10 Sales
     const lastPaidSales = await (prisma as any).transaction.findMany({
-        where: { status: "PAID" },
+        where: { status: { in: ["PAID", "REFUNDED"] } },
         orderBy: { createdAt: "desc" },
         take: 10
     });

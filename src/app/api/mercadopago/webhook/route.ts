@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { MercadoPagoConfig, Payment } from "mercadopago";
+import { clerkClient } from "@clerk/nextjs/server";
 import crypto from "crypto";
 
 // Verifica a assinatura HMAC-SHA256 do Mercado Pago
@@ -122,9 +123,22 @@ export async function POST(req: Request) {
 
       const status = paymentDetails.status;
       const amount = paymentDetails.transaction_amount ?? 0;
-      const customerEmail = paymentDetails.payer?.email ?? "";
-      const customerName = paymentDetails.payer?.first_name ?? "";
       const transactionId = paymentDetails.id?.toString() ?? "";
+
+      // Busca o nome e email reais do usuário pelo userId via Clerk
+      // O MP não preenche o payer.first_name no PIX
+      let customerName = paymentDetails.payer?.first_name ?? "";
+      let customerEmail = paymentDetails.payer?.email ?? "";
+      try {
+        const clerk = await clerkClient();
+        const clerkUser = await clerk.users.getUser(userId);
+        if (clerkUser) {
+          customerName = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || customerName;
+          customerEmail = clerkUser.emailAddresses[0]?.emailAddress ?? customerEmail;
+        }
+      } catch (clerkErr) {
+        console.warn("Webhook MP: Não foi possível buscar usuário no Clerk:", clerkErr);
+      }
 
       console.log(`Webhook MP: userId=${userId} | plan=${planType} | status=${status}`);
 

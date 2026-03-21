@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
 // Retorna o status atual da assinatura e o currentPeriodEnd para comparação no client
-// Se o paymentId for fornecido, consulta ativamente a API do MP (útil para feedback imediato do PIX)
+// Se o paymentId for fornecido, consulta ativamente a API do MP para feedback imediato do PIX
 export async function GET(req: Request) {
   const { userId } = await auth();
   if (!userId) {
@@ -14,92 +14,140 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const paymentId = searchParams.get("paymentId");
 
+  console.log(`[payment-status] userId=${userId} | paymentId=${paymentId}`);
+
   let subscription = await prisma.userSubscription.findUnique({
     where: { userId },
     select: { status: true, planType: true, currentPeriodEnd: true },
   });
 
   if (paymentId) {
-    // Evita conflito com o webhook verificando se já foi pago via Transaction
-    const existingTx = await prisma.transaction.findUnique({
-      where: { caktoTransactionId: paymentId }
+    // Verifica se já foi processado para evitar reprocessamento
+    const existingTx = await (prisma as any).transaction.findUnique({
+      where: { caktoTransactionId: paymentId },
     });
 
-    if (existingTx?.status !== "PAID") {
+    console.log(`[payment-status] existingTx status: ${existingTx?.status ?? "NOT FOUND"}`);
+
+    // Se a transação já está PAID, apenas retorna o status atualizado do banco
+    if (existingTx?.status === "PAID") {
+      console.log(`[payment-status] Transação já processada, retornando status do DB.`);
+      // Recarrega a subscription caso tenha sido atualizada
+      subscription = await prisma.userSubscription.findUnique({
+        where: { userId },
+        select: { status: true, planType: true, currentPeriodEnd: true },
+      });
+    } else {
+      // Consulta ATIVAMENTE a API do Mercado Pago para verificar o status do pagamento
       try {
-        const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN! });
-        const payment = new Payment(client);
-        const paymentDetails = await payment.get({ id: paymentId });
-        
-        const status = paymentDetails.status;
+        const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+        if (!accessToken) {
+          console.error("[payment-status] MERCADOPAGO_ACCESS_TOKEN não configurado!");
+        } else {
+          const client = new MercadoPagoConfig({ accessToken });
+          const paymentApi = new Payment(client);
 
-        if (status === "approved" || status === "authorized") {
-          const extRef = paymentDetails.external_reference || "";
-          const pipeIdx = extRef.indexOf("|");
-          const planTypeStr = pipeIdx !== -1 ? extRef.substring(pipeIdx + 1) : "MONTHLY";
-          const planType = planTypeStr.toUpperCase() as "PRO" | "MONTHLY" | "FREE";
+          // A API do MP aceita o paymentId como string
+          console.log(`[payment-status] Consultando MP API para paymentId=${paymentId}...`);
+          const paymentDetails = await paymentApi.get({ id: paymentId });
 
-          let baseDate = new Date();
-          if (subscription?.currentPeriodEnd && subscription.currentPeriodEnd > new Date()) {
-            baseDate = subscription.currentPeriodEnd;
+          const mpStatus = paymentDetails.status;
+          console.log(`[payment-status] Status do MP: ${mpStatus} | status_detail: ${paymentDetails.status_detail}`);
+
+          if (mpStatus === "approved" || mpStatus === "authorized") {
+            // Extrai o plano do external_reference (formato: "userId|planType")
+            const extRef = paymentDetails.external_reference || "";
+            const pipeIdx = extRef.indexOf("|");
+            const planTypeStr = pipeIdx !== -1 ? extRef.substring(pipeIdx + 1) : "monthly";
+            const planType = planTypeStr.toUpperCase() as "PRO" | "MONTHLY" | "FREE";
+
+            console.log(`[payment-status] ✅ APROVADO! extRef=${extRef} | planType=${planType}`);
+
+            // Calcula a data de expiração adicionando tempo ao plano existente
+            let baseDate = new Date();
+            if (subscription?.currentPeriodEnd && subscription.currentPeriodEnd > new Date()) {
+              baseDate = subscription.currentPeriodEnd;
+            }
+
+            const expirationDate = new Date(baseDate);
+            if (planType === "PRO") {
+              expirationDate.setDate(expirationDate.getDate() + 7);
+            } else if (planType === "MONTHLY") {
+              expirationDate.setDate(expirationDate.getDate() + 31);
+            }
+
+            const amount = paymentDetails.transaction_amount ?? 0;
+
+            // Busca o nome e email reais do usuário logado via Clerk
+            // O MP não preenche o payer.first_name para PIX
+            const clerkUser = await currentUser();
+            const customerName = clerkUser ? `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() : (paymentDetails.payer?.first_name ?? "");
+            const customerEmail = clerkUser?.emailAddresses[0]?.emailAddress ?? paymentDetails.payer?.email ?? "";
+
+            // PASSO 1: Ativa o plano do usuário
+            console.log(`[payment-status] Upserting UserSubscription...`);
+            const updatedSub = await prisma.userSubscription.upsert({
+              where: { userId },
+              create: {
+                userId,
+                planType,
+                caktoTransactionId: paymentId,
+                status: "ACTIVE",
+                currentPeriodEnd: expirationDate,
+              },
+              update: {
+                planType,
+                caktoTransactionId: paymentId,
+                status: "ACTIVE",
+                currentPeriodEnd: expirationDate,
+              },
+            });
+            console.log(`[payment-status] UserSubscription upserted OK. periodEnd=${expirationDate.toISOString()}`);
+
+            // PASSO 2: Registra a transação como PAID (para o webhook não reprocessar)
+            // A FK exige que UserSubscription.caktoTransactionId == Transaction.caktoTransactionId
+            console.log(`[payment-status] Upserting Transaction...`);
+            try {
+              await (prisma as any).transaction.upsert({
+                where: { caktoTransactionId: paymentId },
+                create: {
+                  userId,
+                  caktoTransactionId: paymentId,
+                  amount,
+                  status: "PAID",
+                  paymentMethod: paymentDetails.payment_method_id ?? "pix",
+                  customerEmail,
+                  customerName,
+                },
+                update: { status: "PAID" },
+              });
+              console.log(`[payment-status] Transaction upserted OK.`);
+            } catch (txError) {
+              // Se a FK falhar, logamos mas NÃO quebramos o fluxo
+              // O importante é que o plano já foi ativado acima
+              console.warn(`[payment-status] ⚠️ Transaction upsert falhou (FK constraint?):`, txError);
+            }
+
+            subscription = updatedSub;
+            console.log(`🚀 [payment-status] Plano ${planType} ativado para userId=${userId} até ${expirationDate.toISOString()}`);
+          } else {
+            console.log(`[payment-status] Status do MP ainda não aprovado: ${mpStatus}`);
           }
-
-          const expirationDate = new Date(baseDate);
-          if (planType === "PRO") {
-            expirationDate.setDate(expirationDate.getDate() + 7);
-          } else if (planType === "MONTHLY") {
-            expirationDate.setDate(expirationDate.getDate() + 31);
-          }
-
-          const amount = paymentDetails.transaction_amount ?? 0;
-          const customerEmail = paymentDetails.payer?.email ?? "";
-          const customerName = paymentDetails.payer?.first_name ?? "";
-
-          // Ativa o plano do usuário ativamente
-          const updatedSub = await prisma.userSubscription.upsert({
-            where: { userId },
-            create: {
-              userId,
-              planType,
-              caktoTransactionId: paymentId,
-              status: "ACTIVE",
-              currentPeriodEnd: expirationDate,
-            },
-            update: {
-              planType,
-              caktoTransactionId: paymentId,
-              status: "ACTIVE",
-              currentPeriodEnd: expirationDate,
-            },
-          });
-
-          // Registra a transação como paga para o webhook ignorar depois
-          await prisma.transaction.upsert({
-            where: { caktoTransactionId: paymentId },
-            create: {
-              userId,
-              caktoTransactionId: paymentId,
-              amount,
-              status: "PAID",
-              paymentMethod: paymentDetails.payment_method_id ?? "mercadopago",
-              customerEmail,
-              customerName,
-            },
-            update: { status: "PAID" },
-          });
-
-          subscription = updatedSub;
-          console.log(`🚀 Polling MP Fast Track: Plano ${planType} ativado no frontend para userId=${userId} até ${expirationDate.toISOString()}`);
         }
-      } catch (error) {
-        console.error("Erro ao verificar status ativamente na API do MP no polling:", error);
+      } catch (error: any) {
+        console.error(`[payment-status] ❌ Erro ao consultar MP API:`, error?.message || error);
       }
     }
   }
 
-  return NextResponse.json({
+  const response = {
     status: subscription?.status ?? null,
     planType: subscription?.planType ?? null,
     currentPeriodEnd: subscription?.currentPeriodEnd?.toISOString() ?? null,
-  });
+  };
+
+  console.log(`[payment-status] Respondendo:`, JSON.stringify(response));
+
+  return NextResponse.json(response);
 }
+

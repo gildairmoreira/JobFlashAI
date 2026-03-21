@@ -10,11 +10,12 @@ import Image from "next/image";
 import Link from "next/link";
 import usePremiumModal from "@/hooks/usePremiumModal";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect, useCallback } from "react";
 
 export default function Navbar({
   isAdmin,
-  userPlan = "FREE",
-  periodEnd
+  userPlan: initialPlan = "FREE",
+  periodEnd: initialPeriodEnd
 }: {
   isAdmin?: boolean;
   userPlan?: string;
@@ -23,6 +24,48 @@ export default function Navbar({
   const { theme } = useTheme();
   const premiumModal = usePremiumModal();
   const clerk = useClerk();
+
+  // Estado local para atualizar em tempo real após o pagamento
+  const [userPlan, setUserPlan] = useState(initialPlan);
+  const [periodEnd, setPeriodEnd] = useState(initialPeriodEnd);
+
+  // Sincroniza com as props do servidor quando elas mudam (ex: navegação)
+  useEffect(() => {
+    setUserPlan(initialPlan);
+    setPeriodEnd(initialPeriodEnd);
+  }, [initialPlan, initialPeriodEnd]);
+
+  // Busca a assinatura atualizada do servidor periodicamente
+  // e ao montar, garantindo que a UI reflita o estado real
+  const refreshSubscription = useCallback(async () => {
+    try {
+      const res = await fetch("/api/payment-status");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.planType && data.planType !== "FREE") {
+        setUserPlan(data.planType);
+        setPeriodEnd(data.currentPeriodEnd);
+      } else if (data.planType === null && data.status === null) {
+        // Sem assinatura
+        setUserPlan("FREE");
+        setPeriodEnd(null);
+      }
+    } catch {}
+  }, []);
+
+  // Atualiza a assinatura ao montar e a cada 30 segundos
+  useEffect(() => {
+    refreshSubscription();
+    const interval = setInterval(refreshSubscription, 30000);
+    return () => clearInterval(interval);
+  }, [refreshSubscription]);
+
+  // Também atualiza quando a janela volta ao foco (usuário voltou da tela de pagamento)
+  useEffect(() => {
+    const handleFocus = () => refreshSubscription();
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [refreshSubscription]);
 
   const isPremium = userPlan !== "FREE";
 
@@ -71,7 +114,11 @@ export default function Navbar({
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-stone-500 uppercase tracking-widest">Plano Atual</p>
-                      <p className="text-3xl font-black">
+                      <p className={`text-3xl font-black ${
+                        isPremium 
+                          ? "text-indigo-600 dark:text-indigo-400" 
+                          : "text-stone-800 dark:text-stone-200"
+                      }`}>
                         {userPlan === "PRO" ? "SEMANAL" : userPlan === "MONTHLY" ? "MENSAL" : "GRÁTIS"}
                       </p>
                     </div>
