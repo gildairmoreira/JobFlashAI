@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import confetti from "canvas-confetti";
 
 // Tela de sucesso de pagamento com animação de confete
 // Exibida quando o pagamento PIX é aprovado via webhook
@@ -10,8 +9,11 @@ export default function PaymentSuccess({ planType }: { planType: string | null }
   const router = useRouter();
   const [countdown, setCountdown] = useState(5);
 
-  const launchConfetti = useCallback(() => {
-    // Dispara o confete em rafaga dupla das bordas da tela
+  const launchConfetti = useCallback(async () => {
+    // Importação dinâmica para garantir que só execute no browser, nunca no SSR
+    const confettiModule = await import("canvas-confetti");
+    const confetti = confettiModule.default;
+
     const duration = 4000;
     const end = Date.now() + duration;
 
