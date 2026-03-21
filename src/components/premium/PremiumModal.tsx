@@ -27,7 +27,7 @@ export default function PremiumModal() {
   const proPrice = settings?.proPrice ? `R$ ${settings.proPrice.toFixed(2).replace('.', ',')}` : "R$ 19,90";
   const monthlyPrice = settings?.monthlyPrice ? `R$ ${settings.monthlyPrice.toFixed(2).replace('.', ',')}` : "R$ 49,90";
 
-  async function handlePremiumClick(priceId: string) {
+  async function handlePremiumClick(priceId: "pro" | "monthly") {
     try {
       setLoading(true);
       const redirectUrl = await createCheckoutSession(priceId);
@@ -101,7 +101,7 @@ export default function PremiumModal() {
                 variant="premium"
                 onClick={() =>
                   handlePremiumClick(
-                    'pro-plus'
+                    'monthly'
                   )
                 }
                 disabled={loading}

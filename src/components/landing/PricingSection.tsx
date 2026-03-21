@@ -81,7 +81,7 @@ const PricingSection: React.FC = () => {
         { name: 'Nenhuma fidelidade, cancele quando quiser', included: true },
       ],
       cta: 'Assinar Plano Mensal',
-      href: '/resumes?plan=pro-plus'
+      href: '/resumes?plan=monthly'
     }
   ];
 
