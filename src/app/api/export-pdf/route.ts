@@ -48,9 +48,9 @@ export async function GET(req: Request) {
 
     const browser = await puppeteer.launch({
       args: isLocal ? ["--no-sandbox", "--disable-setuid-sandbox"] : chromium.args,
-      defaultViewport: chromium.defaultViewport,
+      defaultViewport: { width: 1920, height: 1080 },
       executablePath: executablePath || undefined,
-      headless: chromium.headless,
+      headless: true,
     });
 
     const page = await browser.newPage();
