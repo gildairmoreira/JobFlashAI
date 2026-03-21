@@ -19,7 +19,7 @@ export default function CheckoutTrigger({ subscriptionLevel }: CheckoutTriggerPr
     const plan = searchParams.get("plan");
     
     // Se o plano for reconhecido e o usuário não for master/pro
-    if (plan && (plan === "pro" || plan === "pro-plus") && !hasTriggered.current) {
+    if (plan && (plan === "pro" || plan === "monthly") && !hasTriggered.current) {
         
         // Se já for premium, não redireciona para não comprar de novo sem querer
         if (subscriptionLevel === "pro" || subscriptionLevel === "monthly") {
@@ -35,7 +35,7 @@ export default function CheckoutTrigger({ subscriptionLevel }: CheckoutTriggerPr
                     description: "Preparando seu link de pagamento seguro.",
                 });
                 
-                const redirectUrl = await createCheckoutSession(plan);
+                const redirectUrl = await createCheckoutSession(plan as "pro" | "monthly");
                 
                 // Limpa a URL ANTES de ir para o checkout para não entrar em loop ao voltar
                 const newParams = new URLSearchParams(searchParams.toString());
