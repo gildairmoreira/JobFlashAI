@@ -196,7 +196,7 @@ function WorkExperienceItem({
           <FormItem>
             <FormLabel>Cargo</FormLabel>
             <FormControl>
-              <Input {...field} autoFocus />
+              <Input {...field} value={field.value || ""} autoFocus />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -209,7 +209,7 @@ function WorkExperienceItem({
           <FormItem>
             <FormLabel>Empresa</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} value={field.value || ""} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -223,7 +223,7 @@ function WorkExperienceItem({
             <FormItem>
               <FormLabel>Data de início</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input type="date" {...field} value={field.value || ""} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -236,7 +236,7 @@ function WorkExperienceItem({
             <FormItem>
               <FormLabel>Data de término</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input type="date" {...field} value={field.value || ""} />
               </FormControl>
               <FormDescription>Deixe em branco se for o emprego atual.</FormDescription>
               <FormMessage />
@@ -254,7 +254,7 @@ function WorkExperienceItem({
           <FormItem>
             <FormLabel>Descrição</FormLabel>
             <FormControl>
-              <Textarea {...field} />
+              <Textarea {...field} value={field.value || ""} />
             </FormControl>
             <FormMessage />
           </FormItem>

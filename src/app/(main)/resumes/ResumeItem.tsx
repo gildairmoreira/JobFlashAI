@@ -134,7 +134,6 @@ interface MoreMenuProps {
 function MoreMenu({ resumeId, resumeTitle, onPrintClick, subscriptionLevel, isLocked = false }: Readonly<MoreMenuProps>) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [isDuplicating, startDuplicate] = useTransition();
-  const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
   const premiumModal = usePremiumModal();
 
@@ -164,31 +163,6 @@ function MoreMenu({ resumeId, resumeTitle, onPrintClick, subscriptionLevel, isLo
     });
   }
 
-  const handleDownloadPDF = async () => {
-    try {
-      setIsDownloading(true);
-      const response = await fetch(`/api/export-pdf?resumeId=${resumeId}`);
-      if (!response.ok) throw new Error("Erro na geração do PDF");
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${resumeTitle.replace(/\s+/g, "_")}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      a.remove();
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: "destructive",
-        description: "Houve um erro ao gerar o PDF. Tente novamente.",
-      });
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   return (
     <>
       <DropdownMenu>
@@ -204,21 +178,10 @@ function MoreMenu({ resumeId, resumeTitle, onPrintClick, subscriptionLevel, isLo
         <DropdownMenuContent>
           <DropdownMenuItem
             className="flex items-center gap-2"
-            onClick={(e) => {
-              e.preventDefault();
-              handleDownloadPDF();
-            }}
-            disabled={isDownloading}
-          >
-            {isDownloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
-            {isDownloading ? "Baixando..." : "Baixar PDF"}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="flex items-center gap-2"
             onClick={onPrintClick}
           >
-            <Printer className="size-4" />
-            Imprimir
+            <Download className="size-4" />
+            Baixar / Imprimir PDF
           </DropdownMenuItem>
           <DropdownMenuItem
             className={`flex items-center gap-2 ${!canDuplicate ? "opacity-50" : ""}`}

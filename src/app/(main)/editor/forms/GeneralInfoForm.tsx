@@ -52,7 +52,7 @@ export default function GeneralInfoForm({
               <FormItem>
                 <FormLabel>Nome do projeto</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Meu currículo incrível" autoFocus />
+                  <Input {...field} value={field.value || ""} placeholder="Meu currículo incrível" autoFocus />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -65,7 +65,7 @@ export default function GeneralInfoForm({
               <FormItem>
                 <FormLabel>Descrição</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Um currículo para meu próximo emprego" />
+                  <Input {...field} value={field.value || ""} placeholder="Um currículo para meu próximo emprego" />
                 </FormControl>
                 <FormDescription>
                   Descreva para que serve este currículo.

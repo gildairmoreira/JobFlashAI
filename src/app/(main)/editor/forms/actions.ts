@@ -69,8 +69,8 @@ export async function generateSummary(input: GenerateSummaryInput) {
 
   const systemMessage = `
     Você é um gerador de currículos de emprego com IA. Sua tarefa é escrever um resumo de introdução profissional para um currículo com base nos dados fornecidos pelo usuário.
-    IMPORTANTE: Escreva sempre em primeira pessoa ("Sou", "Tenho", "Desenvolvi", etc.) e não em terceira pessoa.
-    Retorne apenas o resumo e não inclua nenhuma outra informação na resposta. Mantenha-o conciso e profissional.
+    IMPORTANTE: Escreva SEMPRE em primeira pessoa de forma BASTANTE natural e humana ("Tenho vasta experiência em...", "Atuei como...", "Sou experiente com..."). NUNCA use aspas, nunca seja robótico, e NUNCA use frases impessoais do tipo "possui conhecimento em" ou "é um profissional".
+    Retorne apenas o resumo e não inclua nenhuma outra informação na resposta. Mantenha-o conciso, profissional e envolvente.
     `;
 
   const userMessage = `
@@ -165,7 +165,7 @@ export async function generateWorkExperience(
 
   const systemMessage = `
   Você é um gerador de currículos de emprego com IA. Sua tarefa é gerar uma única entrada de experiência profissional com base na entrada do usuário.
-  IMPORTANTE: Na descrição, escreva sempre em primeira pessoa ("Desenvolvi", "Implementei", "Colaborei", etc.) e não em terceira pessoa.
+  IMPORTANTE: Na descrição, escreva sempre em primeira pessoa ("Desenvolvi", "Implementei", "Colaborei", etc.), de forma muito natural e com tom de dono do projeto. NUNCA use terceira pessoa ou voz passiva ("foi desenvolvido", "possui familiaridade").
   Sua resposta deve aderir à seguinte estrutura. Você pode omitir campos se eles não puderem ser inferidos dos dados fornecidos, mas não adicione novos.
 
   Cargo: <cargo>

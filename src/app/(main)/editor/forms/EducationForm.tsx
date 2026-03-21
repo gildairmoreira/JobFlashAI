@@ -176,7 +176,7 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
           <FormItem>
             <FormLabel>Curso</FormLabel>
             <FormControl>
-              <Input {...field} autoFocus />
+              <Input {...field} value={field.value || ""} autoFocus />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -189,7 +189,7 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
           <FormItem>
             <FormLabel>Instituição</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} value={field.value || ""} />
             </FormControl>
             <FormMessage />
           </FormItem>

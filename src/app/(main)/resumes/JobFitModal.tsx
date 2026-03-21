@@ -188,7 +188,7 @@ export default function JobFitModal({
           )}
 
           {step === "select-resume" && (
-            <RadioGroup value={selectedResumeId} onValueChange={setSelectedResumeId} className="space-y-3">
+            <RadioGroup value={selectedResumeId} onValueChange={setSelectedResumeId} className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
               {resumes.map((res) => (
                 <div key={res.id} className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-accent/50 transition-colors">
                   <RadioGroupItem value={res.id} id={res.id} />

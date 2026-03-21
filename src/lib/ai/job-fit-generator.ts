@@ -56,8 +56,8 @@ Sua tarefa é ${hasSummary ? 'reescrever o Resumo Profissional do candidato' : '
 Retorne APENAS o texto do resumo ${hasSummary ? 'reescrito' : 'criado'} (3 a 5 linhas compactas). Nunca inclua saudações, aspas ou textos extras informais.
 
 REGRAS CRÍTICAS:
-1. TONE CORPORATIVO: NUNCA escreva em primeira pessoa (nunca use "Eu", "Meu", "Minhas", "Estou", "Sou"). Escreva de forma impessoal e objetiva.
-2. ESTRUTURA IDEAL: Inicie com o título profissional ou nível de atuação. Exemplo de bom resumo: "Desenvolvedor Full Stack com sólida vivência em X e Y. Profissional focado na otimização de interfaces e segurança de dados. Especialista em entregar aplicações confiáveis..."
+1. TONE PROFISSIONAL: Escreva SEMPRE em primeira pessoa de forma BASTANTE natural e humana ("Desenvolvi", "Atuei", "Sou experiente"). NUNCA use frases impessoais ou 3ª pessoa, como "possui conhecimento em" ou "é um profissional".
+2. ESTRUTURA IDEAL: Inicie confirmando diretamente seu FIT. Exemplo de bom resumo: "Sou um Desenvolvedor Full Stack com sólida vivência em X e Y. Minha atuação é focada na otimização de interfaces..."
 3. PALAVRAS-CHAVE ATS: Você DEVE afirmar explicitamente que o candidato possui as habilidades técnicas e comportamentais cruciais que a vaga exige, inserindo as exatas palavras-chave da vaga de forma natural.`;
       
       const userPrompt = `VAGA:
@@ -84,8 +84,8 @@ Sua tarefa é reescrever a descrição da experiência profissional do candidato
 
 REGRAS CRÍTICAS:
 1. Retorne APENAS bullet points (um tópico por linha, usando o modelo: - Texto).
-2. NUNCA use primeira pessoa (proibido usar "eu desenvolvi", "ajudei", "minha equipe").
-3. COMECE COM VERBOS DE AÇÃO IMPESSOAIS ou substantivos de impacto (ex: "Desenvolvimento de aplicações...", "Liderança técnica em projetos...", "Arquitetura e modelagem de...", "Redução de custos operacionais...").
+2. USE PRIMEIRA PESSOA de forma natural e corporativa. O candidato está contando o que fez. (ex: "Atuei na equipe", "Implementei"). Nunca seja robótico.
+3. COMECE COM VERBOS DE AÇÃO NO PASSADO OU PRESENTE ("Desenvolvi aplicações...", "Liderei projetos técnicos...", "Fui responsável pela arquitetura...").
 4. NÃO INVENTE tecnologias ou fatos que o candidato não citou. Apenas destaque e melhore as palavras do texto atual que fazem sentido para a vaga.`;
           
           const userPrompt = `VAGA ALVO:

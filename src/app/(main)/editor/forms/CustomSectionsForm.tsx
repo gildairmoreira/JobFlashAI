@@ -79,6 +79,7 @@ export default function CustomSectionsForm({ resumeData, setResumeData }: Readon
                       <FormControl>
                         <Input 
                           {...field} 
+                          value={field.value || ""}
                           placeholder="Ex: Projetos, Certificações, Idiomas"
                           style={{ textTransform: 'capitalize' }}
                           onChange={(e) => {
@@ -101,6 +102,7 @@ export default function CustomSectionsForm({ resumeData, setResumeData }: Readon
                       <FormControl>
                         <Textarea 
                           {...field} 
+                          value={field.value || ""}
                           rows={5} 
                           placeholder="Descreva o conteúdo desta seção... Você pode usar markdown: **negrito**, *itálico*, - listas"
                         />

@@ -129,7 +129,7 @@ export default function PersonalInfoForm({
                 <FormItem>
                   <FormLabel>Primeiro nome</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -142,7 +142,7 @@ export default function PersonalInfoForm({
                 <FormItem>
                   <FormLabel>Sobrenome</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -156,7 +156,7 @@ export default function PersonalInfoForm({
               <FormItem>
                 <FormLabel>Cargo</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -170,7 +170,7 @@ export default function PersonalInfoForm({
                 <FormItem>
                   <FormLabel>Cidade</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -183,7 +183,7 @@ export default function PersonalInfoForm({
                 <FormItem>
                   <FormLabel>País</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -197,7 +197,7 @@ export default function PersonalInfoForm({
               <FormItem>
                 <FormLabel>Telefone</FormLabel>
                 <FormControl>
-                  <Input {...field} type="tel" />
+                  <Input {...field} type="tel" value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -210,7 +210,7 @@ export default function PersonalInfoForm({
               <FormItem>
                 <FormLabel>E-mail</FormLabel>
                 <FormControl>
-                  <Input {...field} type="email" />
+                  <Input {...field} type="email" value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -247,7 +247,7 @@ export default function PersonalInfoForm({
                     <FormItem>
                       <FormLabel>Rótulo</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="LinkedIn" />
+                        <Input {...field} placeholder="LinkedIn" value={field.value || ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -260,7 +260,7 @@ export default function PersonalInfoForm({
                     <FormItem>
                       <FormLabel>URL</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="https://linkedin.com/in/..." type="url" />
+                        <Input {...field} placeholder="https://linkedin.com/in/..." type="url" value={field.value || ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
