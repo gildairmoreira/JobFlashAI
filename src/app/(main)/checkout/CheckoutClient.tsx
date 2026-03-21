@@ -2,13 +2,14 @@
 
 import { useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPixPayment, createCardPayment } from "./actions";
 import { Loader2, Copy, Check, Info, ShieldCheck, ChevronDown } from "lucide-react";
 import { initMercadoPago } from '@mercadopago/sdk-react';
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import PaymentSuccess from "./PaymentSuccess";
 
 // O Payment Brick precisa ser importado dinamicamente para não falhar no SSR do Next.js
 const MPPayment = dynamic(
@@ -31,6 +32,9 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
   const [loadingPix, setLoadingPix] = useState(false);
   const [copied, setCopied] = useState(false);
   const [sdkInitialized, setSdkInitialized] = useState(false);
+  const [paymentApproved, setPaymentApproved] = useState(false);
+  const [approvedPlanType, setApprovedPlanType] = useState<string | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Inicializa a SDK do MP no client
@@ -46,6 +50,33 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
     handleGeneratePix();
   }, [plan]);
 
+  // Inicia o polling de status de pagamento assim que o QR Code é gerado
+  // A cada 3 segundos consulta /api/payment-status para detectar aprovação via webhook
+  const startPolling = useCallback(() => {
+    if (pollingRef.current) return; // Evita polling duplo
+    pollingRef.current = setInterval(async () => {
+      try {
+        const res = await fetch("/api/payment-status");
+        const data = await res.json();
+        if (data.paid) {
+          setPaymentApproved(true);
+          setApprovedPlanType(data.planType);
+          if (pollingRef.current) clearInterval(pollingRef.current);
+        }
+      } catch (e) {
+        // Silencia erros de rede durante polling
+        console.error("Polling erro:", e);
+      }
+    }, 3000);
+  }, []);
+
+  // Limpa o intervalo de polling ao desmontar
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
   async function handleGeneratePix() {
     try {
       setLoadingPix(true);
@@ -53,6 +84,8 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
       if (res.success) {
         setQrCode(res.qrCode || null);
         setQrCodeBase64(res.qrCodeBase64 || null);
+        // Inicia polling assim que o QR code é exibido ao usuário
+        startPolling();
       }
     } catch (e) {
       console.error(e);
@@ -110,6 +143,11 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
       }
     });
   };
+
+  // Exibe a tela de sucesso com confete quando o pagamento for aprovado pelo webhook
+  if (paymentApproved) {
+    return <PaymentSuccess planType={approvedPlanType} />;
+  }
 
   return (
     <>

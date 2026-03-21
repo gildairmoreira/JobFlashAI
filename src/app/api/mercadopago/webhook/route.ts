@@ -1,9 +1,50 @@
 import prisma from "@/lib/prisma";
 import { MercadoPagoConfig, Payment } from "mercadopago";
+import crypto from "crypto";
+
+// Verifica a assinatura HMAC-SHA256 do Mercado Pago para garantir autenticidade
+function verifyWebhookSignature(req: Request, rawBody: string): boolean {
+  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+  if (!secret) return true; // Em dev sem secret configurado, passa direto
+
+  const xSignature = req.headers.get("x-signature");
+  const xRequestId = req.headers.get("x-request-id");
+  const url = new URL(req.url);
+  const dataId = url.searchParams.get("data.id") || "";
+
+  if (!xSignature) return false;
+
+  // Formato: ts=<timestamp>,v1=<hash>
+  const parts = Object.fromEntries(xSignature.split(",").map((p) => p.split("=")));
+  const ts = parts["ts"];
+  const v1 = parts["v1"];
+
+  if (!ts || !v1) return false;
+
+  // Mensagem assinada: id;request-id;ts
+  const signedMessage = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+  const expectedHash = crypto.createHmac("sha256", secret).update(signedMessage).digest("hex");
+
+  return crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expectedHash));
+}
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const rawBody = await req.text();
+    let body: any;
+    try {
+      body = JSON.parse(rawBody);
+    } catch {
+      return new Response("Invalid JSON body", { status: 400 });
+    }
+
+    // Valida a assinatura do webhook em produção
+    if (process.env.NODE_ENV === "production" && !verifyWebhookSignature(req, rawBody)) {
+      console.warn("Mercado Pago Webhook: Assinatura inválida! Requisição rejeitada.");
+      return new Response("Invalid signature", { status: 401 });
+    }
+
+
 
     // Aceita tanto a chave action (webhook tradicional) quanto a type
     const eventType = body.type || body.action;
