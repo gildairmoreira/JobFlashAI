@@ -3,6 +3,7 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { getGlobalSettings } from '@/app/(main)/billing/actions';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
+import prisma from "@/lib/prisma";
 
 export async function createPixPayment(planType: "pro" | "monthly") {
   const { userId } = await auth();
