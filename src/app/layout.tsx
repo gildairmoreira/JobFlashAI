@@ -42,15 +42,6 @@ export default function RootLayout({
           />
         </head>
         <body className={inter.className} suppressHydrationWarning>
-          <Script src="https://www.googletagmanager.com/gtag/js?id=G-X4RVT0YTBC" strategy="afterInteractive" />
-          <Script id="google-analytics" strategy="afterInteractive" dangerouslySetInnerHTML={{
-             __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-X4RVT0YTBC');
-             `
-          }} />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -60,6 +51,15 @@ export default function RootLayout({
             {children}
             <Toaster />
           </ThemeProvider>
+          <Script src="https://www.googletagmanager.com/gtag/js?id=G-X4RVT0YTBC" strategy="afterInteractive" />
+          <Script id="google-analytics" strategy="afterInteractive" dangerouslySetInnerHTML={{
+             __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-X4RVT0YTBC');
+             `
+          }} />
         </body>
       </html>
     </ClerkProvider>

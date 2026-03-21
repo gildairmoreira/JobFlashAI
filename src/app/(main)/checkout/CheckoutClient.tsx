@@ -60,11 +60,12 @@ export default function CheckoutClient({ proPrice, monthlyPrice, initialPeriodEn
   // Inicia o polling de status de pagamento assim que o QR Code é gerado
   // Só considera pago se o currentPeriodEnd for MAIOR do que era antes do checkout
   // Isso evita o bug de auto-aprovação quando o user já tinha um plano ativo
-  const startPolling = useCallback(() => {
+  const startPolling = useCallback((paymentId: string | null = null) => {
     if (pollingRef.current) return;
     pollingRef.current = setInterval(async () => {
       try {
-        const res = await fetch("/api/payment-status");
+        const url = paymentId ? `/api/payment-status?paymentId=${paymentId}` : "/api/payment-status";
+        const res = await fetch(url);
         const data = await res.json();
         
         const newPeriodEnd = data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null;
@@ -101,7 +102,7 @@ export default function CheckoutClient({ proPrice, monthlyPrice, initialPeriodEn
         setQrCode(res.qrCode || null);
         setQrCodeBase64(res.qrCodeBase64 || null);
         // Inicia polling assim que o QR code é exibido ao usuário
-        startPolling();
+        startPolling(res.paymentId ? res.paymentId.toString() : null);
       }
     } catch (e) {
       console.error(e);
