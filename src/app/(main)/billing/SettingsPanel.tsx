@@ -135,7 +135,7 @@ export default function SettingsPanel({ settings }: SettingsPanelProps) {
               </div>
               <div className="p-4 bg-indigo-50 dark:bg-indigo-500/5 rounded-2xl border border-indigo-100 dark:border-indigo-500/20 flex gap-3">
                 <Info className="w-5 h-5 text-indigo-500 shrink-0" />
-                <p className="text-xs text-indigo-700 dark:text-indigo-400 leading-relaxed">Os preços são sincronizados diretamente com o checkout da Cakto. Para alterar, atualize o portal da Cakto primeiro.</p>
+                <p className="text-xs text-indigo-700 dark:text-indigo-400 leading-relaxed">Estes preços alimentam o Checkout Transparente do Mercado Pago nativo da plataforma. Atualize-os a qualquer momento.</p>
               </div>
             </CardContent>
           </Card>
@@ -161,7 +161,7 @@ export default function SettingsPanel({ settings }: SettingsPanelProps) {
                 <div className="pt-4 border-t border-stone-100 dark:border-stone-800 mt-4 space-y-4">
                     <div className="flex items-center gap-2 text-stone-400 dark:text-stone-500">
                         <Globe className="w-4 h-4" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Deploy: Vercel Production</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Deploy: Netlify Production</span>
                     </div>
                 </div>
             </CardContent>

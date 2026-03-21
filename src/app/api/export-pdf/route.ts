@@ -38,7 +38,7 @@ export async function GET(req: Request) {
     const host = req.headers.get("host");
     const printUrl = `${protocol}://${host}/print/${resumeId}?secret=${secret}`;
 
-    // Configure Sparticuz for Vercel Serverless OR local Puppeteer
+    // Configure Sparticuz for Netlify Serverless OR local Puppeteer
     let executablePath = null;
     if (isLocal) {
       executablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; // Fallback para Windows local

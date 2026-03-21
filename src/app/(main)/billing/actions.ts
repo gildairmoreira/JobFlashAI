@@ -46,7 +46,7 @@ export async function getAdminDashboardData() {
     // Basic stats
     const totalUsersDb = await (prisma.userSubscription as any).count();
 
-    // 1. Fetch Real Transactions (Cakto based)
+    // 1. Fetch Real Transactions (Mercado Pago based - Preserving 'caktoTransactionId' column to avoid dropping DB schema)
     const allTransactions = await (prisma as any).transaction.findMany();
     const paidTransactions = allTransactions.filter((t: any) => t.status === "PAID");
     const pendingTransactions = allTransactions.filter((t: any) => t.status === "PENDING");
@@ -341,11 +341,7 @@ export async function updateGlobalSettings(data: {
             create: { id: "global", ...data }
         });
         
-        // Sincronização com Cakto (Background)
-        if (data.proPrice) updateCaktoOfferPrice(process.env.CAKTO_PRO_PRODUCT_ID!, data.proPrice);
-        if (data.monthlyPrice) updateCaktoOfferPrice(process.env.CAKTO_MONTHLY_PRODUCT_ID!, data.monthlyPrice);
-
-        revalidatePath("/", "layout"); // Revalidação total para refletir mudanças no layout global
+        revalidatePath("/", "layout"); 
         return updated;
     } catch (e) {
         // Raw query fallback for updates
@@ -358,136 +354,9 @@ export async function updateGlobalSettings(data: {
             SET ${sets}, "updatedAt" = NOW() 
             WHERE "id" = 'global'
         `);
-        
-        // Sincronização com Cakto (Background - Raw Fallback)
-        if (data.proPrice) updateCaktoOfferPrice(process.env.CAKTO_PRO_PRODUCT_ID!, data.proPrice);
-        if (data.monthlyPrice) updateCaktoOfferPrice(process.env.CAKTO_MONTHLY_PRODUCT_ID!, data.monthlyPrice);
 
-        revalidatePath("/", "layout"); // Revalidação total para refletir mudanças no layout global
+        revalidatePath("/", "layout"); 
         return { success: true };
     }
 }
 
-async function getCaktoAccessToken() {
-    const clientId = process.env.CAKTO_CLIENT_ID;
-    const clientSecret = process.env.CAKTO_CLIENT_SECRET;
-    
-    if (!clientId || !clientSecret) return null;
-
-    try {
-        // EXATO: Seguindo o exemplo da documentação (CURL)
-        // A Cakto NÃO usa grant_type no exemplo oficial
-        const params = new URLSearchParams();
-        params.append('client_id', clientId);
-        params.append('client_secret', clientSecret);
-
-        const response = await fetch('https://api.cakto.com.br/public_api/token/', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/x-www-form-urlencoded' 
-            },
-            body: params.toString()
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            return data.access_token;
-        }
-
-        console.error("Cakto OAuth Precision Error:", {
-            status: response.status,
-            body: await response.text()
-        });
-        return null;
-    } catch (e) {
-        console.error("Cakto Auth Request Exception:", e);
-        return null;
-    }
-}
-
-async function updateCaktoOfferPrice(id: string, newPrice: number) {
-    const accessToken = await getCaktoAccessToken();
-    if (!accessToken || !id) return;
-
-    const priceStr = newPrice.toFixed(2);
-
-    try {
-        // 1. Tentar descobrir se o ID é um PRODUTO e buscar suas ofertas
-        const productRes = await fetch(`https://api.cakto.com.br/public_api/products/${id}/`, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-
-        if (productRes.ok) {
-            console.log(`Cakto: ID ${id} is a Product. Searching for associated offers...`);
-            
-            // Buscar ofertas vinculadas a este produto
-            const offersListRes = await fetch(`https://api.cakto.com.br/public_api/offers/?product=${id}`, {
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
-
-            if (offersListRes.ok) {
-                const offersData = await offersListRes.json();
-                const offers = Array.isArray(offersData) ? offersData : (offersData.results || []);
-                
-                console.log(`Cakto: Found ${offers.length} offers for product ${id}. Updating all...`);
-                
-                for (const offer of offers) {
-                    const offerId = offer.id;
-                    const updatedOffer = { ...offer, price: newPrice };
-                    
-                    const putRes = await fetch(`https://api.cakto.com.br/public_api/offers/${offerId}/`, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(updatedOffer)
-                    });
-
-                    if (putRes.ok) {
-                        console.log(`Cakto Sync Success (Offer via Product): ${offerId} -> R$ ${newPrice}`);
-                    } else {
-                        console.error(`Cakto Failed to update offer ${offerId}:`, await putRes.text());
-                    }
-                }
-                // Também atualizamos o produto em si (como redundância)
-                const productData = await productRes.json();
-                fetch(`https://api.cakto.com.br/public_api/products/${id}/`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ...productData, price: priceStr })
-                }).catch(() => {});
-                
-                return;
-            }
-        }
-
-        // 2. FALLBACK: Tentar o ID diretamente como OFERTA
-        const getOffer = await fetch(`https://api.cakto.com.br/public_api/offers/${id}/`, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-
-        if (getOffer.ok) {
-            const offerData = await getOffer.json();
-            const updatedOffer = { ...offerData, price: newPrice };
-
-            const resPut = await fetch(`https://api.cakto.com.br/public_api/offers/${id}/`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updatedOffer)
-            });
-
-            if (resPut.ok) {
-                console.log(`Cakto Sync Success (Direct Offer): ${id} -> R$ ${newPrice}`);
-                return;
-            }
-        }
-
-        console.error(`Cakto Sync Failed for ${id}: Product/Offers not found after deep search.`);
-    } catch (e) {
-        console.error("Cakto Sync Exception:", e);
-    }
-}

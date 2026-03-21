@@ -68,10 +68,10 @@ export async function createJobFitGeneration(sourceResumeId: string, jobDescript
     update: { jobFitUsesThisMonth: { increment: 1 } },
   });
 
-  // Disparar processamento em background (o Vercel serverless não cortará essa promessa se usarmos res.waitUntil na API, mas em server actions pode cortar dependendo da duração. O ideal é usar Inngest ou background jobs. Para o escopo do SaaS, se não demorar mais de 60s, o Next.js suporta via await sem blockar UI usando promise orquestrada, MAS a melhor forma aqui é devolver o ID e processar assíncrono ou o client fazer poll)
+  // Disparar processamento em background (o Netlify serverless não cortará essa promessa se usarmos res.waitUntil na API, mas em server actions pode cortar dependendo da duração. O ideal é usar Inngest ou background jobs. Para o escopo do SaaS, se não demorar mais de 60s, o Next.js suporta via await sem blockar UI usando promise orquestrada, MAS a melhor forma aqui é devolver o ID e processar assíncrono ou o client fazer poll)
   // Como estamos num Server Action, a execução finaliza quando a response é enviada.
   // Vamos disparar e *não* aguardar. O Node.js pode tentar rodar em background.
-  // Em prod (Vercel) isso pode ser cortado se a API terminar.
+  // Em prod (Netlify) isso pode ser cortado se a API terminar.
   // O ideal no Next.js App Router é chamar a função e fazer await, mas mantendo a conexão longa, ou chamar uma rota de API via fetch que faz o background (se for Edge).
   // Para fins do Next.js sem deps externas, faremos chamada assíncrona "fire-and-forget" local.
   runJobFitGeneration(generation.id, userId).catch(console.error);
