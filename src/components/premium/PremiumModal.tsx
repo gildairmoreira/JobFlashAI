@@ -2,15 +2,13 @@
 
 import { useToast } from "@/hooks/use-toast";
 import usePremiumModal from "@/hooks/usePremiumModal";
-import { Check } from "lucide-react";
+import { Check, Sparkles, Languages, Zap, ShieldCheck } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { createCheckoutSession } from "./actions";
 import { getGlobalSettings } from "@/app/(main)/billing/actions";
-
-const premiumFeatures = ["Ferramentas de IA", "Até 3 currículos"];
-const premiumPlusFeatures = ["Currículos ilimitados", "Personalizações de design"];
+import { cn } from "@/lib/utils";
 
 export default function PremiumModal() {
   const { open, setOpen } = usePremiumModal();
@@ -56,62 +54,118 @@ export default function PremiumModal() {
         }
       }}
     >
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>JobFlashAI Premium</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-6">
-          <p>Obtenha uma assinatura premium para desbloquear mais recursos.</p>
-          <div className="flex">
-            <div className="flex w-1/2 flex-col space-y-5">
-              <h3 className="text-center text-lg font-bold">Semanal ({proPrice})</h3>
-              <ul className="list-inside space-y-2">
-                {premiumFeatures.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2">
-                    <Check className="size-4 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                onClick={() =>
-                  handlePremiumClick(
-                    'pro'
-                  )
-                }
-                disabled={loading}
-              >
-                Obter Semanal
-              </Button>
+      <DialogContent className="max-w-[95vw] sm:max-w-2xl p-0 border-none bg-white dark:bg-stone-950 shadow-2xl rounded-[2rem] max-h-[90vh] flex flex-col outline-none">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 z-50" />
+        
+        <div className="overflow-y-auto p-6 sm:p-8 pt-4 sm:pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <DialogHeader className="mb-4 text-center">
+            <div className="flex justify-center mb-2">
+              <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                <Sparkles className="w-5 h-5" />
+              </div>
             </div>
-            <div className="mx-6 border-l" />
-            <div className="flex w-1/2 flex-col space-y-5">
-              <h3 className="bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-center text-lg font-bold text-transparent">
-                Mensal ({monthlyPrice})
-              </h3>
-              <ul className="list-inside space-y-2">
-                {premiumPlusFeatures.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2">
-                    <Check className="size-4 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
+            <DialogTitle className="text-xl sm:text-2xl font-black tracking-tight text-stone-900 dark:text-white">
+              Escolha seu <span className="text-indigo-600">Plano Premium</span>
+            </DialogTitle>
+            <p className="text-stone-500 dark:text-stone-400 mt-1 text-xs sm:text-sm px-2">
+              Desbloqueie ferramentas de IA e destaque-se no mercado.
+            </p>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* PLANO SEMANAL */}
+          <div className="bg-stone-50 dark:bg-stone-900/50 p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 flex flex-col justify-between transition-all hover:border-stone-200 dark:hover:border-stone-700">
+            <div>
+              <div className="mb-4">
+                <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">ESSENCIAL</span>
+                <h3 className="text-xl font-black text-stone-900 dark:text-white mt-1">Semanal</h3>
+                <div className="mt-1 flex items-baseline gap-1">
+                  <span className="text-2xl font-black text-stone-900 dark:text-white">{proPrice}</span>
+                  <span className="text-stone-400 text-xs font-bold">/ 7 dias</span>
+                </div>
+              </div>
+
+              <ul className="space-y-2 mb-4">
+                <FeatureItem label="5 Currículos ativos" />
+                <FeatureItem label="Sugestões de IA completas" />
+                <FeatureItem label="Exportação PDF HD" />
+                <FeatureItem label="Tradução por IA" disabled />
               </ul>
+            </div>
+
+            <Button
+              onClick={() => handlePremiumClick('pro')}
+              className="w-full py-6 font-bold rounded-2xl bg-white dark:bg-stone-800 text-stone-900 dark:text-white hover:bg-stone-100 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 shadow-sm transition active:scale-[0.98]"
+              disabled={loading}
+            >
+              Começar Semanal
+            </Button>
+          </div>
+
+          {/* PLANO MENSAL */}
+          <div className="relative group p-[2px] rounded-[2rem] overflow-hidden">
+            {/* Gradiente Animado de Borda */}
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 animate-gradient" />
+            
+            <div className="relative bg-white dark:bg-stone-950 p-6 rounded-[calc(2rem-2px)] h-full flex flex-col justify-between">
+              <div>
+                <div className="mb-4">
+                  <div className="inline-flex items-center gap-1 bg-indigo-600 text-white px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest mb-2">
+                    ⭐ RECOMENDADO
+                  </div>
+                  <h3 className="text-xl font-black text-stone-900 dark:text-white mt-0.5">Mensal</h3>
+                  <div className="mt-1 flex items-baseline gap-1">
+                    <span className="text-2xl font-black text-stone-900 dark:text-white">{monthlyPrice}</span>
+                    <span className="text-stone-400 text-xs font-bold">/ mês</span>
+                  </div>
+                </div>
+
+                <ul className="space-y-2 mb-4">
+                  <FeatureItem label="Currículos ILIMITADOS" highlight />
+                  <FeatureItem label="Tradução Profissional (IA)" highlight icon={<Languages className="w-4 h-4" />} />
+                  <FeatureItem label="Design Premium Exclusivo" />
+                  <FeatureItem label="Suporte Prioritário" />
+                </ul>
+              </div>
+
               <Button
                 variant="premium"
-                onClick={() =>
-                  handlePremiumClick(
-                    'monthly'
-                  )
-                }
+                onClick={() => handlePremiumClick('monthly')}
+                className="w-full py-6 font-black rounded-2xl text-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 transition active:scale-[0.98]"
                 disabled={loading}
               >
-                Obter Mensal
+                🔥 Ativar Mensal
               </Button>
             </div>
+          </div>
+          </div>
+        </div>
+
+        <div className="px-8 pb-6 flex items-center justify-center gap-4 opacity-40 shrink-0">
+          <div className="flex items-center gap-1.5 grayscale">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span className="text-[9px] font-bold uppercase tracking-wider">Pagamento Seguro</span>
           </div>
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function FeatureItem({ label, disabled, highlight, icon }: { label: string, disabled?: boolean, highlight?: boolean, icon?: React.ReactNode }) {
+  return (
+    <li className={cn(
+      "flex items-center gap-2.5 text-xs sm:text-sm transition-opacity",
+      disabled ? "opacity-30 grayscale" : "opacity-100",
+      highlight ? "font-bold text-indigo-600 dark:text-indigo-400" : "text-stone-600 dark:text-stone-400"
+    )}>
+      <div className={cn(
+        "shrink-0 p-0.5 rounded-full",
+        disabled ? "bg-stone-200 dark:bg-stone-800" : highlight ? "bg-indigo-100 dark:bg-indigo-900/30" : "bg-stone-100 dark:bg-stone-800"
+      )}>
+        {icon || <Check className={cn("w-3.5 h-3.5", disabled ? "text-stone-400" : "text-indigo-600 dark:text-indigo-400")} />}
+      </div>
+      <span className={disabled ? "line-through italic" : ""}>{label}</span>
+    </li>
   );
 }

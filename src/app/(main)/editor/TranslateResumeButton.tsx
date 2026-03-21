@@ -164,8 +164,8 @@ export default function TranslateResumeButton({
           isMonthly
             ? isEn
               ? "Voltar para Português"
-              : "Traduzir currículo para inglês"
-            : "Recurso exclusivo do plano Mensal"
+            : "Traduzir currículo para inglês"
+            : "Recurso exclusivo do plano MENSAL"
         }
         onClick={handleClick}
         className="flex items-center gap-1.5 text-xs"
@@ -173,8 +173,8 @@ export default function TranslateResumeButton({
         <Languages className="h-3.5 w-3.5" />
         <span className="hidden sm:inline">{isEn ? "PT" : "EN"}</span>
         {!isMonthly && (
-          <span className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-            PRO
+          <span className="ml-0.5 rounded bg-indigo-100 px-1 py-0.5 text-[9px] font-bold text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+            MENSAL
           </span>
         )}
       </Button>

@@ -27,7 +27,7 @@ export async function createPixPayment(planType: "pro" | "monthly") {
     payer: {
       email: email,
     },
-    external_reference: `${userId}_${planType}`, // Crucial para validar no webhook
+    external_reference: `${userId}|${planType}`, // Separador | para não conflitar com o underscore do Clerk userId
   };
 
   try {
@@ -89,7 +89,7 @@ export async function createCardPayment(formData: any, planType: "pro" | "monthl
           email: finalEmail,
           identification: formData.payer?.identification
         },
-        external_reference: `${userId}_${planType}`,
+        external_reference: `${userId}|${planType}`, // Separador | para não conflitar com o underscore do Clerk userId
       },
       requestOptions: {
         idempotencyKey: crypto.randomUUID()

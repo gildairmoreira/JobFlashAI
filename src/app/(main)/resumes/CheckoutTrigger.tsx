@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createCheckoutSession } from "@/components/premium/actions";
 import { useToast } from "@/hooks/use-toast";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 interface CheckoutTriggerProps {
   subscriptionLevel: string;
@@ -14,6 +15,7 @@ export default function CheckoutTrigger({ subscriptionLevel }: CheckoutTriggerPr
   const router = useRouter();
   const { toast } = useToast();
   const hasTriggered = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const plan = searchParams.get("plan");
@@ -21,15 +23,15 @@ export default function CheckoutTrigger({ subscriptionLevel }: CheckoutTriggerPr
     // Se o plano for reconhecido e o usuário não for master/pro
     if (plan && (plan === "pro" || plan === "monthly") && !hasTriggered.current) {
         
-        // Se já for premium, não redireciona para não comprar de novo sem querer
-        if (subscriptionLevel === "pro" || subscriptionLevel === "monthly") {
-            return;
-        }
-
+        // Se o usuário clicar em um plano que ele já tem OU quer fazer upgrade, permitimos o redirect.
+        // O Mercado Pago/Backend lida com a soma de dias ou troca de plano.
+        // Apenas evitamos loops infinitos usando a ref hasTriggered.
+        
         hasTriggered.current = true;
         
         const triggerCheckout = async () => {
             try {
+                setIsLoading(true);
                 toast({
                     title: "Iniciando Checkout...",
                     description: "Preparando seu link de pagamento seguro.",
@@ -48,6 +50,7 @@ export default function CheckoutTrigger({ subscriptionLevel }: CheckoutTriggerPr
                 }
             } catch (error) {
                 console.error("Checkout Trigger Error:", error);
+                setIsLoading(false);
                 toast({
                     variant: "destructive",
                     title: "Erro ao iniciar pagamento",
@@ -60,5 +63,5 @@ export default function CheckoutTrigger({ subscriptionLevel }: CheckoutTriggerPr
     }
   }, [searchParams, subscriptionLevel, toast]);
 
-  return null;
+  return isLoading ? <LoadingOverlay /> : null;
 }

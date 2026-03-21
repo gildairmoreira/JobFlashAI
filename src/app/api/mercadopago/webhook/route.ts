@@ -2,30 +2,57 @@ import prisma from "@/lib/prisma";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import crypto from "crypto";
 
-// Verifica a assinatura HMAC-SHA256 do Mercado Pago para garantir autenticidade
-function verifyWebhookSignature(req: Request, rawBody: string): boolean {
+// Verifica a assinatura HMAC-SHA256 do Mercado Pago
+// Retorna true se válida, false se inválida (nunca lança exceção)
+function verifyWebhookSignature(req: Request, dataId: string): boolean {
   const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
-  if (!secret) return true; // Em dev sem secret configurado, passa direto
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("Webhook MP: MERCADOPAGO_WEBHOOK_SECRET não configurado em produção!");
+      return false;
+    }
+    return true; // Aceita em dev sem secret 
+  }
 
   const xSignature = req.headers.get("x-signature");
   const xRequestId = req.headers.get("x-request-id");
-  const url = new URL(req.url);
-  const dataId = url.searchParams.get("data.id") || "";
 
-  if (!xSignature) return false;
+  if (!xSignature) {
+    console.warn("Webhook MP: header x-signature ausente");
+    return false;
+  }
 
-  // Formato: ts=<timestamp>,v1=<hash>
-  const parts = Object.fromEntries(xSignature.split(",").map((p) => p.split("=")));
+  // Formato esperado: "ts=<timestamp>,v1=<hash>"
+  const parts: Record<string, string> = {};
+  for (const part of xSignature.split(",")) {
+    const [key, value] = part.split("=");
+    if (key && value) parts[key.trim()] = value.trim();
+  }
+
   const ts = parts["ts"];
   const v1 = parts["v1"];
 
-  if (!ts || !v1) return false;
+  if (!ts || !v1) {
+    console.warn("Webhook MP: ts ou v1 ausentes no x-signature");
+    return false;
+  }
 
-  // Mensagem assinada: id;request-id;ts
-  const signedMessage = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
-  const expectedHash = crypto.createHmac("sha256", secret).update(signedMessage).digest("hex");
+  // Mensagem assinada conforme documentação oficial do MP
+  const signedMessage = `id:${dataId};request-id:${xRequestId ?? ""};ts:${ts};`;
+  const expectedHash = crypto
+    .createHmac("sha256", secret)
+    .update(signedMessage)
+    .digest("hex");
 
-  return crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expectedHash));
+  // Comparação segura contra timing attacks, com proteção contra buffers de tamanho diferente
+  try {
+    const v1Buffer = Buffer.from(v1, "hex");
+    const expectedBuffer = Buffer.from(expectedHash, "hex");
+    if (v1Buffer.length !== expectedBuffer.length) return false;
+    return crypto.timingSafeEqual(v1Buffer, expectedBuffer);
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(req: Request) {
@@ -38,158 +65,164 @@ export async function POST(req: Request) {
       return new Response("Invalid JSON body", { status: 400 });
     }
 
+    // Extrai o dataId do payload para usar na validação de assinatura
+    const paymentIdFromBody = body.data?.id || body.id;
+    const dataId = paymentIdFromBody?.toString() ?? "";
+
     // Valida a assinatura do webhook em produção
-    if (process.env.NODE_ENV === "production" && !verifyWebhookSignature(req, rawBody)) {
+    if (process.env.NODE_ENV === "production" && !verifyWebhookSignature(req, dataId)) {
       console.warn("Mercado Pago Webhook: Assinatura inválida! Requisição rejeitada.");
       return new Response("Invalid signature", { status: 401 });
     }
 
-
-
     // Aceita tanto a chave action (webhook tradicional) quanto a type
     const eventType = body.type || body.action;
+    console.log("Webhook MP recebido - tipo:", eventType, "| paymentId:", dataId);
 
     if (eventType === "payment" || eventType === "payment.created" || eventType === "payment.updated") {
-      // Diferentes payloads de MP trazem o ID no objeto data ou diretamente
-      const paymentId = body.data?.id || body.id;
-
-      if (!paymentId) {
+      if (!dataId) {
         console.warn("Mercado Pago Webhook: Missing Payment ID");
         return new Response("Missing payment ID", { status: 400 });
       }
 
-      // Iniciamos a SDK do Mercado Pago
+      // Verificação de segurança: busca o pagamento diretamente na API do MP
       const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN! });
       const payment = new Payment(client);
+      const paymentDetails = await payment.get({ id: dataId });
 
-      // Verificação DE SEGURANÇA: Buscar e validar o pagamento diretamente na API do MP
-      // Isso impede que alguém falsifique o payload simulando que foi aprovado
-      const paymentDetails = await payment.get({ id: paymentId });
-
-      if (!paymentDetails || !paymentDetails.external_reference) {
-          console.warn("Mercado Pago Webhook: Ignorado - Sem external_reference", paymentId);
-          return new Response("Payment ignored or missing reference", { status: 200 });
+      if (!paymentDetails) {
+        console.warn("Webhook MP: pagamento não encontrado no MP:", dataId);
+        return new Response("Payment not found", { status: 200 });
       }
 
-      const [userId, rawPlanType] = paymentDetails.external_reference.split("_");
+      if (!paymentDetails.external_reference) {
+        console.warn("Webhook MP: external_reference ausente para pagamento:", dataId);
+        return new Response("Payment ignored - missing reference", { status: 200 });
+      }
+
+      // CORREÇÃO CRÍTICA: Usamos pipe (|) como separador para evitar conflito com underscores do Clerk userId
+      // Formato: "user_2abc123|pro" ou "user_2abc123|monthly"
+      const extRef = paymentDetails.external_reference;
+      const pipeIdx = extRef.indexOf("|");
+      if (pipeIdx === -1) {
+        // Fallback: tenta o formato antigo com lastIndexOf underscore
+        console.warn("Webhook MP: external_reference sem pipe, tentando formato legado:", extRef);
+        const lastUnderscoreIdx = extRef.lastIndexOf("_");
+        if (lastUnderscoreIdx === -1) {
+          console.warn("Webhook MP: external_reference com formato inválido:", extRef);
+          return new Response("Invalid external reference format", { status: 200 });
+        }
+        var userId = extRef.substring(0, lastUnderscoreIdx);
+        var rawPlanType = extRef.substring(lastUnderscoreIdx + 1);
+      } else {
+        var userId = extRef.substring(0, pipeIdx);
+        var rawPlanType = extRef.substring(pipeIdx + 1);
+      }
       const planType = rawPlanType.toUpperCase() as "PRO" | "MONTHLY" | "FREE";
 
-      const amount = paymentDetails.transaction_amount;
       const status = paymentDetails.status;
-      const customerEmail = paymentDetails.payer?.email || "";
-      const customerName = paymentDetails.payer?.first_name || "";
-      const transactionId = paymentDetails.id?.toString();
+      const amount = paymentDetails.transaction_amount ?? 0;
+      const customerEmail = paymentDetails.payer?.email ?? "";
+      const customerName = paymentDetails.payer?.first_name ?? "";
+      const transactionId = paymentDetails.id?.toString() ?? "";
+
+      console.log(`Webhook MP: userId=${userId} | plan=${planType} | status=${status}`);
 
       if (!userId || !transactionId) {
-          return new Response("Invalid external reference", { status: 400 });
+        return new Response("Invalid external reference", { status: 400 });
       }
 
-      // Log inicial do funil Analytics
-      if (status === "pending") {
-        await (prisma as any).analyticEvent.create({
-            data: {
-                userId: userId,
-                event: "initiate_checkout",
-                metadata: {
-                    transactionId,
-                    email: customerEmail,
-                    product: planType
-                }
-            }
-        });
-      }
-
-      // === STATUS PENDENTE (Pix gerado ou cartão em análise) ===
+      // === STATUS PENDENTE (PIX gerado ou cartão em análise) ===
       if (status === "pending" || status === "in_process") {
-         await (prisma as any).transaction.upsert({
-            where: { caktoTransactionId: transactionId }, // Mantemos na mesma coluna p/ n quebrar Admin Panel
-            create: {
-                userId: userId,
-                caktoTransactionId: transactionId,
-                amount: amount || 0,
-                status: "PENDING",
-                paymentMethod: paymentDetails.payment_method_id || "mercadopago",
-                customerEmail,
-                customerName,
-            },
-            update: {
-                status: "PENDING",
-            }
-         });
-         return new Response("Pending transaction logged", { status: 200 });
+        await (prisma as any).transaction.upsert({
+          where: { caktoTransactionId: transactionId },
+          create: {
+            userId,
+            caktoTransactionId: transactionId,
+            amount,
+            status: "PENDING",
+            paymentMethod: paymentDetails.payment_method_id ?? "mercadopago",
+            customerEmail,
+            customerName,
+          },
+          update: { status: "PENDING" },
+        });
+
+        await (prisma as any).analyticEvent.create({
+          data: {
+            userId,
+            event: "initiate_checkout",
+            metadata: { transactionId, email: customerEmail, product: planType },
+          },
+        }).catch(() => {}); // Analytics não deve bloquear o fluxo
+
+        return new Response("Pending transaction logged", { status: 200 });
       }
 
       // === STATUS APROVADO (Conversão Concluída) ===
       if (status === "approved" || status === "authorized") {
-         // Pega a assinatura existente para incrementar o tempo (Recorrência/Renovação)
-         const existingSub = await prisma.userSubscription.findUnique({ where: { userId } });
-         let baseDate = new Date();
-         
-         // Se ele já tem plano ativo e ainda não venceu, soma em cima do que ele já tem!
-         if (existingSub && existingSub.currentPeriodEnd && existingSub.currentPeriodEnd > new Date()) {
-             baseDate = existingSub.currentPeriodEnd;
-         }
-         
-         let expirationDate = new Date(baseDate);
-         
-         if (planType === "PRO") {
-             expirationDate.setDate(expirationDate.getDate() + 7);
-         } else if (planType === "MONTHLY") {
-             expirationDate.setDate(expirationDate.getDate() + 31);
-         }
+        // Verifica se já existe assinatura para adicionar tempo (renovação/upgrade)
+        const existingSub = await prisma.userSubscription.findUnique({ where: { userId } });
+        let baseDate = new Date();
 
-         // Atualiza status do plano do Usuário para Ativo!
-         await prisma.userSubscription.upsert({
-             where: { userId: userId },
-             create: {
-                 userId: userId,
-                 planType: planType,
-                 caktoTransactionId: transactionId,
-                 status: "ACTIVE",
-                 currentPeriodEnd: expirationDate,
-             },
-             update: {
-                 planType: planType,
-                 caktoTransactionId: transactionId,
-                 status: "ACTIVE",
-                 currentPeriodEnd: expirationDate,
-             },
-         });
+        if (existingSub?.currentPeriodEnd && existingSub.currentPeriodEnd > new Date()) {
+          baseDate = existingSub.currentPeriodEnd;
+        }
 
-         // Finaliza a Transação como Paga
-         await (prisma as any).transaction.upsert({
-             where: { caktoTransactionId: transactionId },
-             create: {
-                 userId: userId,
-                 caktoTransactionId: transactionId,
-                 amount: amount || 0,
-                 status: "PAID",
-                 paymentMethod: paymentDetails.payment_method_id || "mercadopago",
-                 customerEmail,
-                 customerName,
-             },
-             update: {
-                 status: "PAID",
-             }
-         });
+        const expirationDate = new Date(baseDate);
+        if (planType === "PRO") {
+          expirationDate.setDate(expirationDate.getDate() + 7);
+        } else if (planType === "MONTHLY") {
+          expirationDate.setDate(expirationDate.getDate() + 31);
+        }
 
-         // Salva conversão real no Funil Analytics
-         await (prisma as any).analyticEvent.create({
-            data: {
-                userId: userId,
-                event: "purchase_approved",
-                metadata: {
-                    transactionId,
-                    email: customerEmail,
-                    product: planType
-                }
-            }
-         });
+        // Ativa o plano do usuário
+        await prisma.userSubscription.upsert({
+          where: { userId },
+          create: {
+            userId,
+            planType,
+            caktoTransactionId: transactionId,
+            status: "ACTIVE",
+            currentPeriodEnd: expirationDate,
+          },
+          update: {
+            planType,
+            caktoTransactionId: transactionId,
+            status: "ACTIVE",
+            currentPeriodEnd: expirationDate,
+          },
+        });
 
-         return new Response("Approved Payment! User access liberated.", { status: 200 });
+        // Registra a transação como paga
+        await (prisma as any).transaction.upsert({
+          where: { caktoTransactionId: transactionId },
+          create: {
+            userId,
+            caktoTransactionId: transactionId,
+            amount,
+            status: "PAID",
+            paymentMethod: paymentDetails.payment_method_id ?? "mercadopago",
+            customerEmail,
+            customerName,
+          },
+          update: { status: "PAID" },
+        });
+
+        // Salva conversão no funil de analytics
+        await (prisma as any).analyticEvent.create({
+          data: {
+            userId,
+            event: "purchase_approved",
+            metadata: { transactionId, email: customerEmail, product: planType },
+          },
+        }).catch(() => {});
+
+        console.log(`✅ Webhook MP: Plano ${planType} ativado para userId=${userId} até ${expirationDate.toISOString()}`);
+        return new Response("Approved! User access granted.", { status: 200 });
       }
 
-      return new Response("Event ignored for this status", { status: 200 });
+      return new Response("Event ignored for this status: " + status, { status: 200 });
     }
 
     return new Response("Not a payment event", { status: 200 });

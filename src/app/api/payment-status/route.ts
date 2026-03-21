@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 
-// Verifica se o pagamento do usuário atual foi aprovado
-// Chamado a cada 3 segundos pelo checkout client via polling
+// Retorna o status atual da assinatura e o currentPeriodEnd para comparação no client
+// O client compara com o valor ANTERIOR ao checkout para detectar apenas NOVAS aprovações
 export async function GET() {
   const { userId } = await auth();
   if (!userId) {
@@ -15,14 +15,9 @@ export async function GET() {
     select: { status: true, planType: true, currentPeriodEnd: true },
   });
 
-  // Considera pago se a assinatura ficou ACTIVE com uma data futura de expiração
-  const isPaid =
-    subscription?.status === "ACTIVE" &&
-    subscription.currentPeriodEnd !== null &&
-    subscription.currentPeriodEnd > new Date();
-
   return NextResponse.json({
-    paid: isPaid,
+    status: subscription?.status ?? null,
     planType: subscription?.planType ?? null,
+    currentPeriodEnd: subscription?.currentPeriodEnd?.toISOString() ?? null,
   });
 }

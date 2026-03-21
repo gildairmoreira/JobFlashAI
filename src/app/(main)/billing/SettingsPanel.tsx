@@ -17,6 +17,7 @@ import { updateGlobalSettings } from "./actions";
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface SettingsPanelProps {
   settings: {
@@ -25,9 +26,11 @@ interface SettingsPanelProps {
     proPrice: number;
     monthlyPrice: number;
   };
+  adminRole: string;
 }
 
-export default function SettingsPanel({ settings }: SettingsPanelProps) {
+export default function SettingsPanel({ settings, adminRole }: SettingsPanelProps) {
+  const isMaster = adminRole === "MASTER_ADMIN";
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [mMode, setMMode] = React.useState(settings.maintenanceMode);
@@ -101,14 +104,25 @@ export default function SettingsPanel({ settings }: SettingsPanelProps) {
             </CardContent>
           </Card>
 
-          {/* Business Rules */}
-          <Card className="border-stone-200 dark:border-stone-800 dark:bg-stone-900/50 shadow-sm rounded-3xl">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Database className="w-5 h-5 text-indigo-500" />
-                <CardTitle className="text-lg">Regras de Negócio</CardTitle>
+          {/* Business Rules - Restricted to Master Admin for editing */}
+          <Card className={cn(
+            "border-stone-200 dark:border-stone-800 shadow-sm rounded-3xl transition-opacity",
+            !isMaster && "opacity-80 bg-stone-50/50 dark:bg-stone-900/30"
+          )}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Database className="w-5 h-5 text-indigo-500" />
+                  <CardTitle className="text-lg">Regras de Negócio</CardTitle>
+                </div>
+                <CardDescription>Ajuste limites e parâmetros de faturamento.</CardDescription>
               </div>
-              <CardDescription>Ajuste limites e parâmetros de faturamento.</CardDescription>
+              {!isMaster && (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded-full border border-stone-200 dark:border-stone-700">
+                  <ShieldAlert className="w-3.5 h-3.5 text-stone-400" />
+                  <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Apenas Visualização</span>
+                </div>
+              )}
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -118,8 +132,8 @@ export default function SettingsPanel({ settings }: SettingsPanelProps) {
                     type="number" 
                     value={proPrice}
                     onChange={(e) => setProPrice(e.target.value)}
-                    disabled={isPending}
-                    className="w-full p-3 bg-stone-50 dark:bg-stone-800 border-none rounded-xl text-sm font-bold" 
+                    disabled={isPending || !isMaster}
+                    className="w-full p-3 bg-stone-50 dark:bg-stone-800 border-none rounded-xl text-sm font-bold disabled:cursor-not-allowed" 
                   />
                 </div>
                 <div className="space-y-2">
@@ -128,14 +142,18 @@ export default function SettingsPanel({ settings }: SettingsPanelProps) {
                         type="number" 
                         value={monPrice}
                         onChange={(e) => setMonPrice(e.target.value)}
-                        disabled={isPending}
-                        className="w-full p-3 bg-stone-50 dark:bg-stone-800 border-none rounded-xl text-sm font-bold" 
+                        disabled={isPending || !isMaster}
+                        className="w-full p-3 bg-stone-50 dark:bg-stone-800 border-none rounded-xl text-sm font-bold disabled:cursor-not-allowed" 
                     />
                 </div>
               </div>
               <div className="p-4 bg-indigo-50 dark:bg-indigo-500/5 rounded-2xl border border-indigo-100 dark:border-indigo-500/20 flex gap-3">
                 <Info className="w-5 h-5 text-indigo-500 shrink-0" />
-                <p className="text-xs text-indigo-700 dark:text-indigo-400 leading-relaxed">Estes preços alimentam o Checkout Transparente do Mercado Pago nativo da plataforma. Atualize-os a qualquer momento.</p>
+                <p className="text-xs text-indigo-700 dark:text-indigo-400 leading-relaxed font-medium">
+                  {isMaster 
+                    ? "Estes preços alimentam o Checkout Transparente do Mercado Pago nativo da plataforma. Atualize-os a qualquer momento."
+                    : "Você não tem permissão para alterar os preços. Entre em contato com o administrador master para ajustes financeiros."}
+                </p>
               </div>
             </CardContent>
           </Card>

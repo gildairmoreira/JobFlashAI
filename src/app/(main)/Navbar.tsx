@@ -4,11 +4,12 @@ import logo from "@/assets/logo.png";
 import ThemeToggle from "@/components/ThemeToggle";
 import { UserButton, useClerk } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { CreditCard, ShieldCheck, Crown } from "lucide-react";
+import { CreditCard, ShieldCheck, Crown, Home } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import usePremiumModal from "@/hooks/usePremiumModal";
+import { Button } from "@/components/ui/button";
 
 export default function Navbar({
   isAdmin,
@@ -33,16 +34,16 @@ export default function Navbar({
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-stone-100 dark:border-stone-800 shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 p-3">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <Link href="/resumes" className="flex items-center gap-2">
             <Image
               src={logo}
               alt="Logo"
-              width={50}
-              height={50}
+              width={35}
+              height={35}
               className="rounded-full"
             />
-            <span className="text-xl font-bold tracking-tight">
+            <span className="text-xl font-bold tracking-tight hidden sm:inline-block">
               JobFlashAI
             </span>
           </Link>
@@ -86,18 +87,39 @@ export default function Navbar({
                     </p>
                   )}
 
-                  {!isPremium && (
-                    <Link
-                      href="/#precos"
-                      onClick={() => clerk.closeUserProfile()}
-                      className="block text-center w-full py-3 bg-stone-900 text-white font-bold rounded-lg hover:bg-stone-800 transition"
-                    >
-                      Fazer Upgrade Agora
-                    </Link>
-                  )}
+                  <div className="pt-2">
+                    {userPlan === "FREE" && (
+                      <Link
+                        href="/#precos"
+                        onClick={() => clerk.closeUserProfile()}
+                        className="block text-center w-full py-3 bg-stone-900 dark:bg-white dark:text-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 dark:hover:bg-stone-200 transition shadow-lg"
+                      >
+                        Fazer Upgrade Agora
+                      </Link>
+                    )}
+
+                    {userPlan === "PRO" && (
+                      <Link
+                        href="/resumes?plan=monthly"
+                        onClick={() => clerk.closeUserProfile()}
+                        className="block text-center w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-xl hover:shadow-indigo-500/20 hover:scale-[1.02] transition shadow-lg"
+                      >
+                        🔥 Upgrade para Plano Mensal
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
             </UserButton.UserProfilePage>
+
+            {/* Link para a Home Page */}
+            <UserButton.MenuItems>
+              <UserButton.Link
+                label="Página Inicial (Site)"
+                labelIcon={<Home className="size-4" />}
+                href="/"
+              />
+            </UserButton.MenuItems>
 
             {isAdmin && (
               <UserButton.MenuItems>

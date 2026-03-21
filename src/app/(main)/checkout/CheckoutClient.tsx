@@ -17,7 +17,7 @@ const MPPayment = dynamic(
   { ssr: false, loading: () => <div className="flex justify-center p-10"><Loader2 className="w-6 h-6 animate-spin text-indigo-500" /></div> }
 );
 
-export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: number, monthlyPrice: number }) {
+export default function CheckoutClient({ proPrice, monthlyPrice, initialPeriodEnd }: { proPrice: number, monthlyPrice: number, initialPeriodEnd: string | null }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -34,7 +34,14 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
   const [sdkInitialized, setSdkInitialized] = useState(false);
   const [paymentApproved, setPaymentApproved] = useState(false);
   const [approvedPlanType, setApprovedPlanType] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'default' | 'dark'>('default');
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Detecta se está em dark mode para o tijolo do MP
+    const isDark = document.documentElement.classList.contains('dark');
+    setTheme(isDark ? 'dark' : 'default');
+  }, []);
 
   useEffect(() => {
     // Inicializa a SDK do MP no client
@@ -51,24 +58,33 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
   }, [plan]);
 
   // Inicia o polling de status de pagamento assim que o QR Code é gerado
-  // A cada 3 segundos consulta /api/payment-status para detectar aprovação via webhook
+  // Só considera pago se o currentPeriodEnd for MAIOR do que era antes do checkout
+  // Isso evita o bug de auto-aprovação quando o user já tinha um plano ativo
   const startPolling = useCallback(() => {
-    if (pollingRef.current) return; // Evita polling duplo
+    if (pollingRef.current) return;
     pollingRef.current = setInterval(async () => {
       try {
         const res = await fetch("/api/payment-status");
         const data = await res.json();
-        if (data.paid) {
+        
+        const newPeriodEnd = data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null;
+        const oldPeriodEnd = initialPeriodEnd ? new Date(initialPeriodEnd) : null;
+
+        // Considera pago APENAS se a data de expiração aumentou em relação ao que existia ANTES do checkout
+        const isNewPayment = newPeriodEnd !== null && (
+          oldPeriodEnd === null || newPeriodEnd > oldPeriodEnd
+        );
+
+        if (isNewPayment && data.status === "ACTIVE") {
           setPaymentApproved(true);
           setApprovedPlanType(data.planType);
           if (pollingRef.current) clearInterval(pollingRef.current);
         }
       } catch (e) {
-        // Silencia erros de rede durante polling
         console.error("Polling erro:", e);
       }
     }, 3000);
-  }, []);
+  }, [initialPeriodEnd]);
 
   // Limpa o intervalo de polling ao desmontar
   useEffect(() => {
@@ -108,10 +124,13 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
 
   const customization = {
     paymentMethods: {
-      creditCard: "all" as any, 
-      debitCard: "all" as any, 
+      creditCard: "all" as any,
+      debitCard: "all" as any,
     },
-  };
+    visual: {
+      theme: theme
+    }
+  } as any;
 
   const initialization = {
     amount,
@@ -160,9 +179,9 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
       </div>
 
       <Tabs defaultValue="pix" className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <TabsList className="grid w-full grid-cols-2 mb-6 h-12 rounded-xl bg-stone-200/50 dark:bg-stone-800 p-1">
-          <TabsTrigger value="pix" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-indigo-600 dark:data-[state=active]:bg-stone-900">PIX</TabsTrigger>
-          <TabsTrigger value="card" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-indigo-600 dark:data-[state=active]:bg-stone-900">Cartão de Crédito</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 mb-6 h-12 rounded-xl bg-stone-100 dark:bg-stone-800/50 p-1 border border-stone-200 dark:border-stone-800">
+          <TabsTrigger value="pix" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-indigo-600 dark:data-[state=active]:bg-stone-900 dark:data-[state=active]:text-indigo-400">PIX</TabsTrigger>
+          <TabsTrigger value="card" className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-indigo-600 dark:data-[state=active]:bg-stone-900 dark:data-[state=active]:text-indigo-400">Cartão de Crédito</TabsTrigger>
         </TabsList>
         
         {/* ABA PIX */}
@@ -174,7 +193,7 @@ export default function CheckoutClient({ proPrice, monthlyPrice }: { proPrice: n
             </div>
           ) : qrCodeBase64 ? (
             <div className="w-full flex flex-col items-center animate-in fade-in zoom-in duration-500 delay-150">
-              <div className="p-2 bg-white rounded-2xl border-4 border-stone-100 shadow-sm mb-6">
+              <div className="p-3 bg-white rounded-2xl border-[6px] border-stone-100 dark:border-stone-800 shadow-xl mb-6">
                 <img src={`data:image/jpeg;base64,${qrCodeBase64}`} alt="QR Code PIX" className="w-60 h-60 rounded-xl" />
               </div>
               

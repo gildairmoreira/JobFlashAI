@@ -37,7 +37,7 @@ export default async function AdminDashboard() {
                     lastPaidSales={lastPaidSales as any}
                 />
             }
-            settingsPanel={<SettingsPanel settings={globalSettings} />}
+            settingsPanel={<SettingsPanel settings={globalSettings} adminRole={adminRole || "USER"} />}
         />
     );
 }
