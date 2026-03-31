@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobFlashAI — Plano de Divulgação</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d10;
+    --surface: #13161b;
+    --surface2: #1c2028;
+    --border: #252830;
+    --accent: #c8f135;
+    --accent2: #5effa0;
+    --accent3: #ffd166;
+    --muted: #6b7280;
+    --text: #e8eaf0;
+    --text-dim: #9ba3af;
+    --linkedin: #0077b5;
+    --twitter: #1d9bf0;
+    --yt: #ff0000;
+    --tiktok: #69c9d0;
+    --fb: #1877f2;
+    --insta: #e1306c;
+    --kwai: #ff4747;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 24px;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 500px at 50% 0%, rgba(200,241,53,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 400px at 80% 80%, rgba(94,255,160,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(200,241,53,0.1);
+    border: 1px solid rgba(200,241,53,0.25);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 32px;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  section { padding: 80px 0; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 48px;
+  }
+
+  /* STRATEGY OVERVIEW */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 64px;
+  }
+
+  .overview-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .overview-card:hover { border-color: var(--accent); }
+
+  .overview-card .dot {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .overview-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .overview-card p { font-size: 0.8rem; color: var(--text-dim); }
+
+  /* PLATFORM CARDS */
+  .platform-section { margin-bottom: 64px; }
+
+  .platform-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .platform-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 800;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .platform-meta h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+
+  .platform-meta .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-top: 4px;
+  }
+
+  /* POST CARD */
+  .post-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .post-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .post-card-header .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .post-card-body {
+    padding: 24px;
+    font-size: 0.9rem;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    color: var(--text);
+  }
+
+  .post-card-body .hook {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .post-card-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tip-pill {
+    background: rgba(200,241,53,0.08);
+    border: 1px solid rgba(200,241,53,0.15);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+
+  .tip-pill.orange {
+    background: rgba(255,209,102,0.08);
+    border-color: rgba(255,209,102,0.2);
+    color: var(--accent3);
+  }
+
+  .tip-pill.green {
+    background: rgba(94,255,160,0.08);
+    border-color: rgba(94,255,160,0.2);
+    color: var(--accent2);
+  }
+
+  /* SCRIPT BOX */
+  .script-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+
+  .script-box .ts {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  /* FACEBOOK */
+  .keywords-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .keyword-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .keyword-card .kw {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+
+  .keyword-card p { font-size: 0.8rem; color: var(--text-dim); }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 20px 0;
+  }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .checklist li::before {
+    content: '○';
+    color: var(--accent);
+    font-size: 0.9rem;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 32px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 6px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px rgba(200,241,53,0.15);
+  }
+
+  .timeline-item .week {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+  }
+
+  .timeline-item h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .timeline-item p { font-size: 0.85rem; color: var(--text-dim); }
+
+  /* EXTRAS */
+  .info-box {
+    background: rgba(200,241,53,0.05);
+    border: 1px solid rgba(200,241,53,0.15);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+  }
+
+  .info-box strong { color: var(--accent); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<div class="hero">
+  <div class="hero-badge">🚀 Plano de Divulgação · JobFlashAI</div>
+  <h1>Sua primeira venda<br><span>começa aqui.</span></h1>
+  <p class="hero-sub">Roteiros prontos, copies validadas e estratégia plataforma por plataforma para o JobFlashAI dominar o feed de quem está procurando emprego agora.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">7</div>
+      <div class="stat-label">Plataformas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">20+</div>
+      <div class="stat-label">Copies prontas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">30d</div>
+      <div class="stat-label">Plano de ação</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">R$0</div>
+      <div class="stat-label">Custo inicial</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ESTRATÉGIA GERAL ===================== -->
+<section>
+  <div class="container">
+    <div class="section-label">// 00 — Visão geral</div>
+    <h2 class="section-title">A Estratégia Central</h2>
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="dot" style="background:rgba(0,119,181,0.15); color:#0077b5;">💼</div>
+        <h3>LinkedIn</h3>
+        <p>Jornada do herói. Conta pessoal do dev. Autoridade + viralidade.</p>
+      </div>
+      <div class="overview-card">
+        <div class="dot" style="background:rgba(29,155,240,0.15); color:#1d9bf0;">🐦</div>
+        <h3>Twitter / X</h3>
+        <p>Threads rápidas. Conta pessoal. Tom cru e direto, builds em público.</p>
+      </div>
+      <div class="overview-card">
+        <div class="dot" style="background:rgba(255,0,0,0.15); color:#ff4444;">▶</div>
+        <h3>YouTube Shorts</h3>
+        <p>Demo do produto. Canal do produto. Mostrar na prática.</p>
+      </div>
+      <div class="overview-card">
+        <div class="dot" style="background:rgba(105,201,208,0.15); color:#69c9d0;">♪</div>
+        <h3>TikTok / Kwai</h3>
+        <p>Narrativa emocional. Canal do produto. Hook visual nos primeiros 2s.</p>
+      </div>
+      <div class="overview-card">
+        <div class="dot" style="background:rgba(225,48,108,0.15); color:#e1306c;">📸</div>
+        <h3>Instagram Reels</h3>
+        <p>Antes & depois. Canal do produto. Reels + Stories de prova social.</p>
+      </div>
+      <div class="overview-card">
+        <div class="dot" style="background:rgba(24,119,242,0.15); color:#1877f2;">👥</div>
+        <h3>Facebook Grupos</h3>
+        <p>Aporte orgânico. Infiltração em grupos de vagas e RH. Alto CTR.</p>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Filosofia do plano:</strong> Você não está vendendo um SaaS. Você está vendendo <strong>a entrevista que o lead não consegue marcar</strong>. Toda copy, roteiro e post parte desse ponto de dor — currículo ignorado pelos filtros ATS — e oferece o JobFlashAI como o atalho que eles precisavam.
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LINKEDIN ===================== -->
+<section style="border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="platform-section">
+      <div class="platform-header">
+        <div class="platform-icon" style="background:rgba(0,119,181,0.15); color:#0077b5;">in</div>
+        <div class="platform-meta">
+          <h2>LinkedIn</h2>
+          <span class="tag" style="background:rgba(0,119,181,0.1); color:#0077b5; border:1px solid rgba(0,119,181,0.25);">Conta pessoal do dev · Jornada do Herói</span>
+        </div>
+      </div>
+
+      <!-- POST 1 -->
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">Post #1 · Lançamento · Jornada do Herói</span>
+          <span class="tip-pill">Alto alcance orgânico</span>
+        </div>
+        <div class="post-card-body">
+<span class="hook">DESISTI DE MANDAR CURRÍCULO NO LINKEDIN.</span>
+Não porque não queria trabalhar.
+
+Porque percebi que estava brigando de igual pra igual com um algoritmo — e perdendo feio.
+
+👇 Deixa eu te explicar o que descobri (e o que construí depois disso):
+
+─────────────────
+
+Durante semanas apliquei para mais de 30 vagas.
+Perfil completo. Experiências relevantes. Carta de apresentação caprichada.
+
+Resultado? Silêncio.
+
+Aí um recrutador me deu um conselho que mudou tudo:
+
+"Seu currículo nem chega pra mim. Ele é reprovado no primeiro filtro automático — o ATS."
+
+Eu não sabia o que era ATS.
+
+Aprendi que é um robô que lê currículos antes de qualquer humano. Ele procura palavras-chave específicas de cada vaga. Se você não tiver, vai pro lixo — independente de quão bom você seja.
+
+Então parei de mandar currículo.
+Fui estudar como esses sistemas funcionam.
+E construí uma solução.
+
+─────────────────
+
+Criei o JobFlashAI 👇
+
+Uma IA que:
+✅ Cola a descrição da vaga
+✅ Lê o SEU currículo
+✅ Reescreve suas experiências com as palavras-chave exatas que o ATS da empresa procura
+✅ Gera um score antes de você enviar
+
+Resultado? Em vez de 30 aplicações no silêncio, você manda 10 aplicações cirurgicamente certeiras.
+
+─────────────────
+
+Já tem uma semana disponível por R$ 19,90.
+Menos que um almoço. Mais do que meses de frustração resolvidos.
+
+Se você está numa busca ativa de emprego ou sabe alguém que está:
+
+👉 jobflash.netlify.app
+
+Marca aqui embaixo quem precisa ver isso. 🙏</div>
+        <div class="post-card-footer">
+          <span class="tip-pill">Publique terça ou quarta, 8h–10h</span>
+          <span class="tip-pill orange">Adicione print do dashboard como imagem</span>
+          <span class="tip-pill green">Responda TODO comentário nas primeiras 2h</span>
+        </div>
+      </div>
+
+      <!-- POST 2 -->
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">Post #2 · Prova Social / Dados</span>
+          <span class="tip-pill">Postar 1 semana depois</span>
+        </div>
+        <div class="post-card-body">
+<span class="hook">Seu currículo tem nota 34/100. Sem você saber.</span>
+É assim que os sistemas ATS enxergam a maioria dos currículos no Brasil.
+
+Eu testei o meu antes de criar o JobFlashAI.
+Era 38/100.
+
+Hoje, depois da IA adaptar pra uma vaga específica?
+92/100.
+
+Não mudei minha experiência. Só mudei as palavras certas.
+
+─────────────────
+
+O problema é simples:
+
+❌ Você usa "responsável por" → ATS quer "gerenciei"
+❌ Você usa "ajudei no projeto" → ATS quer métricas: "reduzi em 30%"
+❌ Você tem um currículo genérico → Cada vaga quer um currículo diferente
+
+─────────────────
+
+O JobFlashAI faz isso automaticamente.
+Cole a vaga. Clique. Pronto.
+
+Testa grátis em: jobflash.netlify.app</div>
+        <div class="post-card-footer">
+          <span class="tip-pill">Use dado real do seu próprio teste</span>
+          <span class="tip-pill orange">Adicione comparativo visual (antes/depois)</span>
+        </div>
+      </div>
+
+      <!-- POST 3 -->
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">Post #3 · Behind the Scenes (Dev Story)</span>
+          <span class="tip-pill">Build em público</span>
+        </div>
+        <div class="post-card-body">
+<span class="hook">Lancei um SaaS com R$ 0 de investimento em marketing.</span>
+Aqui está o que aprendi na primeira semana:
+
+→ A dor do usuário importa mais do que a tecnologia
+→ Um preço de R$ 19,90 por 7 dias converte melhor do que R$ 49/mês de imediato
+→ Mostrar o problema resolve metade da venda
+
+O JobFlashAI nasceu porque eu mesmo fiquei frustrado com filtros ATS.
+Construí a solução que eu queria ter.
+
+Se você é dev e pensa em lançar um produto: começa pelo problema, não pela stack.
+
+Link no primeiro comentário 👇</div>
+        <div class="post-card-footer">
+          <span class="tip-pill green">Esse post atrai devs que podem viralizar</span>
+          <span class="tip-pill">Coloque o link nos comentários (mais alcance)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TWITTER / X ===================== -->
+<section style="border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="platform-section">
+      <div class="platform-header">
+        <div class="platform-icon" style="background:rgba(29,155,240,0.15); color:#1d9bf0;">𝕏</div>
+        <div class="platform-meta">
+          <h2>Twitter / X</h2>
+          <span class="tag" style="background:rgba(29,155,240,0.1); color:#1d9bf0; border:1px solid rgba(29,155,240,0.25);">Conta pessoal · Threads e posts curtos</span>
+        </div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">Thread de lançamento · 8 tweets</span>
+          <span class="tip-pill">Fixe no perfil</span>
+        </div>
+        <div class="post-card-body">
+<span class="hook">🧵 Mandei 30 currículos no LinkedIn. Zero resposta. Então construí uma IA pra resolver isso.</span>
+
+[1/8] Aqui está o que descobri sobre como currículos são realmente avaliados (e como parei de ser ignorado):
+
+[2/8] 75% dos currículos nunca chegam a um humano.
+Eles são reprovados por um sistema chamado ATS — que busca palavras-chave específicas de cada vaga.
+Não importa sua experiência. Importa se você usou as palavras certas.
+
+[3/8] O problema: cada empresa usa palavras diferentes.
+"Liderança de times" vs "gestão de equipes" vs "coordenação de squads" — para o ATS, são coisas diferentes.
+Você precisaria reescrever o currículo toda vez que aplica.
+
+[4/8] Então construí o JobFlashAI:
+→ Você cola a descrição da vaga
+→ A IA lê seu currículo
+→ Reescreve suas experiências com as palavras certas
+→ Gera um score ATS antes de enviar
+
+[5/8] Não é magia. É o mesmo processo que headhunters fazem manualmente por R$ 300+.
+Automatizei isso por R$ 19,90 por 7 dias.
+
+[6/8] Testa grátis (sem cartão):
+→ 1 currículo ativo
+→ 1 teste do Vaga-Fit IA
+→ Avaliador ATS completo
+
+Depois de testar, você vai entender por que R$ 19,90 é barato.
+
+[7/8] Lancei há X dias.
+Construindo em público aqui.
+Próximo update: integração com LinkedIn Jobs direto.
+
+[8/8] Se você está buscando emprego ou conhece alguém buscando:
+👉 jobflash.netlify.app
+
+RT se achar útil. Isso pode mudar a busca de alguém. 🙏</div>
+        <div class="post-card-footer">
+          <span class="tip-pill">Publique entre 12h–14h ou 19h–21h</span>
+          <span class="tip-pill orange">Responda quem comentar na thread</span>
+          <span class="tip-pill green">Use #emprego #curriculo #ATS nas primeiras respostas</span>
+        </div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">Posts Standalone · Repita semanalmente</span>
+        </div>
+        <div class="post-card-body">
+Post A:
+"Seu currículo está sendo rejeitado por um robô antes de um humano ver.
+Isso se chama ATS.
+Construí uma IA que bate esses filtros.
+Grátis pra testar: jobflash.netlify.app"
+
+──────────
+
+Post B:
+"Dica rápida pra quem manda currículo:
+Copie a descrição da vaga → jogue numa IA → veja quais palavras aparecem mais → use essas palavras no SEU currículo.
+Ou... deixa o JobFlashAI fazer isso automaticamente."
+
+──────────
+
+Post C (build em público):
+"Update do JobFlashAI: [X] usuários, [Y] currículos gerados.
+Próxima feature: [o que você vai construir]
+Construindo em público. Sem filtro."</div>
+        <div class="post-card-footer">
+          <span class="tip-pill">1 post por dia nos primeiros 14 dias</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== YOUTUBE SHORTS ===================== -->
+<section style="border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="platform-section">
+      <div class="platform-header">
+        <div class="platform-icon" style="background:rgba(255,0,0,0.15); color:#ff4444;">▶</div>
+        <div class="platform-meta">
+          <h2>YouTube Shorts</h2>
+          <span class="tag" style="background:rgba(255,0,0,0.1); color:#ff4444; border:1px solid rgba(255,0,0,0.25);">Canal do produto · Demo + Educação</span>
+        </div>
+      </div>
+
+      <div class="script-box">
+        <span class="ts">Short #1 · "O robô que reprova seu currículo" · 45–60s</span>
+CENA 0–3s (HOOK VISUAL):
+Tela do computador com "0 respostas" no inbox de aplicações.
+Voz: "Você sabe por que ninguém responde seu currículo?"
+
+CENA 3–15s (PROBLEMA):
+[Aparecem logos de empresas grandes]
+"Antes de qualquer humano ler seu currículo, um robô chamado ATS já eliminou você."
+"Ele só deixa passar quem tem as palavras certas."
+
+CENA 15–35s (SOLUÇÃO):
+[Screen recording do JobFlashAI]
+"O JobFlashAI cola a descrição da vaga, lê seu currículo e reescreve automaticamente com as palavras que esse robô quer ver."
+[Mostrar o score subindo de 40 para 90+]
+
+CENA 35–50s (CTA):
+"Testa grátis. O link está na bio."
+"Seu próximo emprego começa com o currículo certo."
+
+TEXTO NA TELA: jobflash.netlify.app</div>
+
+      <div class="script-box">
+        <span class="ts">Short #2 · "Antes e depois em 60 segundos" · 60s</span>
+CENA 0–5s (HOOK):
+Cursor piscando em currículo vazio. Música tensa.
+"Olha a diferença que a IA faz no currículo real."
+
+CENA 5–30s:
+Split screen: currículo original (genérico) vs currículo gerado pelo JobFlashAI
+Destacar as palavras-chave que foram inseridas.
+
+CENA 30–50s:
+Mostrar o Avaliador ATS dando nota 91/100
+"Em 5 minutos. Sem designer. Sem contratar ninguém."
+
+CENA 50–60s (CTA):
+"Grátis pra testar. Sem cartão. Link na bio."</div>
+
+      <div class="script-box">
+        <span class="ts">Short #3 · "Por que currículo do Canva é reprovado" · 45s</span>
+HOOK: "Para de usar currículo do Canva. Os recrutadores odeiam."
+PROBLEMA: ATS não consegue ler elementos visuais. Fontes decorativas = zero pontos.
+SOLUÇÃO: JobFlashAI usa padrão Harvard validado por headhunters.
+CTA: "Testa grátis. Link na bio."</div>
+
+      <div class="post-card-footer" style="background: var(--surface); border-radius: 12px; padding: 20px; margin-top: 4px;">
+        <span class="tip-pill">Poste 3x por semana nas primeiras 2 semanas</span>
+        <span class="tip-pill orange">Thumbnail: número + resultado (ex: "92/100 ATS")</span>
+        <span class="tip-pill green">Adicione legenda em pt-BR</span>
+        <span class="tip-pill">Use os mesmos vídeos no TikTok e Kwai</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TIKTOK / KWAI / REELS ===================== -->
+<section style="border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="platform-section">
+      <div class="platform-header">
+        <div class="platform-icon" style="background:rgba(105,201,208,0.15); color:#69c9d0;">♪</div>
+        <div class="platform-meta">
+          <h2>TikTok · Kwai · Instagram Reels</h2>
+          <span class="tag" style="background:rgba(105,201,208,0.1); color:#69c9d0; border:1px solid rgba(105,201,208,0.25);">Canal do produto · Mesmo conteúdo, pequenas adaptações</span>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Regra de ouro:</strong> Grave 1 vídeo → publique nos 3 canais. TikTok e Kwai têm o mesmo público que não está no YouTube. Instagram Reels tem o público que acompanha "dicas de carreira".
+      </div>
+
+      <div class="two-col">
+        <div class="post-card">
+          <div class="post-card-header">
+            <span class="label">Hooks que param o scroll</span>
+          </div>
+          <div class="post-card-body" style="font-size:0.82rem;">
+"Mandei 40 currículos. Zero resposta. Então eu descobri isso…"
+
+"O recrutador nunca viu seu currículo. E eu vou te provar agora."
+
+"Seu currículo tem nota. E provavelmente é 30/100."
+
+"A razão real pela qual você não é chamado para entrevista."
+
+"Esse erro no currículo está te custando emprego. Sério."
+
+"Você vai mandar currículo do jeito errado pelo resto da vida?"</div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-card-header">
+            <span class="label">Formatos que performam</span>
+          </div>
+          <div class="post-card-body" style="font-size:0.82rem;">
+📱 SCREEN RECORD: mostre o JobFlashAI em uso real.
+Nada converte mais do que ver o produto funcionando.
+
+📊 ANTES/DEPOIS: currículo antes e depois da IA.
+Use texto grande na tela para quem assiste sem som.
+
+🎤 POV / HISTÓRIA: "POV: você finalmente entendeu por que não chamam você"
+
+💬 RESPOSTA A COMENTÁRIO: pegue uma dúvida real e responda em vídeo.
+"Alguém perguntou se funciona pra área de TI. Deixa eu mostrar."</div>
+        </div>
+      </div>
+
+      <div class="post-card" style="margin-top:16px;">
+        <div class="post-card-header">
+          <span class="label">Legenda padrão para TikTok/Reels (adapte para cada vídeo)</span>
+        </div>
+        <div class="post-card-body" style="font-size:0.85rem;">
+Seu currículo tá sendo rejeitado por um robô antes de chegar no RH 😱
+
+O sistema ATS filtra quem não usa as palavras certas da vaga.
+
+O JobFlashAI lê a descrição da vaga + seu currículo e reescreve tudo automaticamente.
+
+✅ Score ATS antes de enviar
+✅ Palavras-chave da vaga inseridas
+✅ Padrão validado por headhunters
+
+Testa grátis → jobflash.netlify.app (link na bio)
+
+#curriculo #emprego #vagadeemprego #ATS #buscadeemprego #carreira #curriculo2025 #dicas #trabalho</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FACEBOOK ===================== -->
+<section style="border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="platform-section">
+      <div class="platform-header">
+        <div class="platform-icon" style="background:rgba(24,119,242,0.15); color:#1877f2;">f</div>
+        <div class="platform-meta">
+          <h2>Facebook Grupos</h2>
+          <span class="tag" style="background:rgba(24,119,242,0.1); color:#1877f2; border:1px solid rgba(24,119,242,0.25);">Orgânico · Alta intenção de compra · Guerrilha</span>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Por que Facebook grupos?</strong> Quem está em grupos de vagas está em busca ativa agora. Eles são o lead mais quente que existe — e estão mendigando uma solução exatamente como a sua.
+      </div>
+
+      <h3 style="font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:16px;">🔍 Palavras-chave para encontrar grupos</h3>
+      <div class="keywords-grid">
+        <div class="keyword-card">
+          <div class="kw">"vagas de emprego [cidade/estado]"</div>
+          <p>Ex: "Vagas de Emprego BH", "Vagas SP 2025"</p>
+        </div>
+        <div class="keyword-card">
+          <div class="kw">"procuro emprego"</div>
+          <p>Grupos onde pessoas postam que estão buscando</p>
+        </div>
+        <div class="keyword-card">
+          <div class="kw">"currículo ajuda"</div>
+          <p>Grupos de dicas e revisão de currículo</p>
+        </div>
+        <div class="keyword-card">
+          <div class="kw">"recrutamento e seleção"</div>
+          <p>RHs e candidatos no mesmo lugar</p>
+        </div>
+        <div class="keyword-card">
+          <div class="kw">"banco de currículos [área]"</div>
+          <p>Ex: "Banco de Currículos TI", "Banco Administrativo"</p>
+        </div>
+        <div class="keyword-card">
+          <div class="kw">"desempregados [estado]"</div>
+          <p>Alta dor, alta receptividade a soluções</p>
+        </div>
+        <div class="keyword-card">
+          <div class="kw">"primeiro emprego"</div>
+          <p>Jovens que não sabem fazer currículo — fit perfeito</p>
+        </div>
+        <div class="keyword-card">
+          <div class="kw">"entrevista de emprego dicas"</div>
+          <p>Já estão no funil — currículo é o passo anterior</p>
+        </div>
+      </div>
+
+      <div class="divider" style="margin: 28px 0;"></div>
+
+      <h3 style="font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:16px;">✍️ Copy para post nos grupos</h3>
+
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">Versão "Ajuda genuína" — maior conversão em grupos</span>
+        </div>
+        <div class="post-card-body" style="font-size:0.88rem;">
+Oi pessoal! 👋
+
+Passei meses mandando currículo e não recebia resposta. Até que um recrutador me explicou o motivo:
+
+A maioria das empresas usa um sistema chamado ATS — que filtra currículos automaticamente ANTES de um humano ver. Se você não tiver as palavras certas da vaga, vai pro lixo.
+
+Desenvolvi uma ferramenta gratuita pra testar isso:
+👉 jobflash.netlify.app
+
+Você cola o seu currículo + a descrição da vaga, e ele te dá uma nota e mostra o que mudar.
+
+Testei aqui e meu currículo foi de 38 para 91 pontos depois das sugestões.
+
+Espero que ajude alguém que está passando pela mesma situação! 🙏
+(Tem plano grátis, sem precisar de cartão)</div>
+        <div class="post-card-footer">
+          <span class="tip-pill">NÃO chame de propaganda. Fale como usuário.</span>
+          <span class="tip-pill orange">Poste de conta pessoal, não página</span>
+          <span class="tip-pill green">Responda quem comentar dentro de 30 minutos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OUTRAS PLATAFORMAS ===================== -->
+<section style="border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-label">// 06 — Bônus</div>
+    <h2 class="section-title">Outras Plataformas Recomendadas</h2>
+
+    <div class="two-col">
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">💬 WhatsApp · Grupos e Status</span>
+        </div>
+        <div class="post-card-body" style="font-size:0.85rem;">
+<strong style="color:var(--accent2);">Grupos:</strong> Entre em grupos de "networking", "vagas [área]", "devs BH" etc.
+
+Poste o mesmo texto do Facebook, mas mais curto. WhatsApp é mais pessoal — seja conversacional.
+
+<strong style="color:var(--accent2);">Status:</strong> Coloque o link no status com uma frase curta:
+"Criei uma ferramenta gratuita que avalia seu currículo no ATS. Quem quiser testar: [link]"
+
+<strong style="color:var(--accent2);">Individual:</strong> Mande para amigos que estão em busca de emprego e peça feedback honesto — isso gera os primeiros depoimentos reais.</div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">📱 Telegram · Grupos de TI e Carreira</span>
+        </div>
+        <div class="post-card-body" style="font-size:0.85rem;">
+Grupos target:
+→ "Vagas de TI Brasil"
+→ "Devs BR"
+→ "Carreira em TI"
+→ "RH e Recrutamento"
+
+Postura: mostre como dev que construiu a solução, não como vendedor. Devs adoram apoiar outros devs que lançam produtos.
+
+Copy ideal: "Oi galera, lancei um SaaS de currículo com IA focado em ATS. Desenvolvedor brasileiro. Alguém quer testar e me dar feedback?"</div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">🌐 Reddit · r/brdev · r/desempregados</span>
+        </div>
+        <div class="post-card-body" style="font-size:0.85rem;">
+<strong style="color:var(--accent2);">r/brdev</strong> — Mostre como você construiu o produto, stack usada, decisões de produto. Devs vão querer testar.
+
+<strong style="color:var(--accent2);">r/desempregados</strong> — Fale da dor. Seja genuíno. Não anuncie — ajude.
+
+<strong style="color:var(--accent2);">r/empreendedorismo</strong> — Conte a jornada de lançar sem budget.</div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-card-header">
+          <span class="label">🎓 Indicadores de Parcerias</span>
+        </div>
+        <div class="post-card-body" style="font-size:0.85rem;">
+→ Cursos de recolocação profissional (ex: cursos no Hotmart/Eduzz)
+→ Coaches de carreira no Instagram/TikTok
+→ YouTubers de "dicas de RH" pequenos (10k–100k subs)
+
+Proposta: afiliação de 20–30% por venda.
+Um criador com 50k seguidores engajados pode fazer sua primeira dezena de vendas em 1 post.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CRONOGRAMA ===================== -->
+<section style="border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-label">// 07 — Execução</div>
+    <h2 class="section-title">Cronograma 30 Dias</h2>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="week">Semana 1 · Dias 1–7</div>
+        <h4>🔥 Ignição — Primeiras impressões</h4>
+        <p>Publique o Post #1 no LinkedIn (jornada do herói). Lance a Thread no Twitter. Publique Short #1 no YouTube/TikTok/Kwai. Poste nos 5 primeiros grupos do Facebook. Responda absolutamente tudo.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="week">Semana 2 · Dias 8–14</div>
+        <h4>📊 Prova social — Construa evidência</h4>
+        <p>Publique Post #2 no LinkedIn (dados/ATS). Short #2 (antes e depois). Continue postando 1x/dia no Twitter. Peça aos primeiros usuários por feedback — use como depoimento real.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="week">Semana 3 · Dias 15–21</div>
+        <h4>🎯 Intensidade — Ampliar alcance</h4>
+        <p>Post #3 LinkedIn (build em público). Short #3 (Canva vs JobFlash). Aborde 10 novos grupos no Facebook. Contate 3 criadores de conteúdo para parceria de afiliação.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="week">Semana 4 · Dias 22–30</div>
+        <h4>💰 Conversão — Foco em venda</h4>
+        <p>Post de urgência: "Só até [data] o plano de 7 dias por R$ 19,90". Re-poste o conteúdo que mais engajou. Analise métricas: qual post gerou mais cliques? Dobra nele.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CHECKLIST FINAL ===================== -->
+<section style="border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-label">// 08 — Checklist</div>
+    <h2 class="section-title">Antes de Publicar Qualquer Coisa</h2>
+    <ul class="checklist">
+      <li>Perfil do LinkedIn atualizado com "Criador do JobFlashAI" na headline</li>
+      <li>Bio do Twitter/X com link do produto</li>
+      <li>Canal YT/TikTok/Kwai criado com nome "JobFlashAI" e link na bio</li>
+      <li>Conta do Instagram criada com @jobflashai (ou similar)</li>
+      <li>UTM links criados para rastrear de onde vem cada clique (use bit.ly ou utm.io)</li>
+      <li>Pixel do Meta instalado na LP (para futuros ads)</li>
+      <li>Planilha simples para registrar: plataforma → cliques → cadastros → vendas</li>
+      <li>Resposta pronta para a pergunta "É seguro? Como funciona o pagamento?"</li>
+      <li>Print do dashboard pronto para usar como imagem nos posts</li>
+      <li>Vídeo demo de 60s gravado (screen record + narração)</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div style="font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; color:var(--accent); margin-bottom:8px;">JobFlashAI — Plano de Divulgação</div>
+  Criado para a primeira venda. Cada post, roteiro e copy foi pensado para o contexto brasileiro.<br>
+  Execute primeiro. Otimize depois. A primeira venda vem de consistência, não perfeição.
+</footer>
+
+</body>
+</html>

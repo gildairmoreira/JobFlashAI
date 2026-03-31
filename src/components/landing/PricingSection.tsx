@@ -40,6 +40,7 @@ const PricingSection: React.FC = () => {
       period: 'por mês',
       features: [
         { name: '1 Currículo ativo (sem duplicar)', included: true },
+        { name: 'Importação Mágica via PDF c/ IA', included: true },
         { name: 'Template Clássico Padrão', included: true },
         { name: 'Download PDF (Com marca d\'água)', included: true },
         { name: 'Gerador Vaga-Fit IA (1 Teste Grátis)', included: true },

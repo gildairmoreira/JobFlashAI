@@ -11,6 +11,7 @@ import prisma from "@/lib/prisma";
 import RenewButton from "@/components/premium/RenewButton";
 import { getGlobalSettings } from "./billing/actions";
 import { Hammer } from "lucide-react";
+import { canCreateResume } from "@/lib/permissions";
 
 export default async function Layout({
   children,
@@ -105,6 +106,9 @@ export default async function Layout({
     );
   }
 
+  const totalCount = await prisma.resume.count({ where: { userId } });
+  const canCreate = canCreateResume(userSubscriptionLevel, totalCount);
+
   return (
     <SubscriptionLevelProvider userSubscriptionLevel={userSubscriptionLevel}>
       <div className="flex min-h-screen flex-col">
@@ -112,6 +116,7 @@ export default async function Layout({
           isAdmin={isAdmin}
           userPlan={userSub?.planType || "FREE"}
           periodEnd={userSub?.currentPeriodEnd?.toISOString() || null}
+          canCreate={canCreate}
         />
         {children}
         <PremiumModal />

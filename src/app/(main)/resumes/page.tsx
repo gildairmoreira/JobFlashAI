@@ -12,6 +12,7 @@ import { getUserJobFitUsage } from "./job-actions";
 import JobFitButton from "./JobFitButton";
 import CreateResumeButtonWrapper from "./CreateResumeButtonWrapper";
 import CheckoutTrigger from "./CheckoutTrigger";
+import ImportResumeButton from "./ImportResumeButton";
 
 export const metadata: Metadata = {
   title: "Seus currículos",
@@ -52,11 +53,16 @@ export default async function Page() {
           <p className="text-muted-foreground">Total: {totalCount}</p>
         </div>
         
-        <div className="w-full md:w-1/3 flex justify-center order-1 md:order-2">
+        <div className="w-full md:w-1/3 flex flex-col sm:flex-row justify-center gap-3 order-1 md:order-2">
           <CreateResumeButtonWrapper
             canCreate={canCreateResume(subscriptionLevel, totalCount)}
             subscriptionLevel={subscriptionLevel}
           />
+          <div className="md:hidden w-full">
+            <ImportResumeButton
+              canCreate={canCreateResume(subscriptionLevel, totalCount)}
+            />
+          </div>
         </div>
 
         <div className="flex w-full md:w-1/3 items-center justify-center md:justify-end gap-3 order-3">

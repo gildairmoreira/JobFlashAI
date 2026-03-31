@@ -136,6 +136,11 @@ function MoreMenu({ resumeId, resumeTitle, onPrintClick, subscriptionLevel, isLo
   const [isDuplicating, startDuplicate] = useTransition();
   const { toast } = useToast();
   const premiumModal = usePremiumModal();
+  const [hasMounted, setHasMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const canDuplicate = canDuplicateResume(subscriptionLevel);
 
@@ -162,6 +167,16 @@ function MoreMenu({ resumeId, resumeTitle, onPrintClick, subscriptionLevel, isLo
       }
     });
   }
+
+  if (!hasMounted) return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className={`absolute right-0.5 top-0.5 opacity-0 group-hover:opacity-100 transition-opacity ${isLocked ? "hidden" : ""}`}
+    >
+      <MoreVertical className="size-4" />
+    </Button>
+  );
 
   return (
     <>

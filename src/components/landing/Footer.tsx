@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
                   <li key={linkIndex}>
                     <Link
                       href={link.href}
-                      className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      className="text-stone-600 dark:text-stone-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
                     >
                       {link.name}
                     </Link>

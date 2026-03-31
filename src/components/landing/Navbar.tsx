@@ -14,22 +14,22 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({ className }) => {
   const { scrollY } = useScroll();
-  const [isVisible, setIsVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { isSignedIn } = useUser();
 
   useEffect(() => {
     const unsubscribe = scrollY.onChange((latest) => {
-      setIsVisible(latest > 50);
-      setScrolled(latest > 50);
+      setScrolled(latest > 20);
     });
 
     return () => unsubscribe();
   }, [scrollY]);
 
-  // Keep navbar always visible but with transition on scroll
-  const navbarClass = `fixed top-4 left-0 right-0 mx-auto w-[95%] max-w-6xl z-[100] transition-all duration-300 ${className} ${scrolled ? 'translate-y-0' : 'translate-y-0'}`;
+  // Se estivermos na Hero, queremos forçar a transparência total.
+  const isForcedTransparent = className?.includes('transparent-hero');
+  
+  const navbarClass = `fixed top-4 left-0 right-0 mx-auto w-[95%] max-w-6xl z-[100] transition-all duration-300 ${className}`;
 
   const navItems = [
     { icon: Home, label: "Início", href: "#home" },
@@ -46,11 +46,11 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
         animate={{
           opacity: 1,
           y: 0,
-          boxShadow: scrolled ? "0 10px 30px rgba(0, 0, 0, 0.05)" : "0 0px 0px rgba(0, 0, 0, 0)"
+          boxShadow: (scrolled && !isForcedTransparent) ? "0 10px 30px rgba(0, 0, 0, 0.05)" : "0 0px 0px rgba(0, 0, 0, 0)"
         }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <div className={`rounded-full px-6 py-3 transition-colors duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl border border-stone-200 shadow-sm' : 'bg-transparent'}`}>
+        <div className={`rounded-3xl px-6 py-3 transition-colors duration-300 ${ (scrolled && (!isForcedTransparent || scrollY.get() > 100)) ? 'bg-white/90 backdrop-blur-xl border border-stone-200 shadow-sm' : 'bg-transparent'}`}>
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
@@ -66,7 +66,7 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
                 <motion.a
                   key={item.label}
                   href={item.href}
-                  className="flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-blue-600 transition-colors"
+                  className="text-stone-600 dark:text-stone-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.95 }}
                 >

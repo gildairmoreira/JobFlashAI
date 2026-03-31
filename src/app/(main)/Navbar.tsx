@@ -11,15 +11,18 @@ import Link from "next/link";
 import usePremiumModal from "@/hooks/usePremiumModal";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useCallback } from "react";
+import ImportResumeButton from "./resumes/ImportResumeButton";
 
 export default function Navbar({
   isAdmin,
   userPlan: initialPlan = "FREE",
-  periodEnd: initialPeriodEnd
+  periodEnd: initialPeriodEnd,
+  canCreate
 }: {
   isAdmin?: boolean;
   userPlan?: string;
   periodEnd?: string | null;
+  canCreate: boolean;
 }) {
   const { theme } = useTheme();
   const premiumModal = usePremiumModal();
@@ -91,7 +94,10 @@ export default function Navbar({
             </span>
           </Link>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <div className="hidden md:flex">
+            <ImportResumeButton canCreate={canCreate} variant="nav" />
+          </div>
           <ThemeToggle />
           <UserButton
             appearance={{

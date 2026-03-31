@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobFlashAI · Guia de Gravação + Copies TI/Devs</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090c;
+    --surface: #0f1117;
+    --surface2: #161920;
+    --surface3: #1e2229;
+    --border: #232731;
+    --border2: #2d3240;
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.08);
+    --green-border: rgba(0,255,136,0.2);
+    --blue: #4da6ff;
+    --blue-dim: rgba(77,166,255,0.08);
+    --orange: #ff8c42;
+    --orange-dim: rgba(255,140,66,0.08);
+    --purple: #b794f4;
+    --purple-dim: rgba(183,148,244,0.08);
+    --red: #ff5757;
+    --muted: #4b5563;
+    --text: #d4d8e2;
+    --text-dim: #6b7280;
+    --text-bright: #f0f2f7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* === HERO === */
+  .hero {
+    padding: 80px 24px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(0,255,136,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--green);
+    background: var(--green-dim); border: 1px solid var(--green-border);
+    padding: 5px 14px; border-radius: 4px;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    font-weight: 700; line-height: 1.1;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+  }
+
+  .hero h1 em { color: var(--green); font-style: italic; }
+
+  .hero p {
+    font-size: 1rem; color: var(--text-dim);
+    max-width: 560px; margin: 0 auto 40px;
+  }
+
+  /* === LAYOUT === */
+  .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 64px 0; border-top: 1px solid var(--border); }
+
+  .sec-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--green);
+    margin-bottom: 8px;
+  }
+
+  .sec-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 700; color: var(--text-bright);
+    margin-bottom: 8px;
+  }
+
+  .sec-sub { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 40px; }
+
+  /* === SETUP GRID === */
+  .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  @media(max-width:620px){ .setup-grid { grid-template-columns: 1fr; } }
+
+  .setup-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+
+  .setup-card .icon { font-size: 1.4rem; margin-bottom: 10px; }
+  .setup-card h3 {
+    font-size: 0.9rem; font-weight: 600;
+    color: var(--text-bright); margin-bottom: 6px;
+  }
+  .setup-card p { font-size: 0.8rem; color: var(--text-dim); }
+  .setup-card code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; color: var(--green);
+    background: var(--green-dim); border: 1px solid var(--green-border);
+    padding: 2px 7px; border-radius: 4px;
+  }
+
+  /* === SCENE BLOCK === */
+  .video-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .video-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .video-header .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.12em;
+  }
+
+  .video-header .duration {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--green);
+    background: var(--green-dim);
+    border: 1px solid var(--green-border);
+    padding: 3px 10px; border-radius: 4px;
+  }
+
+  .scenes { padding: 20px; }
+
+  .scene {
+    display: grid; grid-template-columns: 80px 1fr;
+    gap: 16px; padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .scene:last-child { border-bottom: none; }
+
+  .scene-ts {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--green);
+    font-weight: 700; padding-top: 2px;
+  }
+
+  .scene-content h4 {
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--text-bright); margin-bottom: 6px;
+  }
+
+  .scene-content p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+
+  .scene-content .spoken {
+    margin-top: 10px;
+    font-style: italic;
+    color: var(--blue);
+    font-size: 0.85rem;
+    border-left: 2px solid var(--blue);
+    padding-left: 12px;
+    line-height: 1.75;
+  }
+
+  .scene-content .screen-note {
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--orange);
+    background: var(--orange-dim);
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  /* === TIPS === */
+  .tips-row {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.06em;
+    padding: 4px 12px; border-radius: 4px;
+  }
+
+  .chip.g { color: var(--green); background: var(--green-dim); border: 1px solid var(--green-border); }
+  .chip.b { color: var(--blue); background: var(--blue-dim); border: 1px solid rgba(77,166,255,0.2); }
+  .chip.o { color: var(--orange); background: var(--orange-dim); border: 1px solid rgba(255,140,66,0.2); }
+  .chip.p { color: var(--purple); background: var(--purple-dim); border: 1px solid rgba(183,148,244,0.2); }
+
+  /* === SOFTWARE STEPS === */
+  .steps-list { counter-reset: steps; }
+
+  .step-item {
+    counter-increment: steps;
+    display: grid; grid-template-columns: 36px 1fr;
+    gap: 16px; padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+
+  .step-item::before {
+    content: counter(steps, decimal-leading-zero);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--green);
+    background: var(--green-dim); border: 1px solid var(--green-border);
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; flex-shrink: 0;
+  }
+
+  .step-item h4 { font-size: 0.9rem; font-weight: 600; color: var(--text-bright); margin-bottom: 4px; }
+  .step-item p { font-size: 0.82rem; color: var(--text-dim); }
+
+  /* === COPY BOX === */
+  .copy-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .copy-block-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .copy-block-header .plat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--text-dim);
+  }
+
+  .copy-block-body {
+    padding: 20px;
+    font-size: 0.87rem; line-height: 1.8;
+    white-space: pre-wrap; color: var(--text);
+  }
+
+  .copy-block-body .hook-line {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem; font-weight: 700;
+    color: var(--green); display: block; margin-bottom: 14px;
+  }
+
+  /* === INFO BOX === */
+  .info-box {
+    background: rgba(0,255,136,0.04);
+    border: 1px solid var(--green-border);
+    border-left: 3px solid var(--green);
+    border-radius: 10px; padding: 16px 20px;
+    font-size: 0.85rem; color: var(--text-dim);
+    margin: 20px 0;
+  }
+
+  .info-box strong { color: var(--green); }
+
+  /* === CHECKLIST === */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 0.87rem;
+  }
+  .checklist li span { color: var(--green); font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+  footer {
+    text-align: center; padding: 48px 24px;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem; color: var(--text-dim);
+  }
+  footer strong { color: var(--green); font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">🎬 Guia de Gravação · Nicho TI/Devs</div>
+  <h1>Do zero à câmera<br><em>em 2 horas.</em></h1>
+  <p>Roteiro de gravação passo a passo, setup sem equipamento caro e copies adaptadas para devs e profissionais de TI.</p>
+</div>
+
+<!-- SETUP -->
+<section>
+  <div class="container">
+    <div class="sec-label">// 01 — Antes de gravar</div>
+    <div class="sec-title">Setup Mínimo Viável</div>
+    <p class="sec-sub">Você não precisa de câmera, iluminação profissional ou editor de vídeo pago. Precisa só disso:</p>
+
+    <div class="setup-grid">
+      <div class="setup-card">
+        <div class="icon">🖥️</div>
+        <h3>Gravação de Tela</h3>
+        <p>Use <code>OBS Studio</code> (grátis) ou <code>Loom</code> (grátis com limite). Configure resolução 1080×1920 (vertical) ou grave em 1920×1080 e vire no editor.</p>
+      </div>
+      <div class="setup-card">
+        <div class="icon">🎤</div>
+        <h3>Áudio</h3>
+        <p>Microfone do fone de ouvido já serve. Grave num cômodo silencioso. Teste antes: fale em voz normal e escute. Sem eco = bom.</p>
+      </div>
+      <div class="setup-card">
+        <div class="icon">✂️</div>
+        <h3>Edição</h3>
+        <p>Use <code>CapCut</code> (grátis, celular ou PC). Perfeito para Shorts/TikTok. Já tem legendas automáticas em pt-BR. Essencial: ative "Auto Captions".</p>
+      </div>
+      <div class="setup-card">
+        <div class="icon">🎨</div>
+        <h3>Texto na Tela</h3>
+        <p>No CapCut, adicione texto grande para quem assiste sem som. Fonte <code>Bold</code>, contraste alto. Regra: cada fala importante = 1 texto na tela.</p>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Dica de dev:</strong> Prepare o JobFlashAI aberto em modo demo no browser antes de gravar. Deixe um currículo de TI genérico já carregado e uma vaga de desenvolvedor real do LinkedIn copiada. A demo precisa parecer natural, não roteirizada.
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO 1 -->
+<section>
+  <div class="container">
+    <div class="sec-label">// 02 — Vídeo 01 (grave esse primeiro)</div>
+    <div class="sec-title">O dev que não era chamado</div>
+    <p class="sec-sub">Short/Reels/TikTok · 50–60 segundos · Narrativa pessoal + demo</p>
+
+    <div class="video-card">
+      <div class="video-header">
+        <span class="title">roteiro completo · cena por cena</span>
+        <span class="duration">⏱ 55s</span>
+      </div>
+      <div class="scenes">
+
+        <div class="scene">
+          <div class="scene-ts">0s – 4s</div>
+          <div class="scene-content">
+            <h4>🪝 HOOK — Apareça em câmera (selfie) ou tela com título</h4>
+            <p>Fundo: seu computador com terminal ou IDE aberto ao fundo. Tom sério.</p>
+            <div class="spoken">"Sou desenvolvedor. Mandei currículo pra mais de 20 vagas. Nenhuma resposta. Até entender o motivo."</div>
+            <div class="screen-note">TEXTO NA TELA GRANDE: "20 vagas. 0 resposta."</div>
+          </div>
+        </div>
+
+        <div class="scene">
+          <div class="scene-ts">4s – 16s</div>
+          <div class="scene-content">
+            <h4>🧩 PROBLEMA — Explicar ATS em linguagem de dev</h4>
+            <p>Corte para tela do computador. Pode mostrar um print de um sistema ATS ou simplesmente falar.</p>
+            <div class="spoken">"As empresas usam um sistema chamado ATS — basicamente um algoritmo — que lê seu currículo antes de qualquer humano. Ele compara palavra por palavra com a descrição da vaga. Se não tiver match, vai pro lixo. Automaticamente. Sem revisão humana."</div>
+            <div class="screen-note">TEXTO NA TELA: "ATS = robô que reprova seu currículo"</div>
+          </div>
+        </div>
+
+        <div class="scene">
+          <div class="scene-ts">16s – 38s</div>
+          <div class="scene-content">
+            <h4>💻 DEMO — Mostre o JobFlashAI ao vivo</h4>
+            <p>Screen record do produto. Faça devagar, mostre cada passo claramente.</p>
+            <div class="spoken">"Então construí o JobFlashAI. Você cola a descrição da vaga… seleciona o seu currículo… e a IA reescreve suas experiências com as palavras-chave exatas que o algoritmo daquela empresa procura. Olha o score subindo de quarenta e poucos para noventa e dois."</div>
+            <div class="screen-note">MOSTRE NA TELA: campo da vaga → currículo sendo reescrito → score ATS subindo</div>
+          </div>
+        </div>
+
+        <div class="scene">
+          <div class="scene-ts">38s – 50s</div>
+          <div class="scene-content">
+            <h4>✅ RESULTADO + PREÇO</h4>
+            <div class="spoken">"Não muda sua experiência. Muda como você apresenta ela pra máquina entender. R$ 19,90 por 7 dias, ou grátis pra testar agora."</div>
+            <div class="screen-note">TEXTO NA TELA: "R$19,90 · 7 dias" e "Teste GRÁTIS"</div>
+          </div>
+        </div>
+
+        <div class="scene">
+          <div class="scene-ts">50s – 55s</div>
+          <div class="scene-content">
+            <h4>📲 CTA</h4>
+            <div class="spoken">"Link na bio. jobflash.netlify.app"</div>
+            <div class="screen-note">TEXTO NA TELA: jobflash.netlify.app · seta pra cima</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="tips-row">
+        <span class="chip g">Grave essa versão 3× e use a melhor</span>
+        <span class="chip b">Legenda automática no CapCut</span>
+        <span class="chip o">Som: música lo-fi techno no fundo, volume 15%</span>
+        <span class="chip p">Publique em TikTok → YT Shorts → Kwai → Reels</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO 2 -->
+<section>
+  <div class="container">
+    <div class="sec-label">// 03 — Vídeo 02</div>
+    <div class="sec-title">O erro que todo dev comete no currículo</div>
+    <p class="sec-sub">Short educativo · 40–45 segundos · Alto compartilhamento</p>
+
+    <div class="video-card">
+      <div class="video-header">
+        <span class="title">roteiro · formato lista rápida</span>
+        <span class="duration">⏱ 42s</span>
+      </div>
+      <div class="scenes">
+        <div class="scene">
+          <div class="scene-ts">0s – 3s</div>
+          <div class="scene-content">
+            <h4>🪝 HOOK</h4>
+            <div class="spoken">"Três erros no currículo de dev que o ATS reprovaria na hora."</div>
+            <div class="screen-note">TEXTO: "3 erros que te custam entrevistas"</div>
+          </div>
+        </div>
+        <div class="scene">
+          <div class="scene-ts">3s – 28s</div>
+          <div class="scene-content">
+            <h4>📋 LISTA — Mostre os erros na tela enquanto fala</h4>
+            <div class="spoken">"Erro 1: colocar só as tecnologias sem contexto. ATS quer 'React.js para dashboard com 50k usuários', não só 'React'. Erro 2: usar o mesmo currículo pra vaga de front, back e fullstack. Cada vaga tem palavras diferentes. Erro 3: currículo em PDF de Canva. O robô não lê imagem, só texto estruturado."</div>
+            <div class="screen-note">TEXTO NA TELA: cada erro em destaque conforme fala</div>
+          </div>
+        </div>
+        <div class="scene">
+          <div class="scene-ts">28s – 42s</div>
+          <div class="scene-content">
+            <h4>💡 SOLUÇÃO + CTA</h4>
+            <div class="spoken">"O JobFlashAI corrige os três automaticamente. Cola a vaga, ele adapta o currículo. Testa grátis no link da bio."</div>
+            <div class="screen-note">TEXTO: "JobFlashAI · grátis pra testar · link na bio"</div>
+          </div>
+        </div>
+      </div>
+      <div class="tips-row">
+        <span class="chip g">Esse formato de "erros" tem alto compartilhamento entre devs</span>
+        <span class="chip o">Pode ser só screen record, sem câmera</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO 3 -->
+<section>
+  <div class="container">
+    <div class="sec-label">// 04 — Vídeo 03</div>
+    <div class="sec-title">Demo puro — "Em tempo real"</div>
+    <p class="sec-sub">Short de produto · 60 segundos · Sem narração elaborada, deixa o produto falar</p>
+
+    <div class="video-card">
+      <div class="video-header">
+        <span class="title">roteiro · screen record legendado</span>
+        <span class="duration">⏱ 60s</span>
+      </div>
+      <div class="scenes">
+        <div class="scene">
+          <div class="scene-ts">0s – 5s</div>
+          <div class="scene-content">
+            <h4>🪝 HOOK — só texto na tela, nenhuma fala</h4>
+            <div class="screen-note">TEXTO GRANDE: "Veja o que acontece quando você cola uma vaga do LinkedIn aqui 👇"</div>
+          </div>
+        </div>
+        <div class="scene">
+          <div class="scene-ts">5s – 45s</div>
+          <div class="scene-content">
+            <h4>🎬 DEMO SILENCIOSA — com legendas descritivas</h4>
+            <p>Screen record sem fala. Use setas e textos animados no CapCut para explicar o que está acontecendo.</p>
+            <div class="screen-note">Passo 1: "Cola a descrição da vaga aqui" → Passo 2: "Seleciona seu currículo" → Passo 3: "IA reescreve em segundos" → Passo 4: mostrar score 91/100</div>
+          </div>
+        </div>
+        <div class="scene">
+          <div class="scene-ts">45s – 60s</div>
+          <div class="scene-content">
+            <h4>💰 PREÇO + CTA</h4>
+            <div class="spoken">"7 dias por R$ 19,90. Ou grátis agora pra testar. Só acessar jobflash.netlify.app"</div>
+            <div class="screen-note">TEXTO: preço + link + "Garantia de 7 dias"</div>
+          </div>
+        </div>
+      </div>
+      <div class="tips-row">
+        <span class="chip g">Ótimo pra quem tem vergonha de aparecer na câmera</span>
+        <span class="chip b">Música: eletrônica instrumental, energia alta</span>
+        <span class="chip p">Use cursor grande e animado no OBS para guiar o olhar</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PASSO A PASSO NO OBS -->
+<section>
+  <div class="container">
+    <div class="sec-label">// 05 — Tutorial</div>
+    <div class="sec-title">Como gravar a tela no OBS</div>
+    <p class="sec-sub">Do zero ao arquivo de vídeo em ~20 minutos</p>
+
+    <div class="steps-list">
+      <div class="step-item">
+        <div></div>
+        <div>
+          <h4>Baixar o OBS Studio</h4>
+          <p>obsproject.com → Download → Windows/Mac/Linux. Instale com configurações padrão.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div></div>
+        <div>
+          <h4>Configurar saída de vídeo</h4>
+          <p>Configurações → Vídeo → Resolução base: 1920×1080. FPS: 30. Output: MP4. Qualidade: CRF 18.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div></div>
+        <div>
+          <h4>Adicionar fontes de captura</h4>
+          <p>Na cena principal: clique "+" em Fontes → "Captura de Tela" (para capturar o browser com o JobFlashAI). Adicione também "Captura de Áudio" para o microfone.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div></div>
+        <div>
+          <h4>Fazer um teste antes</h4>
+          <p>Grave 30 segundos, pare, assista. Verifique: áudio claro? Tela nítida? Cursor visível? Ajuste o que precisar.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div></div>
+        <div>
+          <h4>Gravar com o JobFlashAI aberto</h4>
+          <p>Abra o browser com jobflash.netlify.app em tela cheia. Tenha o currículo de dev + descrição de vaga já prontos. Clique "Iniciar Gravação" → execute o roteiro → "Parar Gravação".</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div></div>
+        <div>
+          <h4>Importar no CapCut e editar</h4>
+          <p>Abra o CapCut → "Novo Projeto" → importe o .mp4. Corte silêncios, adicione textos, ative "Auto Legenda" em pt-BR. Exporte em 1080p.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div></div>
+        <div>
+          <h4>Virar para formato vertical (9:16)</h4>
+          <p>No CapCut: proporção 9:16. O screen record vai ficar centralizado. Adicione fundo preto ou desfocado acima/abaixo. Pronto para Shorts/TikTok/Reels.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COPIES TI/DEVS -->
+<section>
+  <div class="container">
+    <div class="sec-label">// 06 — Copies adaptadas para TI/Devs</div>
+    <div class="sec-title">Posts prontos · Nicho Tech</div>
+    <p class="sec-sub">Use no LinkedIn e Twitter. Tom de dev falando com dev.</p>
+
+    <!-- LINKEDIN DEV -->
+    <div class="copy-block">
+      <div class="copy-block-header">
+        <span class="plat">LinkedIn · Conta pessoal · Post principal devs</span>
+        <span class="chip g">Alto alcance</span>
+      </div>
+      <div class="copy-block-body">
+<span class="hook-line">MEU CURRÍCULO COMO DEV ERA REPROVADO POR UM ALGORITMO.<br>E eu, que trabalho com algoritmos, não sabia disso.</span>
+Aqui está o que descobri — e o que construí depois:
+
+─────────────────
+
+Apliquei para umas 20 vagas de dev. Nenhuma resposta.
+
+Perfil GitHub atualizado. Projetos no portfólio. Stack moderna.
+Não entendia o motivo.
+
+Até que um tech recruiter me explicou:
+
+"Seu currículo é reprovado antes de qualquer pessoa ver. O ATS — sistema de triagem automática — compara token por token com a JD da vaga. Se a frequência de palavras-chave não bater um threshold, vai pro lixo."
+
+Meu currículo tinha React. A vaga queria "React.js para sistemas de alta escala com Redux."
+Conteúdo idêntico. Parsing diferente. Resultado: reprovado.
+
+─────────────────
+
+Então automatizei a solução. Construí o JobFlashAI:
+
+→ Você cola a descrição da vaga
+→ Sobe o currículo existente
+→ A IA reescreve suas experiências com as exatas palavras-chave que o ATS daquela empresa procura
+→ Você recebe um score antes de enviar
+
+Não é magia. É NLP + pattern matching contra a JD. O mesmo processo que headhunters fazem manualmente por horas.
+
+─────────────────
+
+Plano de 7 dias: R$ 19,90.
+Tem opção grátis pra testar sem cartão.
+
+Se você é dev em busca de vaga — ou conhece alguém que está:
+👉 jobflash.netlify.app
+
+Comenta aqui se quiser que eu explique como o ATS funciona tecnicamente. Tenho muito dado interessante sobre isso.</div>
+      <div class="tips-row">
+        <span class="chip g">O último parágrafo gera comentários = mais alcance</span>
+        <span class="chip b">Publique terça/quarta 9h</span>
+        <span class="chip o">Imagem: print do score ATS subindo no dashboard</span>
+      </div>
+    </div>
+
+    <!-- TWITTER THREAD DEVS -->
+    <div class="copy-block">
+      <div class="copy-block-header">
+        <span class="plat">Twitter/X · Thread · Devs</span>
+        <span class="chip b">Fixe no perfil</span>
+      </div>
+      <div class="copy-block-body">
+🧵 Sou dev. Mandei currículo pra 20 vagas. Zero retorno. Então entendi o problema e construí a solução.
+
+[1/7] O problema não era meu código. Era como eu descrevia meu código.
+
+[2/7] Empresas usam ATS (Applicant Tracking System).
+É basicamente um pipeline de NLP que tokeniza sua JD e seu currículo e calcula similaridade.
+Se o score não passa de um threshold → você nem é visto.
+
+[3/7] O detalhe: cada empresa usa vocabulário diferente.
+"microsserviços" vs "microservices" vs "arquitetura distribuída"
+Para o ATS: tokens completamente diferentes.
+Para você: a mesma coisa.
+
+[4/7] A solução manual: ler a JD → identificar tokens frequentes → reescrever o currículo.
+Processo de 30–60min por vaga. Para cada vaga.
+Impraticável.
+
+[5/7] Automatizei isso.
+JobFlashAI: cola a JD + sobe o currículo → IA reescreve com os tokens certos.
+Score ATS gerado antes de enviar.
+5 minutos por vaga.
+
+[6/7] Tem plano de 7 dias (R$19,90) e versão gratuita.
+Lancei há pouco. Construindo em público.
+jobflash.netlify.app
+
+[7/7] Se você quiser entender melhor como ATS funciona tecnicamente, responde aqui — tenho material.
+E se estiver em busca ativa: testa. Grátis. Sem cartão.</div>
+      <div class="tips-row">
+        <span class="chip g">Tom técnico funciona muito bem com devs no Twitter</span>
+        <span class="chip p">Hashtags: #dev #carreira #programacao #opentowork</span>
+      </div>
+    </div>
+
+    <!-- GRUPOS FACEBOOK DEV -->
+    <div class="copy-block">
+      <div class="copy-block-header">
+        <span class="plat">Facebook Grupos · Versão tech</span>
+        <span class="chip o">Grupos: Devs BR, Vagas TI, Programadores</span>
+      </div>
+      <div class="copy-block-body">
+Oi pessoal! Uma dica rápida pra quem está buscando vaga na área de TI:
+
+A maioria dos currículos de dev é reprovada por sistemas ATS antes de qualquer recrutador ver. O sistema compara palavras-chave da vaga com o currículo — e qualquer diferença de vocabulário pode te reprovar mesmo você tendo a experiência certa.
+
+Fiz uma ferramenta que resolve isso: você cola a descrição da vaga + seu currículo, e a IA adapta automaticamente com as palavras certas.
+
+👉 jobflash.netlify.app (tem plano grátis, sem cartão)
+
+Testei com uma vaga de React Sênior e meu score ATS foi de 41 para 89. Valeu a pena compartilhar!
+
+Se alguém testar, me fala o que achou 🙏</div>
+      <div class="tips-row">
+        <span class="chip g">Poste em horário noturno (20h–23h) — devs estão ativos</span>
+        <span class="chip b">Grupos target: "Devs BR", "Vagas TI Brasil", "Programadores Iniciantes"</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHECKLIST ANTES DE PUBLICAR -->
+<section>
+  <div class="container">
+    <div class="sec-label">// 07 — Go live</div>
+    <div class="sec-title">Checklist antes de publicar o primeiro vídeo</div>
+
+    <ul class="checklist">
+      <li><span>○</span> OBS instalado e testado (gravação de teste de 30s feita)</li>
+      <li><span>○</span> Currículo de dev fictício criado no JobFlashAI para a demo</li>
+      <li><span>○</span> Descrição de vaga real (ex: dev React sênior) copiada do LinkedIn</li>
+      <li><span>○</span> CapCut instalado (PC ou celular)</li>
+      <li><span>○</span> Canal TikTok, YouTube e Instagram criados com nome "JobFlashAI"</li>
+      <li><span>○</span> Bio de todos os canais com: o que é + link do produto</li>
+      <li><span>○</span> Roteiro do Vídeo 01 lido em voz alta pelo menos 2× antes de gravar</li>
+      <li><span>○</span> Score ATS da demo acima de 85/100 (ajuste o currículo até chegar lá)</li>
+      <li><span>○</span> Primeiro post do LinkedIn escrito e agendado</li>
+      <li><span>○</span> Thread do Twitter pronta para publicar junto com o vídeo</li>
+    </ul>
+
+    <div class="info-box" style="margin-top:28px;">
+      <strong>Ordem de publicação ideal no dia 1:</strong> LinkedIn post (9h) → Twitter thread (12h) → TikTok/Shorts (18h) → Facebook grupos (21h). Publicar tudo no mesmo dia cria um efeito de presença que aumenta credibilidade quando alguém pesquisa o produto.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>jobflash.netlify.app</strong><br><br>
+  Grave primeiro. Perfeiçoe depois.<br>
+  O primeiro vídeo imperfeito publicado vale mais do que o vídeo perfeito que nunca saiu.
+</footer>
+
+</body>
+</html>

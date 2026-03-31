@@ -7,11 +7,13 @@ const Navbar = dynamic(() => import("./Navbar"), { ssr: false });
 export default function ClientNavbar({
   isAdmin,
   userPlan,
-  periodEnd
+  periodEnd,
+  canCreate
 }: {
   isAdmin?: boolean;
   userPlan?: string;
   periodEnd?: string | null;
+  canCreate: boolean;
 }) {
-  return <Navbar isAdmin={isAdmin} userPlan={userPlan} periodEnd={periodEnd} />;
+  return <Navbar isAdmin={isAdmin} userPlan={userPlan} periodEnd={periodEnd} canCreate={canCreate} />;
 }

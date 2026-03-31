@@ -14,7 +14,6 @@ export const env = createEnv({
     CLERK_SECRET_KEY: z.string().min(1),
     BLOB_READ_WRITE_TOKEN: z.string().min(1),
     GEMINI_API_KEY: z.string().min(1).optional(),
-    OPENAI_API_KEY: z.string().min(1).optional(),
     CAKTO_WEBHOOK_SECRET: z.string().optional(),
     CAKTO_PRO_PRODUCT_ID: z.string().optional(),
     CAKTO_MONTHLY_PRODUCT_ID: z.string().optional(),
