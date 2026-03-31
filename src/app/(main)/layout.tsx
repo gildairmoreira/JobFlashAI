@@ -11,7 +11,7 @@ import prisma from "@/lib/prisma";
 import RenewButton from "@/components/premium/RenewButton";
 import { getGlobalSettings } from "./billing/actions";
 import { Hammer } from "lucide-react";
-import { canCreateResume } from "@/lib/permissions";
+import { canCreateResume, canImportResume } from "@/lib/permissions";
 
 export default async function Layout({
   children,
@@ -26,6 +26,7 @@ export default async function Layout({
   const userSubscriptionLevel = await getUserSubscriptionLevel(userId);
   const totalCount = await prisma.resume.count({ where: { userId } });
   const canCreate = canCreateResume(userSubscriptionLevel, totalCount);
+  const canImport = canImportResume(userSubscriptionLevel);
 
   const clerkUser = await currentUser();
   const isMaster = clerkUser?.emailAddresses[0]?.emailAddress === "gildair457@gmail.com";
@@ -70,7 +71,7 @@ export default async function Layout({
     return (
       <SubscriptionLevelProvider userSubscriptionLevel={userSubscriptionLevel}>
         <div className="flex min-h-[100dvh] flex-col bg-[#FAF9F7]">
-          <ClientNavbar isAdmin={isAdmin} canCreate={canCreate} />
+          <ClientNavbar isAdmin={isAdmin} canCreate={canCreate} canImport={canImport} />
           <main className="flex flex-1 items-center justify-center px-4 py-12">
             <div className="max-w-xl w-full text-center space-y-8 bg-white p-10 rounded-3xl shadow-xl border border-stone-100">
               <div className="inline-block bg-orange-100 text-orange-700 px-5 py-2 rounded-full font-bold text-sm tracking-wide">
@@ -116,6 +117,7 @@ export default async function Layout({
           userPlan={userSub?.planType || "FREE"}
           periodEnd={userSub?.currentPeriodEnd?.toISOString() || null}
           canCreate={canCreate}
+          canImport={canImport}
         />
         {children}
         <PremiumModal />

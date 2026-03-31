@@ -8,12 +8,14 @@ export default function ClientNavbar({
   isAdmin,
   userPlan,
   periodEnd,
-  canCreate
+  canCreate,
+  canImport
 }: {
   isAdmin?: boolean;
   userPlan?: string;
   periodEnd?: string | null;
   canCreate: boolean;
+  canImport: boolean;
 }) {
-  return <Navbar isAdmin={isAdmin} userPlan={userPlan} periodEnd={periodEnd} canCreate={canCreate} />;
+  return <Navbar isAdmin={isAdmin} userPlan={userPlan} periodEnd={periodEnd} canCreate={canCreate} canImport={canImport} />;
 }

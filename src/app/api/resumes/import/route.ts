@@ -2,9 +2,17 @@ import { NextResponse } from 'next/server';
 import { generateWithRetry } from '@/lib/gemini';
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
-import { canCreateResume } from '@/lib/permissions';
+import { canCreateResume, canImportResume } from '@/lib/permissions';
 import { getUserSubscriptionLevel } from '@/lib/subscription';
 import { auth } from '@clerk/nextjs/server';
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "5 m"), // 5 imports a cada 5 min (generoso mas impede bot/abuse)
+  analytics: true,
+});
 
 export async function POST(req: Request) {
   try {
@@ -15,12 +23,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { success } = await ratelimit.limit(userId);
+    if (!success) {
+      return NextResponse.json({ error: 'Muitas requisições. Tente novamente em alguns minutos.' }, { status: 429 });
+    }
+
     // Check permissions
     const totalCount = await prisma.resume.count({ where: { userId } });
     const subscriptionLevel = await getUserSubscriptionLevel(userId);
     
     if (!canCreateResume(subscriptionLevel, totalCount)) {
       return NextResponse.json({ error: 'Você atingiu o limite de currículos do seu plano.' }, { status: 403 });
+    }
+
+    if (!canImportResume(subscriptionLevel)) {
+      return NextResponse.json({ error: 'A importação de currículo via IA está disponível apenas para os planos Pro e Mensal.' }, { status: 403 });
     }
 
     const formData = await req.formData();

@@ -17,12 +17,14 @@ export default function Navbar({
   isAdmin,
   userPlan: initialPlan = "FREE",
   periodEnd: initialPeriodEnd,
-  canCreate
+  canCreate,
+  canImport
 }: {
   isAdmin?: boolean;
   userPlan?: string;
   periodEnd?: string | null;
   canCreate: boolean;
+  canImport: boolean;
 }) {
   const { theme } = useTheme();
   const premiumModal = usePremiumModal();
@@ -96,7 +98,7 @@ export default function Navbar({
         </div>
         <div className="flex items-center gap-2">
           <div className="hidden md:flex">
-            <ImportResumeButton canCreate={canCreate} variant="nav" />
+            <ImportResumeButton canCreate={canCreate} canImport={canImport} variant="nav" />
           </div>
           <ThemeToggle />
           <UserButton

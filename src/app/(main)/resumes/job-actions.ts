@@ -31,41 +31,46 @@ export async function createJobFitGeneration(sourceResumeId: string, jobDescript
   // Verificar limite dinâmico
   const limit = getJobFitLimit(subscriptionLevel);
 
-  // @ts-ignore
-  const usage = await prisma.userUsage.findUnique({ where: { userId } });
-  // @ts-ignore
-  if (usage && usage.jobFitUsesThisMonth >= limit) {
-    throw new Error("LIMIT_REACHED");
-  }
-
-  // Verificar propriedade do currículo original (Prevenção de IDOR)
-  const sourceResume = await prisma.resume.findFirst({
-    where: { id: sourceResumeId, userId }
-  });
-  if (!sourceResume) {
-    throw new Error("Source resume not found or unauthorized");
-  }
-
-  // Criar registro de geração
-  // @ts-ignore
-  const generation = await prisma.jobFitGeneration.create({
-    data: {
-      userId,
-      sourceResumeId,
-      jobDescription,
-      status: "pending",
-      sectionsCompleted: 0,
-    },
-  });
-
-  // Atualizar contagem
-  // @ts-ignore
-  await prisma.userUsage.upsert({
-    where: { userId },
+  // TRANSACTIONAL FLOW: Prevenção de Condições de Corrida (Race Conditions)
+  // Garante que o usuário não ultrapasse o limite em requisições paralelas
+  const generation = await prisma.$transaction(async (tx) => {
+    // 1. Verificar limite dinâmico
     // @ts-ignore
-    create: { userId, jobFitUsesThisMonth: 1 },
+    const usage = await tx.userUsage.findUnique({ where: { userId } });
     // @ts-ignore
-    update: { jobFitUsesThisMonth: { increment: 1 } },
+    if (usage && usage.jobFitUsesThisMonth >= limit) {
+      throw new Error("LIMIT_REACHED");
+    }
+
+    // 2. Verificar propriedade do currículo original (Prevenção de IDOR)
+    const sourceResume = await tx.resume.findFirst({
+      where: { id: sourceResumeId, userId }
+    });
+    if (!sourceResume) {
+      throw new Error("Source resume not found or unauthorized");
+    }
+
+    // 3. Registrar o uso preventivamente (Atomic Update)
+    // @ts-ignore
+    await tx.userUsage.upsert({
+      where: { userId },
+      // @ts-ignore
+      create: { userId, jobFitUsesThisMonth: 1 },
+      // @ts-ignore
+      update: { jobFitUsesThisMonth: { increment: 1 } },
+    });
+
+    // 4. Criar registro de geração
+    // @ts-ignore
+    return await tx.jobFitGeneration.create({
+      data: {
+        userId,
+        sourceResumeId,
+        jobDescription,
+        status: "pending",
+        sectionsCompleted: 0,
+      },
+    });
   });
 
   // Disparar processamento em background (o Netlify serverless não cortará essa promessa se usarmos res.waitUntil na API, mas em server actions pode cortar dependendo da duração. O ideal é usar Inngest ou background jobs. Para o escopo do SaaS, se não demorar mais de 60s, o Next.js suporta via await sem blockar UI usando promise orquestrada, MAS a melhor forma aqui é devolver o ID e processar assíncrono ou o client fazer poll)

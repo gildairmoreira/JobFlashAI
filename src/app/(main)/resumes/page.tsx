@@ -1,4 +1,4 @@
-import { canCreateResume } from "@/lib/permissions";
+import { canCreateResume, canImportResume } from "@/lib/permissions";
 import prisma from "@/lib/prisma";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import { resumeDataInclude } from "@/lib/types";
@@ -61,6 +61,7 @@ export default async function Page() {
           <div className="md:hidden w-full">
             <ImportResumeButton
               canCreate={canCreateResume(subscriptionLevel, totalCount)}
+              canImport={canImportResume(subscriptionLevel)}
             />
           </div>
         </div>

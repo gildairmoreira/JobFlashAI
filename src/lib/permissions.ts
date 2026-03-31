@@ -25,6 +25,11 @@ export function canUseCustomizations(subscriptionLevel: SubscriptionLevel) {
   return subscriptionLevel !== "free";
 }
 
+/** Importação Mágica via PDF — disponível para PRO (semanal) e MONTHLY (mensal) */
+export function canImportResume(subscriptionLevel: SubscriptionLevel) {
+  return subscriptionLevel === "pro" || subscriptionLevel === "monthly";
+}
+
 /** Duplicar currículo — disponível para PRO (semanal) e MONTHLY (mensal) */
 export function canDuplicateResume(subscriptionLevel: SubscriptionLevel) {
   return subscriptionLevel === "pro" || subscriptionLevel === "monthly";

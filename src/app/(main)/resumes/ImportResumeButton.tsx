@@ -5,19 +5,27 @@ import { Button } from "@/components/ui/button";
 import { Upload, Loader2, FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import usePremiumModal from "@/hooks/usePremiumModal";
 
 interface Props {
   canCreate: boolean;
+  canImport: boolean;
   variant?: "default" | "nav";
 }
 
-export default function ImportResumeButton({ canCreate, variant = "default" }: Props) {
+export default function ImportResumeButton({ canCreate, canImport, variant = "default" }: Props) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const router = useRouter();
+  const premiumModal = usePremiumModal();
 
   const handleUploadClick = () => {
+    if (!canImport) {
+      premiumModal.setOpen(true);
+      return;
+    }
+    
     if (!canCreate) {
       toast({
         title: "Limite atingido",
