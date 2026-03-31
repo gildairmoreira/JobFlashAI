@@ -46,6 +46,18 @@ export async function POST(req: Request) {
     try {
       console.log('--- Iniciando extração nativa de texto ---');
       
+      // Polyfill crucial para PDF.js v4+ em ambientes Node (Vercel/Next.js)
+      // Evita o erro 'DOMMatrix is not defined' durante a extração de texto
+      if (typeof global.DOMMatrix === 'undefined') {
+        // @ts-ignore
+        global.DOMMatrix = class DOMMatrix {
+          a: number; b: number; c: number; d: number; e: number; f: number;
+          constructor() {
+            this.a = 1; this.b = 0; this.c = 0; this.d = 1; this.e = 0; this.f = 0;
+          }
+        };
+      }
+
       // Importação dinâmica do PDF.js para ambiente Node
       // Usamos o build legacy para maior compatibilidade com ambientes sem canvas nativo
       const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
@@ -63,12 +75,15 @@ export async function POST(req: Request) {
       // @ts-ignore
       pdfjs.GlobalWorkerOptions.workerSrc = workerPath;
 
-      // Carregar o documento PDF
+      // Configuração adicional para ambiente Node: desabilitar worker se necessário ou forçar carregamento
+      // Em alguns ambientes de produção, o worker externo pode falhar, então permitimos fallback
       const loadingTask = pdfjs.getDocument({
         data: new Uint8Array(arrayBuffer),
         useSystemFonts: true,
         disableFontFace: true,
         isEvalSupported: false,
+        useWorkerFetch: false, // Importante para Vercel
+        stopAtErrors: false,
       });
 
       const pdf = await loadingTask.promise;
