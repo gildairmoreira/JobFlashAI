@@ -195,13 +195,18 @@ export async function updateUserStatus(targetUserId: string, status: "ACTIVE" | 
 export async function updateUserPlan(targetUserId: string, newPlanType: "FREE" | "PRO" | "MONTHLY") {
     const adminData = await verifyAdminAccess();
 
-    // Determine current expiration based on new plan
-    let expirationDate: Date | null = null;
+    // Determine current expiration based on new plan (Cumulative Logic)
+    const existingSub = await prisma.userSubscription.findUnique({ where: { userId: targetUserId } });
+    let baseDate = new Date();
+
+    if (existingSub?.currentPeriodEnd && existingSub.currentPeriodEnd > new Date()) {
+        baseDate = existingSub.currentPeriodEnd;
+    }
+
+    const expirationDate = new Date(baseDate);
     if (newPlanType === "PRO") {
-        expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 7);
     } else if (newPlanType === "MONTHLY") {
-        expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 31);
     }
 
@@ -214,7 +219,7 @@ export async function updateUserPlan(targetUserId: string, newPlanType: "FREE" |
         },
         update: {
             planType: newPlanType,
-            currentPeriodEnd: expirationDate !== null ? expirationDate : null
+            currentPeriodEnd: expirationDate
         },
     });
 

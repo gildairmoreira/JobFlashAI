@@ -71,7 +71,23 @@ export function SubscriptionTab() {
                 </div>
             </div>
 
-            {!isPremium && (
+            {isPremium ? (
+                <div className="space-y-4">
+                    <Button 
+                        onClick={() => premiumModal.setOpen(true)} 
+                        variant="outline"
+                        className="w-full border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold py-6 rounded-2xl transition-all"
+                    >
+                        🚀 Estender Assinatura / Ver Planos
+                    </Button>
+                    
+                    <div className="p-4 rounded-2xl border border-border/50 bg-muted/5">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground text-center leading-relaxed">
+                            Para suporte ou cancelamento, entre em contato através do nosso canal de suporte.
+                        </p>
+                    </div>
+                </div>
+            ) : (
                 <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 space-y-3">
                     <div className="flex gap-3">
                         <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
@@ -84,18 +100,10 @@ export function SubscriptionTab() {
                     </div>
                     <Button 
                         onClick={() => premiumModal.setOpen(true)} 
-                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold"
+                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-6 rounded-xl"
                     >
                         Ver Planos Premium
                     </Button>
-                </div>
-            )}
-
-            {isPremium && (
-                <div className="p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5">
-                    <p className="text-xs text-muted-foreground text-center">
-                        Para suporte ou cancelamento, entre em contato através do nosso canal de suporte.
-                    </p>
                 </div>
             )}
         </div>

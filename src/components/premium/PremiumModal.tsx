@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { createCheckoutSession } from "./actions";
 import { getGlobalSettings } from "@/app/(main)/billing/actions";
+import { getUserSubscription } from "@/app/actions/auth-actions";
 import { cn } from "@/lib/utils";
 
 export default function PremiumModal() {
@@ -15,10 +16,12 @@ export default function PremiumModal() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = React.useState<any>(null);
+  const [sub, setSub] = React.useState<any>(null);
 
   React.useEffect(() => {
     if (open) {
       getGlobalSettings().then(setSettings);
+      getUserSubscription().then(setSub);
     }
   }, [open]);
 
@@ -57,8 +60,7 @@ export default function PremiumModal() {
       <DialogContent className="max-w-[95vw] sm:max-w-2xl p-0 border-none bg-white dark:bg-stone-950 shadow-2xl rounded-[2rem] max-h-[90vh] flex flex-col outline-none">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 z-50" />
         
-        <div className="overflow-y-auto p-6 sm:p-8 pt-4 sm:pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <DialogHeader className="mb-4 text-center">
+        <div className="overflow-y-auto p-6 sm:p-8 pt-4 sm:pt-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">            <DialogHeader className="mb-4 text-center">
             <div className="flex justify-center mb-2">
               <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl">
                 <Sparkles className="w-5 h-5" />
@@ -67,9 +69,19 @@ export default function PremiumModal() {
             <DialogTitle className="text-xl sm:text-2xl font-black tracking-tight text-stone-900 dark:text-white">
               Escolha seu <span className="text-indigo-600">Plano Premium</span>
             </DialogTitle>
-            <p className="text-stone-500 dark:text-stone-400 mt-1 text-xs sm:text-sm px-2">
-              Desbloqueie ferramentas de IA e destaque-se no mercado.
-            </p>
+            
+            {sub?.currentPeriodEnd && new Date(sub.currentPeriodEnd) > new Date() ? (
+              <div className="mt-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 p-2 rounded-xl flex items-center justify-center gap-2">
+                <Zap className="w-3 h-3 text-indigo-600" />
+                <p className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-tight">
+                  Benefício Ativo: Seus novos dias serão somados ao vencimento atual!
+                </p>
+              </div>
+            ) : (
+              <p className="text-stone-500 dark:text-stone-400 mt-1 text-xs sm:text-sm px-2">
+                Desbloqueie ferramentas de IA e destaque-se no mercado.
+              </p>
+            )}
           </DialogHeader>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -98,7 +110,7 @@ export default function PremiumModal() {
               className="w-full py-6 font-bold rounded-2xl bg-white dark:bg-stone-800 text-stone-900 dark:text-white hover:bg-stone-100 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 shadow-sm transition active:scale-[0.98]"
               disabled={loading}
             >
-              Começar Semanal
+              {sub?.currentPeriodEnd && new Date(sub.currentPeriodEnd) > new Date() ? "Adicionar +7 Dias" : "Começar Semanal"}
             </Button>
           </div>
 
@@ -134,10 +146,11 @@ export default function PremiumModal() {
                 className="w-full py-6 font-black rounded-2xl text-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 transition active:scale-[0.98]"
                 disabled={loading}
               >
-                🔥 Ativar Mensal
+                {sub?.currentPeriodEnd && new Date(sub.currentPeriodEnd) > new Date() ? "🔥 Adicionar +31 Dias" : "🔥 Ativar Mensal"}
               </Button>
             </div>
           </div>
+
           </div>
         </div>
 
