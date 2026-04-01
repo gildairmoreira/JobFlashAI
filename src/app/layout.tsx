@@ -8,7 +8,9 @@ import Script from "next/script";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://jobflash.netlify.app"), // Define a URL base para metadados (OG, Twitter)
+  metadataBase: process.env.NEXT_PUBLIC_BASE_URL 
+    ? new URL(process.env.NEXT_PUBLIC_BASE_URL) 
+    : (process.env.NODE_ENV === 'development' ? new URL("http://localhost:3000") : undefined), // Define a URL base para metadados (OG, Twitter)
   title: {
     template: "%s - JobFlashAI",
     absolute: "JobFlashAI",
