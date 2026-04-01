@@ -80,6 +80,35 @@ body {
   }
 }
 
+@layer utilities {
+  .animate-bounce-subtle {
+    animation: bounce-subtle 3s ease-in-out infinite;
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Global Auth scrollbar removal */
+  .auth-no-scroll {
+    overflow: hidden !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .auth-no-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 #resumePreviewContent {
   font-family: Inter;
 }

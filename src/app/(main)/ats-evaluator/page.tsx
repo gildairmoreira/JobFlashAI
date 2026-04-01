@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import { resumeDataInclude } from "@/lib/types";
@@ -12,11 +13,15 @@ export const metadata: Metadata = {
 };
 
 export default async function AtsEvaluatorPage() {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     return null;
   }
+
+  const userId = session.user.id;
 
   // Fetch resumes and their ATS scores
   const [resumes, subscriptionLevel] = await Promise.all([

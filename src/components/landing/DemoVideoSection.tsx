@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Button } from "@/components/ui/button";
 
 const DemoVideoSection: React.FC = () => {
   return (
@@ -41,23 +42,23 @@ const DemoVideoSection: React.FC = () => {
               </div>
             </div>
 
-            {/* Application Screen - Placeholder for Video/Gif */}
-            <div className="relative w-full h-full bg-white rounded-[2.25rem] overflow-hidden flex flex-col items-center justify-center">
-               
-              <p className="text-stone-400 font-medium z-10 text-center px-4">
-                Coloque o vídeo/gif da aplicação aqui<br/>
-                <code className="text-xs bg-stone-100 rounded px-1 mt-2 block">{'<video src="/assets/demo.mp4" />'}</code>
+            {/* Application Screen - Placeholder for Video Link */}
+            <div className="relative w-full h-full bg-stone-50 rounded-[2.25rem] overflow-hidden flex flex-col items-center justify-center p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-6">
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-stone-900 mb-2">Veja na Prática</h3>
+              <p className="text-sm text-stone-500 mb-8 leading-relaxed">
+                Assista ao vídeo demonstrativo e descubra como o JobFlashAI transforma sua busca por emprego.
               </p>
-              
-              <video 
-                src="/assets/demo.mp4" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover z-20 pointer-events-none"
-                onError={(e) => (e.currentTarget.style.display = 'none')}
-              />
+              <Button asChild className="rounded-full px-8 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200">
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                  Assistir Demo
+                </a>
+              </Button>
             </div>
 
             {/* Floating Badges simulating the design */}

@@ -3,9 +3,17 @@
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { updateUserPlan, updateUserStatus, promoteToAdmin, demoteFromAdmin, addJobFitCredits } from "./actions";
+import { updateUserPlan, updateUserStatus, promoteToAdmin, demoteFromAdmin, addJobFitCredits, deleteUser } from "./actions";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface UserTableRowProps {
   user: any;
@@ -17,6 +25,26 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
   const { toast } = useToast();
   const [currentPlan, setCurrentPlan] = useState(user.planType);
   const [currentStatus, setCurrentStatus] = useState(user.status);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  async function handleDelete() {
+    startTransition(async () => {
+      try {
+        await deleteUser(user.userId);
+        toast({
+          title: "Usuário excluído",
+          description: "O usuário e todos os seus dados foram removidos permanentemente.",
+        });
+        setShowDeleteDialog(false);
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao excluir",
+          description: error.message || "Ocorreu um erro inesperado.",
+        });
+      }
+    });
+  }
 
   async function handlePlanChange(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -299,7 +327,58 @@ export default function UserTableRow({ user, adminRole }: UserTableRowProps) {
               Remover Admin
             </button>
           )}
+          {adminRole === "MASTER_ADMIN" && user.role !== "MASTER_ADMIN" && (
+            <div className="pt-2 mt-2 border-t border-stone-100 w-full flex justify-end">
+              <button
+                onClick={() => setShowDeleteDialog(true)}
+                disabled={isPending}
+                className="flex items-center gap-1.5 text-[10px] text-red-500 hover:text-red-700 font-bold uppercase tracking-wider transition-colors"
+                title="Excluir Usuário Permanentemente"
+              >
+                <Trash2 className="w-3 h-3" />
+                Excluir Conta
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Dialog de Confirmação de Exclusão */}
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <DialogContent className="sm:max-w-[425px] border-red-100 shadow-2xl">
+            <DialogHeader>
+              <div className="mx-auto w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <DialogTitle className="text-center text-xl font-bold text-stone-900">
+                Confirmar Exclusão?
+              </DialogTitle>
+              <DialogDescription className="text-center text-stone-500 pt-2">
+                Essa ação é <span className="font-bold text-red-600 uppercase">irreversível</span>. 
+                O usuário <strong>{user.firstName}</strong> e todos os seus currículos, 
+                assinaturas e transações serão apagados para sempre.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex sm:justify-center gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteDialog(false)}
+                disabled={isPending}
+                className="w-full sm:w-auto"
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isPending}
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 font-bold"
+              >
+                {isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Sim, Excluir Tudo
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </td>
     </tr>
   );

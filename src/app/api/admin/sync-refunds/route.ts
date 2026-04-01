@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
@@ -7,14 +8,17 @@ import { MercadoPagoConfig, Payment } from "mercadopago";
 // Detecta estornos (refunds), pagamentos rejeitados e atualiza o banco local
 export async function POST() {
   // Verifica se o usuário é admin
-  const { userId } = await auth();
-  if (!userId) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session || !session.user) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
 
+  const userId = session.user.id;
   const userSub = await prisma.userSubscription.findUnique({ where: { userId } });
-  const clerkUser = await currentUser();
-  const isMaster = clerkUser?.emailAddresses[0]?.emailAddress === "gildair457@gmail.com";
+  const isMaster = session.user.email === "gildair457@gmail.com";
   const isAdmin = isMaster || userSub?.role === "ADMIN" || userSub?.role === "MASTER_ADMIN";
 
   if (!isAdmin) {

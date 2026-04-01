@@ -1,16 +1,21 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
 // Retorna o status atual da assinatura e o currentPeriodEnd para comparação no client
 // Se o paymentId for fornecido, consulta ativamente a API do MP para feedback imediato do PIX
 export async function GET(req: Request) {
-  const { userId } = await auth();
-  if (!userId) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session || !session.user) {
     return NextResponse.json({ paid: false }, { status: 401 });
   }
 
+  const userId = session.user.id;
   const { searchParams } = new URL(req.url);
   const paymentId = searchParams.get("paymentId");
 
@@ -78,11 +83,9 @@ export async function GET(req: Request) {
 
             const amount = paymentDetails.transaction_amount ?? 0;
 
-            // Busca o nome e email reais do usuário logado via Clerk
-            // O MP não preenche o payer.first_name para PIX
-            const clerkUser = await currentUser();
-            const customerName = clerkUser ? `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() : (paymentDetails.payer?.first_name ?? "");
-            const customerEmail = clerkUser?.emailAddresses[0]?.emailAddress ?? paymentDetails.payer?.email ?? "";
+            // Busca o nome e email reais do usuário logado via Better Auth
+            const customerName = session.user.name || (paymentDetails.payer?.first_name ?? "");
+            const customerEmail = session.user.email || paymentDetails.payer?.email || "";
 
             // PASSO 1: Ativa o plano do usuário
             console.log(`[payment-status] Upserting UserSubscription...`);

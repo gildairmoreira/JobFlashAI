@@ -4,16 +4,21 @@ import { canDuplicateResume } from "@/lib/permissions";
 import prisma from "@/lib/prisma";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import { resumeDataInclude } from "@/lib/types";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 
 export async function deleteResume(id: string) {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     throw new Error("User not authenticated");
   }
+
+  const userId = session.user.id;
 
   const resume = await prisma.resume.findFirst({
     where: {
@@ -45,11 +50,15 @@ export async function deleteResume(id: string) {
 
 // Duplica um currículo existente com todas as seções e relações
 export async function duplicateResume(id: string) {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     throw new Error("User not authenticated");
   }
+
+  const userId = session.user.id;
 
   // Verificar permissão de plano
   const subscriptionLevel = await getUserSubscriptionLevel(userId);

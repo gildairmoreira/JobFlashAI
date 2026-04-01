@@ -1,13 +1,18 @@
 'use server';
 
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function createCheckoutSession(planType: "pro" | "monthly") {
-  const { userId } = await auth();
-  if (!userId) throw new Error('Usuário não autenticado');
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  const user = await currentUser();
-  const email = user?.emailAddresses[0]?.emailAddress;
+  if (!session || !session.user) {
+    throw new Error('Usuário não autenticado');
+  }
+
+  const email = session.user.email;
   if (!email) throw new Error('Email do usuário não encontrado');
 
   // Direciona o usuário para o nosso checkout transparente

@@ -11,9 +11,8 @@ import {
   generateWorkExperienceSchema,
   WorkExperience,
 } from "@/lib/validation";
-import { auth } from "@clerk/nextjs/server";
-
-
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 import { generateWithRetry } from "@/lib/gemini";
 import crypto from "crypto";
@@ -32,8 +31,12 @@ function generateCacheKey(systemMessage: string, userMessage: string): string {
 }
 
 export async function getUserAILimits() {
-  const { userId } = await auth();
-  if (!userId) return { exp: 0, summary: 0, custom: 0 };
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session || !session.user) return { exp: 0, summary: 0, custom: 0 };
+
+  const userId = session.user.id;
 
   const userUsage = await (prisma as any).userUsage.findUnique({
     where: { userId },
@@ -47,11 +50,15 @@ export async function getUserAILimits() {
 }
 
 export async function generateSummary(input: GenerateSummaryInput) {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     throw new Error("Não autorizado");
   }
+
+  const userId = session.user.id;
 
   const { success } = await ratelimit.limit(userId);
   if (!success) {
@@ -134,11 +141,15 @@ export async function generateSummary(input: GenerateSummaryInput) {
 export async function generateWorkExperience(
   input: GenerateWorkExperienceInput,
 ) {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     throw new Error("Unauthorized");
   }
+
+  const userId = session.user.id;
 
   const { success } = await ratelimit.limit(userId);
   if (!success) {
@@ -208,7 +219,7 @@ export async function generateWorkExperience(
 
   // 4. If Free User and not cached (actually performed work), increment usages
   // Actually, even if cached, they are "using" their perk.
-  if (isFreeUser) {
+  if (userId) {
       await (prisma as any).userUsage.upsert({
         where: { userId },
         update: { aiExperienceUses: { increment: 1 } },
@@ -226,11 +237,15 @@ export async function generateWorkExperience(
 }
 
 export async function generateCustomSection(input: { description: string }) {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     throw new Error("Não autorizado");
   }
+
+  const userId = session.user.id;
 
   const { success } = await ratelimit.limit(userId);
   if (!success) {

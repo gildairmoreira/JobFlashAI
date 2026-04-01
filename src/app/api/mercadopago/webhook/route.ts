@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import { MercadoPagoConfig, Payment } from "mercadopago";
-import { clerkClient } from "@clerk/nextjs/server";
 import crypto from "crypto";
 
 // Verifica a assinatura HMAC-SHA256 do Mercado Pago
@@ -101,10 +100,12 @@ export async function POST(req: Request) {
         return new Response("Payment ignored - missing reference", { status: 200 });
       }
 
-      // CORREÇÃO CRÍTICA: Usamos pipe (|) como separador para evitar conflito com underscores do Clerk userId
-      // Formato: "user_2abc123|pro" ou "user_2abc123|monthly"
+      // CORREÇÃO CRÍTICA: Usamos pipe (|) como separador para identificação segura
       const extRef = paymentDetails.external_reference;
       const pipeIdx = extRef.indexOf("|");
+      let userId: string;
+      let rawPlanType: string;
+
       if (pipeIdx === -1) {
         // Fallback: tenta o formato antigo com lastIndexOf underscore
         console.warn("Webhook MP: external_reference sem pipe, tentando formato legado:", extRef);
@@ -113,11 +114,11 @@ export async function POST(req: Request) {
           console.warn("Webhook MP: external_reference com formato inválido:", extRef);
           return new Response("Invalid external reference format", { status: 200 });
         }
-        var userId = extRef.substring(0, lastUnderscoreIdx);
-        var rawPlanType = extRef.substring(lastUnderscoreIdx + 1);
+        userId = extRef.substring(0, lastUnderscoreIdx);
+        rawPlanType = extRef.substring(lastUnderscoreIdx + 1);
       } else {
-        var userId = extRef.substring(0, pipeIdx);
-        var rawPlanType = extRef.substring(pipeIdx + 1);
+        userId = extRef.substring(0, pipeIdx);
+        rawPlanType = extRef.substring(pipeIdx + 1);
       }
       const planType = rawPlanType.toUpperCase() as "PRO" | "MONTHLY" | "FREE";
 
@@ -125,19 +126,20 @@ export async function POST(req: Request) {
       const amount = paymentDetails.transaction_amount ?? 0;
       const transactionId = paymentDetails.id?.toString() ?? "";
 
-      // Busca o nome e email reais do usuário pelo userId via Clerk
-      // O MP não preenche o payer.first_name no PIX
+      // Busca o nome e email reais do usuário pelo userId no banco de dados local (Better Auth)
       let customerName = paymentDetails.payer?.first_name ?? "";
       let customerEmail = paymentDetails.payer?.email ?? "";
       try {
-        const clerk = await clerkClient();
-        const clerkUser = await clerk.users.getUser(userId);
-        if (clerkUser) {
-          customerName = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || customerName;
-          customerEmail = clerkUser.emailAddresses[0]?.emailAddress ?? customerEmail;
+        // @ts-ignore - Caso o cliente Prisma ainda não tenha sido gerado com o novo schema no ambiente de lint
+        const localUser = await prisma.user.findUnique({
+          where: { id: userId }
+        });
+        if (localUser) {
+          customerName = localUser.name || customerName;
+          customerEmail = localUser.email || customerEmail;
         }
-      } catch (clerkErr) {
-        console.warn("Webhook MP: Não foi possível buscar usuário no Clerk:", clerkErr);
+      } catch (dbErr) {
+        console.warn("Webhook MP: Não foi possível buscar usuário no Banco de Dados:", dbErr);
       }
 
       console.log(`Webhook MP: userId=${userId} | plan=${planType} | status=${status}`);

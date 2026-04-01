@@ -4,7 +4,8 @@ import { canCreateResume, canUseCustomizations } from "@/lib/permissions";
 import prisma from "@/lib/prisma";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import { resumeSchema, ResumeValues } from "@/lib/validation";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { del, put } from "@vercel/blob";
 import path from "path";
 
@@ -16,11 +17,15 @@ export async function saveResume(values: ResumeValues) {
   const { photo, workExperiences, educations, ...resumeValues } =
     resumeSchema.parse(values);
 
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     throw new Error("User not authenticated");
   }
+
+  const userId = session.user.id;
 
   const subscriptionLevel = await getUserSubscriptionLevel(userId);
   if (!id) {

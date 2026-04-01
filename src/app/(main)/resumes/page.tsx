@@ -2,7 +2,8 @@ import { canCreateResume, canImportResume } from "@/lib/permissions";
 import prisma from "@/lib/prisma";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import { resumeDataInclude } from "@/lib/types";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { Metadata } from "next";
 import { BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,11 +20,15 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     return null;
   }
+
+  const userId = session.user.id;
 
   const [resumes, totalCount, subscriptionLevel, jobFitUsage] = await Promise.all([
     prisma.resume.findMany({

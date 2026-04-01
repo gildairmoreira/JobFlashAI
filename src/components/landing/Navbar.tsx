@@ -5,8 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { Home, Layers, FileText, User, Menu, X } from 'lucide-react';
-import logo from '@/assets/logos/logo.png';
-import { useUser } from '@clerk/nextjs';
+import logo from '@/assets/logo.png';
+import { useSession } from '@/lib/auth-client';
+import { UserDropdown } from '@/components/auth/UserDropdown';
 
 interface NavBarProps {
   className?: string;
@@ -16,7 +17,8 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
   const { scrollY } = useScroll();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { isSignedIn } = useUser();
+  const { data: session, isPending } = useSession();
+  const isSignedIn = !!session;
 
   useEffect(() => {
     const unsubscribe = scrollY.onChange((latest) => {
@@ -61,7 +63,7 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
             </Link>
 
             {/* Navigation Links - Desktop */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className={`hidden md:flex items-center gap-8 transition-all duration-500 ${(isForcedTransparent && !scrolled) ? 'opacity-0 scale-95 pointer-events-none absolute left-1/2 -translate-x-1/2' : 'opacity-100 scale-100 relative'}`}>
               {navItems.map((item) => (
                 <motion.a
                   key={item.label}
@@ -76,26 +78,28 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
             </div>
 
             {/* Login/App Button */}
-            <div className="hidden md:block">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                {isSignedIn ? (
+            <div className="hidden md:flex items-center gap-3">
+              {isPending ? (
+                 <div className="h-9 w-24 bg-stone-200 animate-pulse rounded-xl" />
+              ) : isSignedIn ? (
+                <div className="flex items-center gap-3">
                   <Link
                     href="/resumes"
-                    className="bg-stone-900 hover:bg-stone-800 text-white rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all flex items-center gap-2"
+                    className="bg-stone-900 hover:bg-stone-800 text-white rounded-xl px-5 py-2 text-sm font-semibold shadow-sm transition-all flex items-center gap-2"
                   >
-                    <FileText className="w-4 h-4" />
-                    Meus Currículos
+                    Meu Painel
                   </Link>
-                ) : (
-                  <Link
-                    href="/sign-in"
-                    className="bg-stone-900 hover:bg-stone-800 text-white rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all flex items-center gap-2"
-                  >
-                    <User className="w-4 h-4" />
-                    Entrar
-                  </Link>
-                )}
-              </motion.div>
+                  <UserDropdown />
+                </div>
+              ) : (
+                <Link
+                  href="/sign-in"
+                  className="bg-stone-900 hover:bg-stone-800 text-white rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all flex items-center gap-2"
+                >
+                  <User className="w-4 h-4" />
+                  Entrar
+                </Link>
+              )}
             </div>
 
             {/* Mobile Menu Button */}

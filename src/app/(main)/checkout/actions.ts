@@ -1,16 +1,23 @@
 'use server';
 
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { getGlobalSettings } from '@/app/(main)/billing/actions';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 import prisma from "@/lib/prisma";
 
 export async function createPixPayment(planType: "pro" | "monthly") {
-  const { userId } = await auth();
-  if (!userId) throw new Error('Usuário não autenticado');
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  const user = await currentUser();
-  const email = user?.emailAddresses[0]?.emailAddress;
+  if (!session || !session.user) {
+    throw new Error('Usuário não autenticado');
+  }
+
+  const userId = session.user.id;
+  const email = session.user.email;
+  
   if (!email) throw new Error('Email não encontrado');
   
   const settings = await getGlobalSettings();
@@ -27,7 +34,7 @@ export async function createPixPayment(planType: "pro" | "monthly") {
     payer: {
       email: email,
     },
-    external_reference: `${userId}|${planType}`, // Separador | para não conflitar com o underscore do Clerk userId
+    external_reference: `${userId}|${planType}`, // Separador | para identificação segura
   };
 
   try {
@@ -62,11 +69,16 @@ export async function createPixPayment(planType: "pro" | "monthly") {
 }
 
 export async function createCardPayment(formData: any, planType: "pro" | "monthly") {
-  const { userId } = await auth();
-  if (!userId) throw new Error('Usuário não autenticado');
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  const user = await currentUser();
-  const currentEmail = user?.emailAddresses[0]?.emailAddress;
+  if (!session || !session.user) {
+    throw new Error('Usuário não autenticado');
+  }
+
+  const userId = session.user.id;
+  const currentEmail = session.user.email;
   const finalEmail = currentEmail || formData.payer?.email;
 
   const settings = await getGlobalSettings();
@@ -89,7 +101,7 @@ export async function createCardPayment(formData: any, planType: "pro" | "monthl
           email: finalEmail,
           identification: formData.payer?.identification
         },
-        external_reference: `${userId}|${planType}`, // Separador | para não conflitar com o underscore do Clerk userId
+        external_reference: `${userId}|${planType}`, // Separador | para identificação segura
       },
       requestOptions: {
         idempotencyKey: crypto.randomUUID()

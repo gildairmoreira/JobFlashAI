@@ -1,24 +1,27 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-
 import { revalidatePath } from "next/cache";
 
 // Utility to verify if current user is an admin
 export async function verifyAdminAccess() {
-    const { userId } = await auth();
-    if (!userId) redirect("/sign-in");
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session || !session.user) {
+        redirect("/login");
+    }
+
+    const userId = session.user.id;
+    const email = session.user.email;
 
     const userSub = await prisma.userSubscription.findUnique({
         where: { userId },
     }) as any;
-
-    // Master Admin is hardcoded or set manually
-    const client = await clerkClient();
-    const currentUserObj = await client.users.getUser(userId);
-    const email = currentUserObj.emailAddresses[0]?.emailAddress;
 
     const isMasterAdmin = email === "gildair457@gmail.com";
     const isAdmin = userSub?.role === "ADMIN" || userSub?.role === "MASTER_ADMIN" || isMasterAdmin;
@@ -44,9 +47,10 @@ export async function getAdminDashboardData() {
     const adminData = await verifyAdminAccess();
 
     // Basic stats
-    const totalUsersDb = await (prisma.userSubscription as any).count();
+    // @ts-ignore
+    const totalUsersDb = await prisma.user.count();
 
-    // 1. Fetch Real Transactions (Mercado Pago based - Preserving 'caktoTransactionId' column to avoid dropping DB schema)
+    // 1. Fetch Real Transactions (Mercado Pago based)
     const allTransactions = await (prisma as any).transaction.findMany();
     const paidTransactions = allTransactions.filter((t: any) => t.status === "PAID");
     const pendingTransactions = allTransactions.filter((t: any) => t.status === "PENDING");
@@ -54,7 +58,6 @@ export async function getAdminDashboardData() {
     // Exact revenue from PAID transactions
     const totalRevenue = paidTransactions.reduce((acc: number, curr: any) => acc + curr.amount, 0);
 
-    // FIX: Using $transaction instead of transaction
     const [activeProPaid, activeMonthlyPaid, frozenOrBanned] = await prisma.$transaction([
         prisma.userSubscription.count({
             where: { planType: "PRO", status: "ACTIVE", caktoTransactionId: { not: null } }
@@ -88,7 +91,7 @@ export async function getAdminDashboardData() {
         revenue
     }));
 
-    // 3. Funnel Data (With Mocking)
+    // 3. Funnel Data
     const funnelEvents = await (prisma as any).analyticEvent.groupBy({
         by: ['event'],
         _count: { id: true }
@@ -102,50 +105,42 @@ export async function getAdminDashboardData() {
         { name: "Vendas Concluídas", value: paidTransactions.length }
     ];
 
-    // Basic legacy metrics
+    // Basic estimates
     const estimatedRevenue = (activeProPaid * 19.90) + (activeMonthlyPaid * 49.90);
 
-    // Fetch latest 50 users from Clerk as source of truth for all signups
-    const client = await clerkClient();
-    const clerkUserList = await client.users.getUserList({
-        limit: 50,
-        orderBy: "-created_at"
-    });
-
-    const userIds = clerkUserList.data.map(u => u.id);
-
-    // Fetch their corresponding DB records
-    const dbUsers = await (prisma.userSubscription as any).findMany({
-        where: { userId: { in: userIds } }
-    });
-
-    const totalUsers = clerkUserList.totalCount || totalUsersDb;
-
-    const recentUsers = clerkUserList.data.map(clerkObj => {
-        const u = dbUsers.find((db: any) => db.userId === clerkObj.id);
-
-        const now = Date.now();
-        const fifteenMinutesAgo = now - 15 * 60 * 1000;
-
-        let lastActiveMs = clerkObj.lastActiveAt || clerkObj.lastSignInAt || 0;
-        if (lastActiveMs > 0 && lastActiveMs < 1000000000000) {
-            lastActiveMs *= 1000;
+    // Fetch latest 50 users from Database (Better Auth source of truth)
+    // @ts-ignore
+    const usersList = await prisma.user.findMany({
+        take: 50,
+        orderBy: { createdAt: "desc" },
+        include: {
+            subscription: true,
+            sessions: {
+                take: 1,
+                orderBy: { updatedAt: "desc" }
+            }
         }
+    });
 
-        const isOnline = lastActiveMs > fifteenMinutesAgo;
+    const recentUsers = usersList.map((userObj: any) => {
+        const now = new Date();
+        const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+
+        const lastActiveDate = userObj.sessions[0]?.updatedAt || userObj.updatedAt || userObj.createdAt;
+        const isOnline = lastActiveDate > fifteenMinutesAgo;
 
         return {
-            userId: clerkObj.id,
-            planType: (u as any)?.planType || "FREE",
-            role: (u as any)?.role || "USER",
-            status: (u as any)?.status || "ACTIVE",
-            createdAt: (u as any)?.createdAt || new Date(clerkObj.createdAt),
-            lastActiveAt: lastActiveMs,
+            userId: userObj.id,
+            planType: userObj.subscription?.planType || "FREE",
+            role: userObj.subscription?.role || "USER",
+            status: userObj.subscription?.status || "ACTIVE",
+            createdAt: userObj.createdAt,
+            lastActiveAt: lastActiveDate.getTime(),
             isOnline,
-            email: clerkObj.emailAddresses[0]?.emailAddress || "Sem E-mail",
-            firstName: clerkObj.firstName || "",
-            lastName: clerkObj.lastName || "",
-            imageUrl: clerkObj.imageUrl || ""
+            email: userObj.email,
+            firstName: userObj.name.split(" ")[0] || "",
+            lastName: userObj.name.split(" ").slice(1).join(" ") || "",
+            imageUrl: userObj.image || ""
         }
     });
 
@@ -159,7 +154,7 @@ export async function getAdminDashboardData() {
     return {
         adminRole: adminData.role,
         stats: {
-            totalUsers,
+            totalUsers: totalUsersDb,
             activeProPaid,
             activeMonthlyPaid,
             frozenOrBanned,
@@ -200,7 +195,7 @@ export async function updateUserStatus(targetUserId: string, status: "ACTIVE" | 
 export async function updateUserPlan(targetUserId: string, newPlanType: "FREE" | "PRO" | "MONTHLY") {
     const adminData = await verifyAdminAccess();
 
-    // Determine current expiration based on new plan (optional, but good practice)
+    // Determine current expiration based on new plan
     let expirationDate: Date | null = null;
     if (newPlanType === "PRO") {
         expirationDate = new Date();
@@ -284,38 +279,49 @@ export async function demoteFromAdmin(targetUserId: string) {
     return { success: true };
 }
 
-// Global Settings Actions - Optimized for Windows dev-server locks
+export async function deleteUser(targetUserId: string) {
+    const adminData = await verifyAdminAccess();
+
+    if (adminData.role !== "MASTER_ADMIN") {
+        throw new Error("Somente o MASTER_ADMIN pode excluir usuários permanentemente.");
+    }
+
+    const target = await prisma.userSubscription.findUnique({ where: { userId: targetUserId } });
+    if (target?.role === "MASTER_ADMIN") {
+        throw new Error("Não é possível excluir outro MASTER_ADMIN.");
+    }
+
+    // Exclui o usuário (aciona gatilhos de cascade no banco de dados)
+    await prisma.user.delete({
+        where: { id: targetUserId }
+    });
+
+    revalidatePath("/billing");
+    return { success: true };
+}
+
+// Global Settings Actions
 export async function getGlobalSettings() {
-    // REMOVIDO: verifyAdminAccess() 
-    // Esta função deve ser acessível por qualquer pessoa (inclusive Landing Page) 
-    // para verificar status do sistema e preços.
-    
     try {
-        // Try standard access first
-        let settings = await (prisma as any).globalSetting?.findFirst({
+        let settings = await (prisma as any).globalSetting?.findUnique({
             where: { id: "global" }
         });
 
         if (!settings) {
-            // Fallback to raw query if model is missing from client or table is empty
-            const rawResults = await prisma.$queryRawUnsafe(`SELECT * FROM "global_settings" WHERE "id" = 'global' LIMIT 1`) as any[];
-            settings = rawResults[0];
-            
-            if (!settings) {
-                // Initialize if both fail
-                settings = await (prisma as any).globalSetting?.create({
-                    data: { id: "global" }
-                }) || await prisma.$executeRawUnsafe(`INSERT INTO "global_settings" ("id", "maintenanceMode", "proPrice", "monthlyPrice", "updatedAt") VALUES ('global', false, 19.90, 49.90, NOW()) RETURNING *`);
-            }
+            settings = await (prisma as any).globalSetting?.create({
+                data: { 
+                    id: "global",
+                    maintenanceMode: false,
+                    proPrice: 19.90,
+                    monthlyPrice: 49.90,
+                    maintenanceMessage: "Estamos em manutenção programada. Voltaremos em breve!"
+                }
+            });
         }
 
         return settings;
     } catch (e) {
-        console.error("Prisma Client out of sync, using raw query fallback", e);
-        const rawResults = await prisma.$queryRawUnsafe(`SELECT * FROM "global_settings" WHERE "id" = 'global' LIMIT 1`) as any[];
-        if (rawResults.length > 0) return rawResults[0];
-        
-        // Return defaults if everything fails to prevent UI crash
+        console.error("Erro ao buscar configurações globais:", e);
         return {
             id: "global",
             maintenanceMode: false,
@@ -335,28 +341,16 @@ export async function updateGlobalSettings(data: {
     await verifyAdminAccess();
 
     try {
-        const updated = await (prisma as any).globalSetting.upsert({
+        const updated = await (prisma as any).globalSetting.update({
             where: { id: "global" },
-            update: data,
-            create: { id: "global", ...data }
+            data: data
         });
         
         revalidatePath("/", "layout"); 
         return updated;
     } catch (e) {
-        // Raw query fallback for updates
-        const sets = Object.entries(data)
-            .map(([k, v]) => `"${k}" = ${typeof v === 'string' ? `'${v}'` : v}`)
-            .join(', ');
-        
-        await prisma.$executeRawUnsafe(`
-            UPDATE "global_settings" 
-            SET ${sets}, "updatedAt" = NOW() 
-            WHERE "id" = 'global'
-        `);
-
-        revalidatePath("/", "layout"); 
-        return { success: true };
+        console.error("Erro ao atualizar configurações globais:", e);
+        throw new Error("Falha ao atualizar configurações.");
     }
 }
 

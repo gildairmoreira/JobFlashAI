@@ -1,6 +1,6 @@
 import { getGlobalSettings } from "@/app/(main)/billing/actions";
-import { currentUser } from "@clerk/nextjs/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import CheckoutClient from "./CheckoutClient";
 import Link from "next/link";
@@ -8,17 +8,22 @@ import { HomeIcon } from "lucide-react";
 import prisma from "@/lib/prisma";
 
 export default async function CheckoutPage() {
-  const user = await currentUser();
-  if (!user) redirect("/sign-in");
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  const { userId } = await auth();
+  if (!session || !session.user) {
+    redirect("/login");
+  }
+
+  const userId = session.user.id;
 
   // Passa o currentPeriodEnd atual para o client usar como referência
   // para detectar uma NOVA aprovação (sem disparar se o plano já estava ativo)
-  const existingSub = userId ? await prisma.userSubscription.findUnique({
+  const existingSub = await prisma.userSubscription.findUnique({
     where: { userId },
     select: { currentPeriodEnd: true },
-  }) : null;
+  });
 
   const settings = await getGlobalSettings();
 

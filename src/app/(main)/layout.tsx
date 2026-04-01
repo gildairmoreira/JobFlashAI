@@ -1,13 +1,10 @@
 import PremiumModal from "@/components/premium/PremiumModal";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
-import { auth } from "@clerk/nextjs/server";
-//import dynamic from "next/dynamic";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import ClientNavbar from "./ClientNavbar";
 import SubscriptionLevelProvider from "./SubscriptionLevelProvider";
-
-import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-
 import RenewButton from "@/components/premium/RenewButton";
 import { getGlobalSettings } from "./billing/actions";
 import { Hammer } from "lucide-react";
@@ -18,18 +15,23 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     return null;
   }
+
+  const userId = session.user.id;
+  const userEmail = session.user.email;
+
   const userSubscriptionLevel = await getUserSubscriptionLevel(userId);
   const totalCount = await prisma.resume.count({ where: { userId } });
   const canCreate = canCreateResume(userSubscriptionLevel, totalCount);
   const canImport = canImportResume(userSubscriptionLevel);
 
-  const clerkUser = await currentUser();
-  const isMaster = clerkUser?.emailAddresses[0]?.emailAddress === "gildair457@gmail.com";
+  const isMaster = userEmail === "gildair457@gmail.com";
   const userSub = await prisma.userSubscription.findUnique({ where: { userId } });
   const isAdmin = isMaster || userSub?.role === "ADMIN" || userSub?.role === "MASTER_ADMIN";
   

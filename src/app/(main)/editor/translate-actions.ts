@@ -3,7 +3,8 @@
 import { generateWithRetry } from "@/lib/gemini";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import { ResumeValues } from "@/lib/validation";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
@@ -67,11 +68,15 @@ interface TranslatedFields {
 export async function translateResume(
   resumeData: ResumeValues
 ): Promise<TranslatedFields> {
-  const { userId } = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!userId) {
+  if (!session || !session.user) {
     throw new Error("Não autorizado");
   }
+
+  const userId = session.user.id;
 
   const { success } = await ratelimit.limit(userId);
   if (!success) {

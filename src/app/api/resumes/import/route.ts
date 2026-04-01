@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { canCreateResume, canImportResume } from '@/lib/permissions';
 import { getUserSubscriptionLevel } from '@/lib/subscription';
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
@@ -18,10 +19,15 @@ export async function POST(req: Request) {
   try {
     console.log('--- Iniciando processamento de PDF v5 (Native PDF.js) ---');
     
-    const { userId } = await auth();
-    if (!userId) {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const userId = session.user.id;
 
     const { success } = await ratelimit.limit(userId);
     if (!success) {

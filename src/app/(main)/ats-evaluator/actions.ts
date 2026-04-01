@@ -1,7 +1,8 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { generateWithRetry } from "@/lib/gemini";
 import { Resume, WorkExperience, Education, CustomSection } from "@prisma/client";
@@ -79,8 +80,15 @@ function serializeResumeToPlainText(
 }
 
 export async function evaluateResumeAts(resumeId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session || !session.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const userId = session.user.id;
 
   const { success } = await ratelimit.limit(userId);
   if (!success) {
@@ -128,17 +136,13 @@ Retorne APENAS um JSON válido, sem nenhum texto antes ou depois, sem markdown (
 CURRÍCULO PARA AVALIAR:
 ${plainText}`;
 
-  // Consider rate limiting logic here if necessary in the future
-  
   const responseText = await generateWithRetry(systemPrompt, userPrompt);
 
   let parsedDetails: AtsEvaluationDetails;
   try {
-    // Strip markdown formatting if the model accidentally includes it
     const cleanJson = responseText.replace(/```json\n?/g, "").replace(/```/g, "").trim();
     parsedDetails = JSON.parse(cleanJson);
 
-    // Basic validation
     if (parsedDetails.score_total === undefined || !parsedDetails.categorias) {
        throw new Error("Invalid structure");
     }
@@ -155,7 +159,7 @@ ${plainText}`;
       userId,
       resumeId: resume.id,
       score: parsedDetails.score_total,
-      details: parsedDetails as any, // Prisma doesn't strictly type JSON fields for TS inference easily
+      details: parsedDetails as any,
     },
     update: {
       score: parsedDetails.score_total,

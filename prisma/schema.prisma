@@ -14,9 +14,73 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  // JobFlash Relations
+  resumes       Resume[]
+  subscription  UserSubscription?
+  usage         UserUsage?
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
 model Resume {
   id     String @id @default(cuid())
   userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   title       String?
   description String?
@@ -123,6 +187,7 @@ enum SubStatus {
 model UserSubscription {
   id                      String   @id @default(cuid())
   userId                  String   @unique
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   role                    Role     @default(USER)
 
   planType                PlanType @default(FREE)
@@ -142,6 +207,7 @@ model UserSubscription {
 model UserUsage {
   id     String @id @default(cuid())
   userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   aiExperienceUses Int @default(0)
   aiSummaryUses    Int @default(0)
@@ -211,7 +277,7 @@ model Transaction {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  userSubscription   UserSubscription @relation(fields: [caktoTransactionId], references: [caktoTransactionId], map: "transaction_subscription_fkey")
+  userSubscription   UserSubscription @relation(fields: [caktoTransactionId], references: [caktoTransactionId], onDelete: Cascade, map: "transaction_subscription_fkey")
 
   @@map("transactions")
 }
