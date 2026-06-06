@@ -11,10 +11,19 @@ export const getUserSubscriptionLevel = cache(
       where: {
         userId,
       },
+      include: {
+        user: true,
+      }
     });
 
     if (!subscription) {
       return "free"; // Default if not found
+    }
+
+    // Admins bypass expiration and freezing
+    const isMaster = subscription.user.email === "gildair457@gmail.com";
+    if (isMaster || subscription.role === "ADMIN" || subscription.role === "MASTER_ADMIN") {
+      return "pro"; 
     }
 
     // Checking status
@@ -22,20 +31,16 @@ export const getUserSubscriptionLevel = cache(
       return "banned";
     }
 
-    if (subscription.status === "FROZEN") {
-      return "frozen";
-    }
-
     // Handle MONTHLY plan directly
     if (subscription.planType === ("MONTHLY" as PlanType)) {
         // If MONTHLY, check for expiration
         if (subscription.currentPeriodEnd && subscription.currentPeriodEnd < new Date()) {
-            // Expired -> auto freeze
+            // Expired -> change to FREE
             await prisma.userSubscription.update({
                 where: { id: subscription.id },
-                data: { status: "FROZEN" }
+                data: { planType: "FREE" }
             });
-            return "frozen";
+            return "free";
         }
         return "monthly";
     }
@@ -43,14 +48,18 @@ export const getUserSubscriptionLevel = cache(
     // Checking Expiration for PRO
     if (subscription.planType === "PRO") {
       if (subscription.currentPeriodEnd && subscription.currentPeriodEnd < new Date()) {
-        // Expired -> auto freeze
+        // Expired -> change to FREE
         await prisma.userSubscription.update({
           where: { id: subscription.id },
-          data: { status: "FROZEN" }
+          data: { planType: "FREE" }
         });
-        return "frozen";
+        return "free";
       }
       return subscription.planType.toLowerCase() as SubscriptionLevel;
+    }
+
+    if (subscription.status === "FROZEN") {
+      return "frozen";
     }
 
     return "free";

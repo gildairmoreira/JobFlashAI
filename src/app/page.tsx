@@ -3,7 +3,6 @@
 import React from 'react';
 import LandingPageLayout from './LandingPageLayout';
 import AIResumeHero from '@/components/landing/AIResumeHero';
-import DemoVideoSection from '@/components/landing/DemoVideoSection';
 import AIScrollSection from '@/components/landing/AIScrollSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import SocialProofSection from '@/components/landing/SocialProofSection';
@@ -18,7 +17,6 @@ export default function Home() {
       <section id="home">
         <AIResumeHero />
       </section>
-      <DemoVideoSection />
       <AIScrollSection />
       <section id="recursos">
         <FeaturesSection />
