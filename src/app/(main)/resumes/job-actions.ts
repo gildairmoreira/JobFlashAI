@@ -13,7 +13,10 @@ let ratelimit: Ratelimit | null = null;
 try {
   if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
     ratelimit = new Ratelimit({
-      redis: Redis.fromEnv(),
+      redis: new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL.replace(/^"|"$/g, ''),
+        token: process.env.UPSTASH_REDIS_REST_TOKEN.replace(/^"|"$/g, ''),
+      }),
       limiter: Ratelimit.slidingWindow(3, "1 m"),
       analytics: true,
     });
@@ -24,17 +27,27 @@ try {
 
 export async function createJobFitGeneration(sourceResumeId: string, jobDescription: string) {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    let session;
+    try {
+      session = await auth.api.getSession({
+        headers: await headers(),
+      });
+    } catch (e: any) {
+      return { success: false, error: "Auth falhou (fetch): " + e.message };
+    }
+
     if (!session || !session.user) return { success: false, error: "Unauthorized" };
     
     const userId = session.user.id;
 
     if (ratelimit) {
-      const { success } = await ratelimit.limit(userId);
-      if (!success) {
-        return { success: false, error: "LIMIT_REACHED_RATELIMIT" };
+      try {
+        const { success } = await ratelimit.limit(userId);
+        if (!success) {
+          return { success: false, error: "LIMIT_REACHED_RATELIMIT" };
+        }
+      } catch (e: any) {
+        return { success: false, error: "Upstash falhou (fetch): " + e.message };
       }
     }
 
