@@ -97,7 +97,6 @@ export default function ResumeItem({ resume, subscriptionLevel, isLocked = false
         overflow: visible !important;
         zoom: 1 !important;
         margin: 0 !important;
-        padding: 0 !important;
         box-shadow: none !important;
         border: none !important;
         background: white !important;
