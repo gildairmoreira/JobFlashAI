@@ -31,6 +31,20 @@ export async function runJobFitGeneration(generationId: string, userId: string) 
     }
 
     const jobTitleShortcut = generation.jobDescription.substring(0, 40).replace(/\n/g, " ");
+    
+    // 1.5 Extract Target Job Title
+    let targetJobTitle = originalResume.jobTitle;
+    try {
+      const sysPromptTitle = `Você é um extrator de dados. Extraia APENAS o NOME DO CARGO da vaga descrita. Responda APENAS com o nome do cargo (ex: "Estagiário de Administração", "Desenvolvedor Júnior"), sem pontos finais, aspas ou textos extras.`;
+      const userPromptTitle = `VAGA:\n${generation.jobDescription}\n\nCARGO:`;
+      const extracted = await generateWithRetry(sysPromptTitle, userPromptTitle);
+      if (extracted && extracted.length < 60) {
+        targetJobTitle = extracted.replace(/["\.]/g, '').trim();
+      }
+    } catch (e) {
+      console.error("Job title extraction failed", e);
+    }
+
     let finalSummary = originalResume.summary;
     let finalSkills = [...(originalResume.skills || [])];
 
@@ -160,7 +174,7 @@ RETORNE JSON:`;
         fontFamily: (originalResume as any).fontFamily || "lato",
         firstName: originalResume.firstName,
         lastName: originalResume.lastName,
-        jobTitle: originalResume.jobTitle,
+        jobTitle: targetJobTitle,
         city: originalResume.city,
         country: originalResume.country,
         phone: originalResume.phone,
