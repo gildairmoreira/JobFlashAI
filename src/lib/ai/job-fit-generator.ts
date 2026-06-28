@@ -120,7 +120,7 @@ ${hasSkills ? 'SKILLS ATUAIS DO CANDIDATO:\n' + finalSkills.join(", ") : 'O cand
 
 RETORNE JSON:`;
 
-      const responseText = await generateWithRetry(sysPrompt, userPrompt);
+      const responseText = await generateWithRetry(sysPrompt, userPrompt, undefined, undefined, "application/json");
       const cleanJson = responseText.replace(/```json\n?/g, "").replace(/```/g, "").trim();
       const suggestedSkills = JSON.parse(cleanJson);
       if (Array.isArray(suggestedSkills)) {

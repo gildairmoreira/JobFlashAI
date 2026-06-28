@@ -153,7 +153,7 @@ REGRAS DE EXTRAÇÃO:
 
     const userMessage = `Extraia os dados deste currículo:\n\n${pdfText}`;
 
-    const rawResponse = await generateWithRetry(systemInstruction, userMessage);
+    const rawResponse = await generateWithRetry(systemInstruction, userMessage, undefined, undefined, "application/json");
     
     // Limpar Markdown fences se a IA as incluir
     const cleanJson = rawResponse.replace(/```json/g, '').replace(/```/g, '').trim();

@@ -136,7 +136,7 @@ Retorne APENAS um JSON válido, sem nenhum texto antes ou depois, sem markdown (
 CURRÍCULO PARA AVALIAR:
 ${plainText}`;
 
-  const responseText = await generateWithRetry(systemPrompt, userPrompt);
+  const responseText = await generateWithRetry(systemPrompt, userPrompt, undefined, undefined, "application/json");
 
   let parsedDetails: AtsEvaluationDetails;
   try {

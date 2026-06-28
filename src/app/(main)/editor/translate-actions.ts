@@ -127,7 +127,7 @@ CRITICAL RULES:
 
   const userMessage = `Translate this resume data to English:\n${JSON.stringify(input, null, 2)}`;
 
-  const aiResponse = await generateWithRetry(systemMessage, userMessage);
+  const aiResponse = await generateWithRetry(systemMessage, userMessage, undefined, undefined, "application/json");
 
   // Limpa a resposta removendo possíveis blocos de código Markdown
   const cleaned = aiResponse
