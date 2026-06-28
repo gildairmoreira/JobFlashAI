@@ -122,26 +122,44 @@ export default function JobFitModal({
 
     startTransition(async () => {
       try {
-        const genId = await createJobFitGeneration(selectedResumeId, jobDescription);
-        setGenerationId(genId);
-        setStep("processing");
-      } catch (error: any) {
-        if (error.message === "LIMIT_REACHED") {
-          toast({
-            variant: "destructive",
-            title: "Limite Atingido",
-            description: "Você já atingiu seu limite de gerações Vaga-Fit para o seu plano atual. Acesse a área de faturamento para renovar ou melhorar seu plano.",
-          });
-        } else if (error.message === "UNAUTHORIZED_PLAN") {
-          onOpenChange(false);
-          premiumModal.setOpen(true);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Ocorreu um erro",
-            description: error.message || "Não foi possível iniciar a geração.",
-          });
+        const response = await createJobFitGeneration(selectedResumeId, jobDescription);
+        
+        if (!response.success) {
+          if (response.error === "LIMIT_REACHED") {
+            toast({
+              variant: "destructive",
+              title: "Limite Atingido",
+              description: "Você já atingiu seu limite de gerações Vaga-Fit para o seu plano atual. Acesse a área de faturamento para renovar ou melhorar seu plano.",
+            });
+          } else if (response.error === "UNAUTHORIZED_PLAN") {
+            onOpenChange(false);
+            premiumModal.setOpen(true);
+          } else if (response.error === "LIMIT_REACHED_RATELIMIT") {
+            toast({
+              variant: "destructive",
+              title: "Calma aí!",
+              description: "Você atingiu o limite de requisições. Tente novamente em 1 minuto.",
+            });
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Ocorreu um erro",
+              description: response.error || "Não foi possível iniciar a geração.",
+            });
+          }
+          return;
         }
+
+        if (response.generationId) {
+          setGenerationId(response.generationId);
+          setStep("processing");
+        }
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Ocorreu um erro",
+          description: error.message || "Falha na comunicação com o servidor.",
+        });
       }
     });
   };

@@ -23,68 +23,73 @@ try {
 }
 
 export async function createJobFitGeneration(sourceResumeId: string, jobDescription: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (!session || !session.user) throw new Error("Unauthorized");
-  
-  const userId = session.user.id;
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session || !session.user) return { success: false, error: "Unauthorized" };
+    
+    const userId = session.user.id;
 
-  if (ratelimit) {
-    const { success } = await ratelimit.limit(userId);
-    if (!success) {
-      throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
+    if (ratelimit) {
+      const { success } = await ratelimit.limit(userId);
+      if (!success) {
+        return { success: false, error: "LIMIT_REACHED_RATELIMIT" };
+      }
     }
+
+    const subscriptionLevel = await getUserSubscriptionLevel(userId);
+    if (!canGenerateForJob(subscriptionLevel)) {
+      return { success: false, error: "UNAUTHORIZED_PLAN" };
+    }
+
+    // Verificar limite dinâmico
+    const limit = getJobFitLimit(subscriptionLevel);
+
+    // TRANSACTIONAL FLOW: Prevenção de Condições de Corrida (Race Conditions)
+    // Garante que o usuário não ultrapasse o limite em requisições paralelas
+    const generation = await prisma.$transaction(async (tx) => {
+      // 1. Verificar limite dinâmico
+      const usage = await tx.userUsage.findUnique({ where: { userId } });
+      if (usage && usage.jobFitUsesThisMonth >= limit) {
+        throw new Error("LIMIT_REACHED");
+      }
+
+      // 2. Verificar propriedade do currículo original (Prevenção de IDOR)
+      const sourceResume = await tx.resume.findFirst({
+        where: { id: sourceResumeId, userId }
+      });
+      if (!sourceResume) {
+        throw new Error("Source resume not found or unauthorized");
+      }
+
+      // 3. Registrar o uso preventivamente (Atomic Update)
+      await tx.userUsage.upsert({
+        where: { userId },
+        create: { userId, jobFitUsesThisMonth: 1 },
+        update: { jobFitUsesThisMonth: { increment: 1 } },
+      });
+
+      // 4. Criar registro de geração
+      return await tx.jobFitGeneration.create({
+        data: {
+          userId,
+          sourceResumeId,
+          jobDescription,
+          status: "pending",
+          sectionsCompleted: 0,
+        },
+      });
+    });
+
+    // Disparar processamento em background
+    runJobFitGeneration(generation.id, userId).catch(console.error);
+
+    return { success: true, generationId: generation.id };
+  } catch (error: any) {
+    console.error("Erro no createJobFitGeneration:", error);
+    return { success: false, error: error.message || "Ocorreu um erro interno." };
   }
-
-  const subscriptionLevel = await getUserSubscriptionLevel(userId);
-  if (!canGenerateForJob(subscriptionLevel)) {
-    throw new Error("UNAUTHORIZED_PLAN");
-  }
-
-  // Verificar limite dinâmico
-  const limit = getJobFitLimit(subscriptionLevel);
-
-  // TRANSACTIONAL FLOW: Prevenção de Condições de Corrida (Race Conditions)
-  // Garante que o usuário não ultrapasse o limite em requisições paralelas
-  const generation = await prisma.$transaction(async (tx) => {
-    // 1. Verificar limite dinâmico
-    const usage = await tx.userUsage.findUnique({ where: { userId } });
-    if (usage && usage.jobFitUsesThisMonth >= limit) {
-      throw new Error("LIMIT_REACHED");
-    }
-
-    // 2. Verificar propriedade do currículo original (Prevenção de IDOR)
-    const sourceResume = await tx.resume.findFirst({
-      where: { id: sourceResumeId, userId }
-    });
-    if (!sourceResume) {
-      throw new Error("Source resume not found or unauthorized");
-    }
-
-    // 3. Registrar o uso preventivamente (Atomic Update)
-    await tx.userUsage.upsert({
-      where: { userId },
-      create: { userId, jobFitUsesThisMonth: 1 },
-      update: { jobFitUsesThisMonth: { increment: 1 } },
-    });
-
-    // 4. Criar registro de geração
-    return await tx.jobFitGeneration.create({
-      data: {
-        userId,
-        sourceResumeId,
-        jobDescription,
-        status: "pending",
-        sectionsCompleted: 0,
-      },
-    });
-  });
-
-  // Disparar processamento em background
-  runJobFitGeneration(generation.id, userId).catch(console.error);
-
-  return generation.id;
 }
 
 export async function getJobFitStatus(generationId: string) {
