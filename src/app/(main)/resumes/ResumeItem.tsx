@@ -25,7 +25,7 @@ import { mapToResumeValues } from "@/lib/utils";
 import { formatDate } from "date-fns";
 import { Copy, MoreVertical, Printer, Trash2, Lock, Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useRef, useState, useTransition } from "react";
+import React, { useRef, useState, useTransition, useCallback } from "react";
 import { useReactToPrint } from "react-to-print";
 import { deleteResume, duplicateResume } from "./actions";
 import usePremiumModal from "@/hooks/usePremiumModal";
@@ -41,9 +41,53 @@ export default function ResumeItem({ resume, subscriptionLevel, isLocked = false
   const router = useRouter();
   const premiumModal = usePremiumModal();
 
+  // Reset do zoom antes de imprimir para garantir PDF A4 correto
+  const onBeforePrint = useCallback(() => {
+    const el = contentRef.current;
+    if (el) {
+      el.dataset.originalZoom = el.style.zoom || "";
+      el.style.zoom = "1";
+    }
+    return Promise.resolve();
+  }, []);
+
+  const onAfterPrint = useCallback(() => {
+    const el = contentRef.current;
+    if (el && el.dataset.originalZoom !== undefined) {
+      el.style.zoom = el.dataset.originalZoom;
+      delete el.dataset.originalZoom;
+    }
+  }, []);
+
   const reactToPrintFn = useReactToPrint({
     contentRef,
     documentTitle: resume.title ?? "Currículo",
+    onBeforePrint,
+    onAfterPrint,
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      #resumePreviewContent {
+        zoom: 1 !important;
+        width: 794px !important;
+        min-height: 1123px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    `,
   });
 
   const wasUpdated = resume.updatedAt !== resume.createdAt;

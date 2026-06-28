@@ -52,7 +52,7 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
         }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <div className={`rounded-3xl px-6 py-3 transition-colors duration-300 ${ (scrolled && (!isForcedTransparent || scrollY.get() > 100)) ? 'bg-white/90 backdrop-blur-xl border border-stone-200 shadow-sm' : 'bg-transparent'}`}>
+        <div className={`rounded-3xl px-6 py-3 transition-colors duration-300 ${ (isOpen || (scrolled && (!isForcedTransparent || scrollY.get() > 100))) ? 'bg-white/95 backdrop-blur-xl border border-stone-200 shadow-sm' : 'bg-transparent'}`}>
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">

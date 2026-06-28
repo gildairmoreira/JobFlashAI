@@ -75,8 +75,47 @@ body {
 }
 
 @media print {
+  /* Reset do zoom inline para tamanho real A4 */
   #resumePreviewContent {
     zoom: 1 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Container do ResumePreview: remove aspect-ratio e restrições visuais */
+  #resumePreviewContent,
+  #resumePreviewContent * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Remove bordas, sombras e backgrounds de containers do currículo */
+  [class*="aspect-[210/297]"] {
+    aspect-ratio: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+  }
+
+  /* Esconde TUDO que não é o conteúdo do currículo */
+  header, footer, nav,
+  [role="dialog"] > div:first-child,
+  button, .no-print,
+  [class*="DialogHeader"],
+  [class*="border-t"],
+  [class*="overflow-y-auto"] > div > div:not(:has(#resumePreviewContent)) {
+    display: none !important;
+  }
+
+  /* Garante que o body e html não adicionem margens extras */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 
@@ -117,3 +156,4 @@ body {
   size: A4;
   margin: 0;
 }
+

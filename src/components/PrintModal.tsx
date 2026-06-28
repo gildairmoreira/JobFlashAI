@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,14 +30,57 @@ export default function PrintModal({
 }: Readonly<PrintModalProps>) {
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // Reset do zoom antes de imprimir — o zoom inline é calculado para o container do modal
+  // e precisa ser 1 para que o PDF saia em tamanho A4 real
+  const onBeforePrint = useCallback(() => {
+    const el = contentRef.current;
+    if (el) {
+      el.dataset.originalZoom = el.style.zoom || "";
+      el.style.zoom = "1";
+    }
+    return Promise.resolve();
+  }, []);
+
+  // Restaura o zoom original após imprimir para não quebrar a visualização no modal
+  const onAfterPrint = useCallback(() => {
+    const el = contentRef.current;
+    if (el && el.dataset.originalZoom !== undefined) {
+      el.style.zoom = el.dataset.originalZoom;
+      delete el.dataset.originalZoom;
+    }
+  }, []);
+
   const reactToPrintFn = useReactToPrint({
     contentRef,
     documentTitle: resumeTitle,
+    onBeforePrint,
+    onAfterPrint,
+    // Injeta CSS de print no iframe — garante A4 correto independente do dispositivo
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      #resumePreviewContent {
+        zoom: 1 !important;
+        width: 794px !important;
+        min-height: 1123px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    `,
   });
-
-  const handlePrint = () => {
-    reactToPrintFn();
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -47,7 +90,7 @@ export default function PrintModal({
             <DialogTitle>Visualizar e baixar currículo</DialogTitle>
             <div className="flex gap-2 w-full sm:w-auto">
               <Button 
-                onClick={handlePrint} 
+                onClick={() => reactToPrintFn()} 
                 className="flex-1 sm:flex-none flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Download className="size-4" />
@@ -70,4 +113,4 @@ export default function PrintModal({
       </DialogContent>
     </Dialog>
   );
-}
+}

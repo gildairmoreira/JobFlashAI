@@ -3,6 +3,7 @@
 import React from 'react';
 import LandingPageLayout from './LandingPageLayout';
 import AIResumeHero from '@/components/landing/AIResumeHero';
+import NavBar from '@/components/landing/Navbar';
 import AIScrollSection from '@/components/landing/AIScrollSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import SocialProofSection from '@/components/landing/SocialProofSection';
@@ -14,6 +15,7 @@ import Footer from '@/components/landing/Footer';
 export default function Home() {
   return (
     <LandingPageLayout>
+      <NavBar className="transparent-hero" />
       <section id="home">
         <AIResumeHero />
       </section>

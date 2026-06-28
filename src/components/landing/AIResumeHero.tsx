@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import NavBar from './Navbar';
-
 const AIResumeHero: React.FC = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
 
@@ -29,10 +27,7 @@ const AIResumeHero: React.FC = () => {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-[2]"></div>
       </div>
 
-      {/* Content Layer */}
-      <div className="relative z-10 flex flex-col flex-1">
-        <NavBar className="top-4 z-[50] transparent-hero" />
-        
+      <div className="relative z-10 flex flex-col flex-1">        
         <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-12 pt-24 md:pt-8">
           <motion.div
             className="w-full max-w-4xl mx-auto text-center"
