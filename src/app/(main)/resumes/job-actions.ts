@@ -47,7 +47,8 @@ export async function createJobFitGeneration(sourceResumeId: string, jobDescript
           return { success: false, error: "LIMIT_REACHED_RATELIMIT" };
         }
       } catch (e: any) {
-        return { success: false, error: "Upstash falhou (fetch): " + e.message };
+        console.warn("Upstash falhou (fetch), ignorando rate limit temporariamente:", e.message);
+        // Falha de forma tolerante (fail-open) para não quebrar a aplicação caso o Redis caia ou esteja mal configurado.
       }
     }
 
