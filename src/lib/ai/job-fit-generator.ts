@@ -56,16 +56,25 @@ Sua tarefa é ${hasSummary ? 'reescrever o Resumo Profissional do candidato' : '
 Retorne APENAS o texto do resumo ${hasSummary ? 'reescrito' : 'criado'} (3 a 5 linhas compactas). Nunca inclua saudações, aspas ou textos extras informais.
 
 REGRAS CRÍTICAS:
-1. TONE PROFISSIONAL: Escreva SEMPRE em primeira pessoa de forma BASTANTE natural e humana ("Desenvolvi", "Atuei", "Sou experiente"). NUNCA use frases impessoais ou 3ª pessoa, como "possui conhecimento em" ou "é um profissional".
-2. ESTRUTURA IDEAL: Inicie confirmando diretamente seu FIT. Exemplo de bom resumo: "Sou um Desenvolvedor Full Stack com sólida vivência em X e Y. Minha atuação é focada na otimização de interfaces..."
-3. PALAVRAS-CHAVE ATS: Você DEVE afirmar explicitamente que o candidato possui as habilidades técnicas e comportamentais cruciais que a vaga exige, inserindo as exatas palavras-chave da vaga de forma natural.`;
+1. TONE PROFISSIONAL: Escreva SEMPRE em primeira pessoa de forma BASTANTE natural e humana ("Desenvolvi", "Atuei", "Sou experiente"). NUNCA use frases impessoais ou 3ª pessoa.
+2. ESTRUTURA IDEAL: Inicie confirmando diretamente seu FIT. Exemplo de bom resumo: "Sou um Desenvolvedor Full Stack com sólida vivência em X e Y..."
+3. PALAVRAS-CHAVE ATS: Afirme explicitamente que o candidato possui as habilidades técnicas e comportamentais cruciais da vaga, inserindo as palavras-chave de forma natural.
+4. ZERO PLACEHOLDERS: NUNCA crie textos com colchetes (ex: [Nome do Curso]). Utilize APENAS os dados reais fornecidos nas Informações do Candidato. Se faltar algum dado, contorne redigindo o texto de forma que a informação não seja necessária. Não invente fatos.`;
+
+      const candidateContext = `
+INFORMAÇÕES REAIS DO CANDIDATO (USE PARA PREENCHER O RESUMO):
+- Cargo: ${originalResume.jobTitle || 'Não informado'}
+- Formação: ${originalResume.educations.map((e: any) => `${e.degree} em ${e.school}`).join('; ') || 'Não informada'}
+- Experiências principais: ${originalResume.workExperiences.map((e: any) => `${e.position} na ${e.company}`).join('; ') || 'Não informada'}
+- Habilidades: ${originalResume.skills.join(', ') || 'Não informadas'}`;
       
       const userPrompt = `VAGA:
 ${generation.jobDescription}
+${candidateContext}
 
-${hasSummary ? 'RESUMO ATUAL:\n' + originalResume.summary : 'O candidato não inseriu um resumo ainda. Crie um resumo impactante do zero focado na vaga.'}
+${hasSummary ? 'RESUMO ATUAL:\n' + originalResume.summary : 'O candidato não inseriu um resumo ainda. Crie um resumo impactante do zero focado na vaga utilizando APENAS os dados reais do candidato fornecidos acima.'}
 
-${hasSummary ? 'REESCREVA' : 'CRIE'} O RESUMO APLICANDO AS REGRAS (SEM PRIMEIRA PESSOA):`;
+${hasSummary ? 'REESCREVA' : 'CRIE'} O RESUMO APLICANDO AS REGRAS (USE PRIMEIRA PESSOA, SEM PLACEHOLDERS):`;
       
       finalSummary = await generateWithRetry(sysPrompt, userPrompt);
     } catch (error) {
@@ -86,7 +95,8 @@ REGRAS CRÍTICAS:
 1. Retorne APENAS bullet points (um tópico por linha, usando o modelo: - Texto).
 2. USE PRIMEIRA PESSOA de forma natural e corporativa. O candidato está contando o que fez. (ex: "Atuei na equipe", "Implementei"). Nunca seja robótico.
 3. COMECE COM VERBOS DE AÇÃO NO PASSADO OU PRESENTE ("Desenvolvi aplicações...", "Liderei projetos técnicos...", "Fui responsável pela arquitetura...").
-4. NÃO INVENTE tecnologias ou fatos que o candidato não citou. Apenas destaque e melhore as palavras do texto atual que fazem sentido para a vaga.`;
+4. NÃO INVENTE tecnologias ou fatos que o candidato não citou. Apenas destaque e melhore as palavras do texto atual que fazem sentido para a vaga.
+5. ZERO PLACEHOLDERS: NUNCA gere textos com colchetes (ex: [Mês/Ano] ou [Nome do Projeto]). Utilize apenas os dados fornecidos.`;
           
           const userPrompt = `VAGA ALVO:
 ${generation.jobDescription}
