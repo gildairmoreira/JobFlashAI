@@ -9,11 +9,18 @@ import { canGenerateForJob, getJobFitLimit } from "@/lib/permissions";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(3, "1 m"), // Limite mais restrito para processos pesados
-  analytics: true,
-});
+let ratelimit: Ratelimit | null = null;
+try {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    ratelimit = new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(3, "1 m"),
+      analytics: true,
+    });
+  }
+} catch (err) {
+  console.warn("Upstash Redis não configurado. Rate limiting desativado.");
+}
 
 export async function createJobFitGeneration(sourceResumeId: string, jobDescription: string) {
   const session = await auth.api.getSession({
@@ -23,9 +30,11 @@ export async function createJobFitGeneration(sourceResumeId: string, jobDescript
   
   const userId = session.user.id;
 
-  const { success } = await ratelimit.limit(userId);
-  if (!success) {
-    throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
+  if (ratelimit) {
+    const { success } = await ratelimit.limit(userId);
+    if (!success) {
+      throw new Error("Você atingiu o limite de requisições. Tente novamente em 1 minuto.");
+    }
   }
 
   const subscriptionLevel = await getUserSubscriptionLevel(userId);
@@ -40,9 +49,7 @@ export async function createJobFitGeneration(sourceResumeId: string, jobDescript
   // Garante que o usuário não ultrapasse o limite em requisições paralelas
   const generation = await prisma.$transaction(async (tx) => {
     // 1. Verificar limite dinâmico
-    // @ts-ignore
     const usage = await tx.userUsage.findUnique({ where: { userId } });
-    // @ts-ignore
     if (usage && usage.jobFitUsesThisMonth >= limit) {
       throw new Error("LIMIT_REACHED");
     }
@@ -56,17 +63,13 @@ export async function createJobFitGeneration(sourceResumeId: string, jobDescript
     }
 
     // 3. Registrar o uso preventivamente (Atomic Update)
-    // @ts-ignore
     await tx.userUsage.upsert({
       where: { userId },
-      // @ts-ignore
       create: { userId, jobFitUsesThisMonth: 1 },
-      // @ts-ignore
       update: { jobFitUsesThisMonth: { increment: 1 } },
     });
 
     // 4. Criar registro de geração
-    // @ts-ignore
     return await tx.jobFitGeneration.create({
       data: {
         userId,
@@ -92,7 +95,6 @@ export async function getJobFitStatus(generationId: string) {
 
   const userId = session.user.id;
 
-  // @ts-ignore
   const generation = await prisma.jobFitGeneration.findFirst({
     where: { id: generationId, userId },
     select: {
@@ -115,8 +117,6 @@ export async function getUserJobFitUsage() {
   
   const userId = session.user.id;
 
-  // @ts-ignore
   const usage = await prisma.userUsage.findUnique({ where: { userId } });
-  // @ts-ignore
   return usage?.jobFitUsesThisMonth ?? 0;
 }

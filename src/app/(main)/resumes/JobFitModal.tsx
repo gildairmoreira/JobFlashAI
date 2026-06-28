@@ -139,7 +139,7 @@ export default function JobFitModal({
           toast({
             variant: "destructive",
             title: "Ocorreu um erro",
-            description: "Não foi possível iniciar a geração.",
+            description: error.message || "Não foi possível iniciar a geração.",
           });
         }
       }
