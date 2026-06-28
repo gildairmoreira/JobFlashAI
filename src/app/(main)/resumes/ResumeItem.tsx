@@ -74,7 +74,7 @@ export default function ResumeItem({ resume, subscriptionLevel, isLocked = false
         padding: 0 !important;
         width: 210mm !important;
         background: white !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
@@ -88,15 +88,16 @@ export default function ResumeItem({ resume, subscriptionLevel, isLocked = false
         visibility: visible !important;
       }
       #resumePreviewContent {
-        position: fixed !important;
+        position: absolute !important;
         left: 0 !important;
         top: 0 !important;
         width: 210mm !important;
-        height: 297mm !important;
-        max-height: 297mm !important;
-        overflow: hidden !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
         zoom: 1 !important;
         margin: 0 !important;
+        padding: 0 !important;
         box-shadow: none !important;
         border: none !important;
         background: white !important;
