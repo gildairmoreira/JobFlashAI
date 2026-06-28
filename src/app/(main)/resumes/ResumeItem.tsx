@@ -66,26 +66,49 @@ export default function ResumeItem({ resume, subscriptionLevel, isLocked = false
     onAfterPrint,
     pageStyle: `
       @page {
-        size: A4;
+        size: 210mm 297mm;
         margin: 0;
       }
       html, body {
         margin: 0 !important;
         padding: 0 !important;
+        width: 210mm !important;
         background: white !important;
+        overflow: hidden !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
+      /* Esconde tudo por padrão */
+      body * {
+        visibility: hidden !important;
+      }
+      /* Mostra apenas o conteúdo do currículo */
+      #resumePreviewContent,
+      #resumePreviewContent * {
+        visibility: visible !important;
+      }
       #resumePreviewContent {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        max-height: 297mm !important;
+        overflow: hidden !important;
         zoom: 1 !important;
-        width: 794px !important;
-        min-height: 1123px !important;
         margin: 0 !important;
         box-shadow: none !important;
         border: none !important;
         background: white !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+      }
+      /* Remove aspect-ratio do container pai */
+      [class*="aspect-"] {
+        aspect-ratio: auto !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: none !important;
       }
     `,
   });

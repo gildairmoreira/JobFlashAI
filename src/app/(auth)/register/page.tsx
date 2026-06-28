@@ -10,10 +10,12 @@ import { User, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/resumes";
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   
@@ -26,7 +28,7 @@ export default function RegisterPage() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/resumes",
+        callbackURL: callbackUrl,
       });
     } catch (error) {
       console.error("Login Error:", error);
@@ -60,7 +62,7 @@ export default function RegisterPage() {
       }
 
       toast.success("Conta criada com sucesso! Redirecionando...");
-      router.push("/resumes");
+      router.push(callbackUrl);
       router.refresh();
     } catch (err) {
       console.error(err);
@@ -184,7 +186,7 @@ export default function RegisterPage() {
 
       <div className="text-center text-sm">
         <span className="text-stone-500 dark:text-stone-400">Já tem uma conta? </span>
-        <Link href="/login" className="font-semibold text-primary hover:underline transition-all">
+        <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-semibold text-primary hover:underline transition-all">
           Faça login.
         </Link>
       </div>

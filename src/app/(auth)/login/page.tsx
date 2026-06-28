@@ -10,10 +10,12 @@ import { ArrowRight, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/resumes";
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -24,7 +26,7 @@ export default function LoginPage() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/resumes",
+        callbackURL: callbackUrl,
       });
     } catch (error) {
       console.error("Login Error:", error);
@@ -55,7 +57,7 @@ export default function LoginPage() {
       }
 
       toast.success("Login realizado com sucesso!");
-      router.push("/resumes");
+      router.push(callbackUrl);
       router.refresh();
     } catch (err) {
       console.error(err);
@@ -162,7 +164,7 @@ export default function LoginPage() {
 
       <div className="text-center text-xs xl:text-sm">
         <span className="text-stone-500 dark:text-stone-400">Não tem uma conta? </span>
-        <Link href="/register" className="font-semibold text-primary hover:underline transition-all">
+        <Link href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-semibold text-primary hover:underline transition-all">
           Crie grátis.
         </Link>
       </div>

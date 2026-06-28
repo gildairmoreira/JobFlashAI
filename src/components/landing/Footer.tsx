@@ -12,11 +12,11 @@ const Footer: React.FC = () => {
     {
       title: 'Produto',
       links: [
-        { name: 'Recursos', href: '#' },
-        { name: 'Templates', href: '#' },
-        { name: 'Preços', href: '#' },
-        { name: 'Exemplos', href: '#' },
-        { name: 'Avaliações', href: '#' },
+        { name: 'Recursos', href: '/#recursos' },
+        { name: 'Templates', href: '/em-breve' },
+        { name: 'Preços', href: '/#precos' },
+        { name: 'Exemplos', href: '/em-breve' },
+        { name: 'Avaliações', href: '/#avaliacoes' },
       ],
     },
     {
@@ -42,9 +42,9 @@ const Footer: React.FC = () => {
   ];
 
   const socialLinks = [
-    { name: 'Twitter', icon: <Twitter className="w-5 h-5" />, href: '#' },
+    { name: 'Twitter', icon: <Twitter className="w-5 h-5" />, href: 'https://x.com/codegil' },
     { name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" />, href: 'https://www.linkedin.com/in/gildair-moreira/' },
-    { name: 'Instagram', icon: <Instagram className="w-5 h-5" />, href: '#' },
+    { name: 'Instagram', icon: <Instagram className="w-5 h-5" />, href: 'https://instagram.com/jobflashai' },
     { name: 'Email', icon: <Mail className="w-5 h-5" />, href: 'mailto:contato.gildair@gmail.com' },
   ];
 
@@ -101,7 +101,7 @@ const Footer: React.FC = () => {
               © {currentYear} JobFlashAI. Todos os direitos reservados.
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Powered by <Link href="https://www.instagram.com/gildairmoreira" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 transition-colors">Dev gil</Link>
+              Powered by <Link href="https://www.linkedin.com/in/gildair-moreira/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 transition-colors">Dev gil</Link>
             </p>
           </div>
 

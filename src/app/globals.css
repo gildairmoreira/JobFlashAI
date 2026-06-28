@@ -75,14 +75,36 @@ body {
 }
 
 @media print {
-  /* Reset do zoom inline para tamanho real A4 */
+  /* Esconde ABSOLUTAMENTE TUDO por padrão */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Mostra apenas o conteúdo do currículo e seus filhos */
+  #resumePreviewContent,
+  #resumePreviewContent * {
+    visibility: visible !important;
+  }
+
+  /* Posiciona o conteúdo no topo da página para impressão */
   #resumePreviewContent {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 794px !important;
+    height: 1123px !important;
+    max-height: 1123px !important;
+    overflow: hidden !important;
     zoom: 1 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Container do ResumePreview: remove aspect-ratio e restrições visuais */
+  /* Remove aspect-ratio do container pai para não interferir */
   #resumePreviewContent,
   #resumePreviewContent * {
     -webkit-print-color-adjust: exact !important;
@@ -92,28 +114,21 @@ body {
   /* Remove bordas, sombras e backgrounds de containers do currículo */
   [class*="aspect-[210/297]"] {
     aspect-ratio: auto !important;
-    width: 100% !important;
+    width: auto !important;
     height: auto !important;
+    overflow: visible !important;
     box-shadow: none !important;
     border: none !important;
-    background: white !important;
-  }
-
-  /* Esconde TUDO que não é o conteúdo do currículo */
-  header, footer, nav,
-  [role="dialog"] > div:first-child,
-  button, .no-print,
-  [class*="DialogHeader"],
-  [class*="border-t"],
-  [class*="overflow-y-auto"] > div > div:not(:has(#resumePreviewContent)) {
-    display: none !important;
+    background: transparent !important;
   }
 
   /* Garante que o body e html não adicionem margens extras */
   html, body {
     margin: 0 !important;
     padding: 0 !important;
+    width: 794px !important;
     background: white !important;
+    overflow: hidden !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
